@@ -1,5 +1,5 @@
-import { Button } from '@/renderer/src/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/renderer/src/components/ui/card'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
 
 const AuthPage = () => {
   return (

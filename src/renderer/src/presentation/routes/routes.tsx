@@ -7,8 +7,8 @@ import LessonPage from '../pages/Lesson'
 import NotebookPage from '../pages/Notebook'
 import SettingPage from '../pages/Setting'
 import WikiPage from '../pages/Wiki'
+import NotFoundPage from '../pages/Other'
 
-// Need to rename to .tsx since we're using JSX
 export const routes: RouteObject[] = [
   {
     path: '/auth',
@@ -41,6 +41,10 @@ export const routes: RouteObject[] = [
       {
         path: 'settings',
         Component: SettingPage,
+      },
+      {
+        path: '*',
+        Component: NotFoundPage,
       },
     ],
   },

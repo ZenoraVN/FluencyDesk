@@ -7,10 +7,16 @@ const reactPlugin = require('@vitejs/plugin-react')
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      watch: {}
+    }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      watch: {}
+    }
   },
   renderer: {
     resolve: {
@@ -18,6 +24,12 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [reactPlugin()]
+    plugins: [reactPlugin()],
+    server: {
+      hmr: true,
+      watch: {
+        usePolling: true
+      }
+    }
   }
 })
