@@ -1,12 +1,27 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { routes } from './presentation/routes'
-import './assets/base.css'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
+import HomePage from './presentation/pages/Home'
+import CoursePage from './presentation/pages/Course'
+import MainSidebar from './components/common/MainSidebar'
 
-function App(): JSX.Element {
-  const router = createBrowserRouter(routes)
-
+const AppLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <RouterProvider router={router} />
+    <div className="flex h-screen">
+      <MainSidebar />
+      <main className="flex-1 overflow-auto">{children}</main>
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <AppLayout>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/course/:courseId" element={<CoursePage />} />
+        </Routes>
+      </AppLayout>
+    </Router>
   )
 }
 

@@ -1,78 +1,73 @@
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
+import { courses } from './data'
+import { Badge } from '../../../components/ui/badge'
+import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
+  const navigate = useNavigate()
+
+  const handleCourseClick = (courseId: string) => {
+    navigate(`/course/${courseId}`)
+  }
+
   return (
     <div className="container py-6">
       <div className="mb-8">
-        <h1 className="mb-2 text-4xl font-bold">Welcome back!</h1>
-        <p className="text-xl text-muted-foreground">Continue your English learning journey</p>
+        <h1 className="mb-2 text-3xl font-bold">Welcome back!</h1>
+        <p className="text-lg text-muted-foreground">Continue your English learning journey</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Button variant="outline" className="justify-start">
-              Continue Last Lesson
-            </Button>
-            <Button variant="outline" className="justify-start">
-              Practice Speaking
-            </Button>
-            <Button variant="outline" className="justify-start">
-              Review Vocabulary
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Progress Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Progress Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <p className="mb-2">Daily Streak</p>
-                <div className="h-2 rounded-full bg-muted">
-                  <div className="h-full w-2/3 rounded-full bg-primary"></div>
+      {/* Available Courses */}
+      <div className="mt-6">
+        <h2 className="mb-4 text-xl font-semibold">Available Courses</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {courses.map((course) => (
+            <Card 
+              key={course.id} 
+              className="overflow-hidden cursor-pointer transition-colors hover:bg-muted/50"
+              onClick={() => handleCourseClick(course.id)}
+            >
+              <div className="relative">
+                <img
+                  src={course.image_urls[0]}
+                  alt={course.title}
+                  className="aspect-square w-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                  <div className="flex flex-wrap gap-1">
+                    {course.skills.map((skill) => (
+                      <Badge key={skill} variant="secondary" className="bg-white/20 text-xs text-white">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                <p className="mb-2">Weekly Goals</p>
-                <div className="h-2 rounded-full bg-muted">
-                  <div className="h-full w-1/2 rounded-full bg-primary"></div>
+              <CardHeader className="p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle className="line-clamp-2 text-base">{course.title}</CardTitle>
+                  <Badge variant="outline" className="text-xs">{course.band}</Badge>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="h-2 w-2 rounded-full bg-primary"></div>
-                <p className="text-sm">Completed Grammar Lesson</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="h-2 w-2 rounded-full bg-primary"></div>
-                <p className="text-sm">Practiced Speaking</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="h-2 w-2 rounded-full bg-primary"></div>
-                <p className="text-sm">Added New Vocabulary</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardHeader>
+              <CardContent className="p-3 pt-0">
+                <p className="line-clamp-2 text-xs text-muted-foreground">
+                  {course.overview}
+                </p>
+                <Button 
+                  size="sm" 
+                  className="mt-3 w-full text-sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleCourseClick(course.id)
+                  }}
+                >
+                  Start Learning
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+import React from 'react'
 import { RouteObject } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import AuthPage from '../pages/Auth'
@@ -7,45 +8,52 @@ import LessonPage from '../pages/Lesson'
 import NotebookPage from '../pages/Notebook'
 import SettingPage from '../pages/Setting'
 import WikiPage from '../pages/Wiki'
-import NotFoundPage from '../pages/Other'
+import ErrorBoundary from '../../components/common/ErrorBoundary'
+import NotFoundPage from '../pages/Other/NotFoundPage'
 
 export const routes: RouteObject[] = [
   {
-    path: '/auth',
-    Component: AuthPage,
-  },
-  {
     path: '/',
-    Component: MainLayout,
+    errorElement: <ErrorBoundary />,
     children: [
       {
-        index: true,
-        Component: HomePage,
+        path: 'auth',
+        element: <AuthPage />
       },
       {
-        path: 'courses',
-        Component: CoursePage,
-      },
-      {
-        path: 'lessons/:lessonId',
-        Component: LessonPage,
-      },
-      {
-        path: 'notebook',
-        Component: NotebookPage,
-      },
-      {
-        path: 'wiki',
-        Component: WikiPage,
-      },
-      {
-        path: 'settings',
-        Component: SettingPage,
-      },
-      {
-        path: '*',
-        Component: NotFoundPage,
-      },
-    ],
+        element: <MainLayout />,
+        children: [
+          {
+            index: true,
+            element: <HomePage />
+          },
+          {
+            path: 'courses',
+            element: <CoursePage />
+          },
+          {
+            path: 'lessons/:lessonId',
+            element: <LessonPage />
+          },
+          {
+            path: 'notebook',
+            element: <NotebookPage />
+          },
+          {
+            path: 'wiki',
+            element: <WikiPage />
+          },
+          {
+            path: 'settings',
+            element: <SettingPage />
+          }
+        ]
+      }
+    ]
   },
+  // Handle 404s separately from other errors
+  {
+    path: '*',
+    element: <NotFoundPage />
+  }
 ]
