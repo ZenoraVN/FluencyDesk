@@ -33,36 +33,40 @@ const MainSidebar = () => {
 
   const navItems = [
     { path: '/', icon: Home, label: 'Trang chủ' },
-    { path: '/courses', icon: GraduationCap, label: 'Khóa học' },
+    { path: '/favorite', icon: GraduationCap, label: 'Khóa học' },
     { path: '/notebook', icon: Book, label: 'Sổ tay' },
     { path: '/settings', icon: Settings, label: 'Cài đặt' },
   ]
 
   return (
-    <nav className="w-72 border-r border-border bg-card p-6 flex flex-col h-screen">
+    <nav className="flex h-screen w-72 flex-col border-r border-[#52aaa5]/10 bg-[#f6f6f0] p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Fluency</h1>
+        <h1 className="text-3xl font-bold text-[#2D3748]">Fluency</h1>
         <div className="mt-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="h-5 w-5 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#52aaa5]/10">
+            <User className="h-5 w-5 text-[#52aaa5]" />
           </div>
           <div>
-            <p className="font-medium">{userData.name}</p>
-            <p className="text-sm text-muted-foreground">{userData.email}</p>
+            <p className="font-medium text-[#2D3748]">{userData.name}</p>
+            <p className="text-sm text-[#718096]">{userData.email}</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="space-y-2 flex-1">
+      <div className="flex-1 space-y-2">
         {navItems.map((item) => (
           <Link key={item.path} to={item.path}>
             <Button
               variant={isActive(item.path) ? 'secondary' : 'ghost'}
-              className="w-full justify-start gap-3 text-base py-6"
+              className={`w-full justify-start gap-3 rounded-2xl py-6 text-base transition-colors ${
+                isActive(item.path)
+                  ? 'bg-[#52aaa5] text-white hover:bg-[#52aaa5]/90'
+                  : 'text-[#2D3748] hover:bg-[#52aaa5]/10'
+              }`}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className={`h-5 w-5 ${isActive(item.path) ? 'text-white' : 'text-[#52aaa5]'}`} />
               {item.label}
             </Button>
           </Link>
@@ -70,34 +74,40 @@ const MainSidebar = () => {
       </div>
 
       {/* User Stats */}
-      <div className="mb-6 p-4 bg-primary/5 rounded-lg">
-        <div className="flex justify-between mb-2">
-          <span className="text-sm">Khóa học đã hoàn thành</span>
-          <span className="font-medium">{userData.progress.coursesCompleted}</span>
+      <div className="mb-6 rounded-2xl bg-[#52aaa5]/5 p-4">
+        <div className="mb-2 flex justify-between">
+          <span className="text-sm text-[#2D3748]">Khóa học đã hoàn thành</span>
+          <span className="font-medium text-[#52aaa5]">{userData.progress.coursesCompleted}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-sm">Chuỗi ngày học</span>
-          <span className="font-medium">{userData.progress.currentStreak} ngày</span>
+          <span className="text-sm text-[#2D3748]">Chuỗi ngày học</span>
+          <span className="font-medium text-[#52aaa5]">{userData.progress.currentStreak} ngày</span>
         </div>
       </div>
 
       {/* Account Actions */}
       <div className="space-y-2">
-        <Button variant="ghost" className="w-full justify-start gap-3 text-base">
-          <UserPlus className="h-5 w-5" />
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start gap-3 rounded-2xl text-base text-[#2D3748] hover:bg-[#52aaa5]/10"
+        >
+          <UserPlus className="h-5 w-5 text-[#52aaa5]" />
           Chuyển tài khoản
         </Button>
-        <Button variant="ghost" className="w-full justify-start gap-3 text-base text-destructive">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start gap-3 rounded-2xl text-base text-red-500 hover:bg-red-50"
+        >
           <LogOut className="h-5 w-5" />
           Đăng xuất
         </Button>
       </div>
 
       {/* Footer Info */}
-      <div className="mt-6 pt-4 border-t border-border">
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="mt-6 border-t border-[#52aaa5]/10 pt-4">
+        <div className="flex items-center justify-between text-sm text-[#718096]">
           <div className="flex items-center gap-1">
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4 text-[#52aaa5]" />
             <span>Đồng bộ {userData.lastSync}</span>
           </div>
           <span>{userData.version}</span>

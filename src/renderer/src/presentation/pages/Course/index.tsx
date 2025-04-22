@@ -2,12 +2,11 @@ import { Badge } from '../../../components/ui/badge'
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
 import { useParams } from 'react-router-dom'
-import { courses } from '../Home/data'
-import { Course } from '../Home/data'
+import { courseDetail } from './data'
 
 const CoursePage = () => {
   const { courseId } = useParams()
-  const course = courses.find((c) => c.id === courseId) as Course
+  const course = courseId === courseDetail.id ? courseDetail : null
 
   if (!course) {
     return (
@@ -70,7 +69,7 @@ const CoursePage = () => {
             </div>
             <div className="flex gap-8">
               <div>
-                <p className="text-2xl font-bold">0/{course.lessons?.length || 0}</p>
+                <p className="text-2xl font-bold">0/{course.lessons.length}</p>
                 <p className="text-sm text-muted-foreground">Lessons Completed</p>
               </div>
               <div>
@@ -87,53 +86,51 @@ const CoursePage = () => {
       </Card>
 
       {/* Course Content */}
-      {course.lessons && (
-        <div>
-          <h2 className="mb-6 text-2xl font-semibold">Course Content</h2>
-          <div className="space-y-4">
-            {course.lessons.map((lesson) => (
-              <Card key={lesson.id} className="transition-colors hover:bg-muted/50">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="mb-1 flex items-center gap-3">
-                        <Badge variant="outline" className="h-6 w-6 justify-center rounded-full p-0">
-                          {lesson.sequence}
-                        </Badge>
-                        <CardTitle className="text-lg">{lesson.title}</CardTitle>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{lesson.overview}</p>
-                    </div>
-                    {lesson.questions && (
-                      <Badge variant="secondary" className="shrink-0">
-                        {lesson.questions.length} questions
+      <div>
+        <h2 className="mb-6 text-2xl font-semibold">Course Content</h2>
+        <div className="space-y-4">
+          {course.lessons.map((lesson) => (
+            <Card key={lesson.id} className="transition-colors hover:bg-muted/50">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="mb-1 flex items-center gap-3">
+                      <Badge variant="outline" className="h-6 w-6 justify-center rounded-full p-0">
+                        {lesson.sequence}
                       </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex -space-x-2">
-                        {[...Array(3)].map((_, i) => (
-                          <div
-                            key={i}
-                            className="h-8 w-8 rounded-full border-2 border-background bg-muted"
-                          />
-                        ))}
-                      </div>
-                      <p className="text-sm text-muted-foreground">+20 students completed</p>
+                      <CardTitle className="text-lg">{lesson.title}</CardTitle>
                     </div>
-                    <Button variant="outline" size="sm">
-                      Start Lesson
-                    </Button>
+                    <p className="text-sm text-muted-foreground">{lesson.overview}</p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  {lesson.questions && lesson.questions.length > 0 && (
+                    <Badge variant="secondary" className="shrink-0">
+                      {lesson.questions.length} questions
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex -space-x-2">
+                      {[...Array(3)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-8 w-8 rounded-full border-2 border-background bg-muted"
+                        />
+                      ))}
+                    </div>
+                    <p className="text-sm text-muted-foreground">+20 students completed</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Start Lesson
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }
