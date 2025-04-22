@@ -3,15 +3,13 @@ import MainSidebar from '../../components/common/MainSidebar'
 
 const MainLayout = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="flex min-h-screen">
-        <MainSidebar />
-        
-        {/* Main content */}
-        <div className="flex-1">
-          <Outlet />
-        </div>
-      </main>
+    <div className="flex min-h-screen bg-background">
+      <MainSidebar />
+      
+      {/* Main content */}
+      <div className="flex-1 pl-72">
+        <Outlet />
+      </div>
     </div>
   )
 }

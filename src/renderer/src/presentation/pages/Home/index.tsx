@@ -10,81 +10,96 @@ const HomePage = () => {
     navigate(`/course/${courseId}`)
   }
 
+  const generateRandomShapes = () => {
+    const shapes = []
+    // Generate 50 random shapes
+    for (let i = 0; i < 50; i++) {
+      const size = Math.floor(Math.random() * 40) + 2 // 2px to 42px
+      const opacity = Math.floor(Math.random() * 15) + 3 // 3% to 18%
+      const left = Math.floor(Math.random() * 100)
+      const top = Math.floor(Math.random() * 100)
+      const rotation = Math.floor(Math.random() * 360)
+      const isVertical = Math.random() > 0.5
+      const isBorder = Math.random() > 0.8
+
+      shapes.push(
+        <div
+          key={i}
+          className={`absolute ${
+            isVertical ? `h-${size} w-2` : `h-2 w-${size}`
+          } rounded-full ${
+            isBorder
+              ? `border border-[#52aaa5]/${opacity}`
+              : `bg-[#52aaa5]/${opacity}`
+          }`}
+          style={{
+            left: `${left}%`,
+            top: `${top}%`,
+            transform: `rotate(${rotation}deg)`,
+          }}
+        />
+      )
+    }
+    return shapes
+  }
+
   return (
     <div className="relative min-h-screen bg-[#f6f6f0] p-6">
       {/* Decorative Background Elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Top right section */}
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#52aaa5]/10" />
-        <div className="absolute right-40 top-40 h-32 w-32 rounded-full bg-[#52aaa5]/5" />
-        <div className="absolute right-96 top-20 h-24 w-24 rounded-3xl bg-[#52aaa5]/8 transform rotate-45" />
-        <div className="absolute right-1/4 top-32 h-16 w-16 rounded-lg bg-[#52aaa5]/6 transform -rotate-12" />
-        <div className="absolute right-80 top-60 h-20 w-3 rounded-full bg-[#52aaa5]/7" />
-        <div className="absolute right-60 top-28 h-28 w-28 rounded-2xl bg-[#52aaa5]/4 transform rotate-30" />
-        <div className="absolute right-32 top-48 h-2 w-20 rounded-full bg-[#52aaa5]/9" />
+        {/* Dynamic random shapes */}
+        {generateRandomShapes()}
         
-        {/* Top left section */}
-        <div className="absolute left-20 top-20 h-40 w-40 rounded-2xl bg-[#52aaa5]/6 transform rotate-15" />
-        <div className="absolute left-60 top-40 h-24 w-24 rounded-full bg-[#52aaa5]/4" />
-        <div className="absolute left-40 top-60 h-3 w-20 rounded-full bg-[#52aaa5]/8" />
-        <div className="absolute left-80 top-32 h-16 w-16 rounded-lg bg-[#52aaa5]/5 transform rotate-45" />
-        <div className="absolute left-32 top-48 h-32 w-32 rounded-full bg-[#52aaa5]/3" />
-        <div className="absolute left-1/4 top-24 h-20 w-2 rounded-full bg-[#52aaa5]/7 transform -rotate-30" />
+        {/* Large focal points */}
+        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-[#52aaa5]/5" />
+        <div className="absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-[#52aaa5]/7" />
+        <div className="absolute right-1/4 top-1/4 h-72 w-72 rounded-3xl bg-[#52aaa5]/4 transform rotate-45" />
+        <div className="absolute left-1/3 bottom-1/3 h-64 w-64 rounded-full bg-[#52aaa5]/6" />
         
-        {/* Bottom left section */}
-        <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-3xl bg-[#52aaa5]/5 transform rotate-12" />
-        <div className="absolute bottom-20 left-32 h-32 w-32 rounded-full bg-[#52aaa5]/10" />
-        <div className="absolute bottom-40 left-60 h-20 w-20 rounded-lg bg-[#52aaa5]/7 transform -rotate-12" />
-        <div className="absolute bottom-60 left-40 h-16 w-3 rounded-full bg-[#52aaa5]/9" />
-        <div className="absolute bottom-28 left-48 h-24 w-24 rounded-2xl bg-[#52aaa5]/4 transform -rotate-15" />
-        <div className="absolute bottom-1/4 left-1/4 h-28 w-2 rounded-full bg-[#52aaa5]/6" />
+        {/* Medium elements */}
+        <div className="absolute right-1/2 top-1/2 h-48 w-48 rounded-2xl bg-[#52aaa5]/8 transform -rotate-15" />
+        <div className="absolute left-2/3 bottom-1/4 h-40 w-40 rounded-full bg-[#52aaa5]/5" />
+        <div className="absolute right-1/3 top-2/3 h-36 w-36 rounded-3xl bg-[#52aaa5]/7 transform rotate-30" />
+        <div className="absolute left-1/4 top-1/3 h-32 w-32 rounded-2xl bg-[#52aaa5]/4 transform -rotate-45" />
         
-        {/* Bottom right section */}
-        <div className="absolute -bottom-10 right-20 h-36 w-36 rounded-2xl bg-[#52aaa5]/4 transform rotate-30" />
-        <div className="absolute bottom-40 right-40 h-24 w-24 rounded-full bg-[#52aaa5]/6" />
-        <div className="absolute bottom-60 right-60 h-3 w-16 rounded-full bg-[#52aaa5]/8" />
-        <div className="absolute bottom-32 right-28 h-20 w-20 rounded-lg bg-[#52aaa5]/5 transform -rotate-20" />
-        <div className="absolute bottom-48 right-48 h-16 w-16 rounded-full bg-[#52aaa5]/7" />
-        <div className="absolute bottom-1/3 right-1/3 h-2 w-24 rounded-full bg-[#52aaa5]/9" />
-        
-        {/* Middle area elements */}
-        <div className="absolute right-1/4 top-1/3 h-40 w-40 rounded-2xl bg-[#52aaa5]/5 transform -rotate-15" />
-        <div className="absolute left-1/3 top-1/2 h-36 w-36 rounded-full bg-[#52aaa5]/6" />
-        <div className="absolute right-1/3 bottom-1/3 h-28 w-28 rounded-3xl bg-[#52aaa5]/8 transform rotate-30" />
-        <div className="absolute left-1/2 top-1/3 h-20 w-3 rounded-full bg-[#52aaa5]/7" />
-        <div className="absolute right-1/2 bottom-1/2 h-3 w-24 rounded-full bg-[#52aaa5]/5" />
-        <div className="absolute left-2/5 top-2/5 h-24 w-24 rounded-2xl bg-[#52aaa5]/4 transform rotate-12" />
-        <div className="absolute right-2/5 bottom-2/5 h-32 w-32 rounded-full bg-[#52aaa5]/3" />
-        
-        {/* Scattered elements */}
-        <div className="absolute left-1/4 top-1/4 h-4 w-4 rounded-full bg-[#52aaa5]/20" />
-        <div className="absolute right-1/3 bottom-1/4 h-6 w-6 rounded-full bg-[#52aaa5]/15" />
-        <div className="absolute left-1/3 top-2/3 h-5 w-5 rounded-full bg-[#52aaa5]/10" />
-        <div className="absolute right-1/4 top-1/2 h-8 w-8 rounded-lg bg-[#52aaa5]/12 transform rotate-45" />
-        <div className="absolute left-2/3 bottom-1/3 h-10 w-10 rounded-xl bg-[#52aaa5]/7" />
-        <div className="absolute right-2/3 top-2/3 h-6 w-6 rounded-full bg-[#52aaa5]/9" />
-        <div className="absolute left-3/4 top-1/4 h-7 w-7 rounded-lg bg-[#52aaa5]/8" />
-        <div className="absolute right-3/4 bottom-1/4 h-5 w-5 rounded-full bg-[#52aaa5]/11" />
+        {/* Small elements */}
+        <div className="absolute right-1/4 bottom-2/3 h-24 w-24 rounded-full bg-[#52aaa5]/9" />
+        <div className="absolute left-1/2 top-2/5 h-20 w-20 rounded-2xl bg-[#52aaa5]/6 transform rotate-15" />
+        <div className="absolute right-2/5 bottom-1/2 h-16 w-16 rounded-full bg-[#52aaa5]/8" />
+        <div className="absolute left-3/4 top-1/4 h-12 w-12 rounded-xl bg-[#52aaa5]/5 transform -rotate-30" />
         
         {/* Border elements */}
-        <div className="absolute left-40 top-40 h-3 w-12 rounded-full bg-[#52aaa5]/10" />
-        <div className="absolute right-60 bottom-60 h-12 w-3 rounded-full bg-[#52aaa5]/10" />
-        <div className="absolute left-1/2 top-1/4 h-16 w-16 rounded-full border-2 border-[#52aaa5]/10" />
-        <div className="absolute right-1/2 bottom-1/4 h-20 w-20 rounded-2xl border-2 border-[#52aaa5]/8" />
-        <div className="absolute left-1/4 bottom-1/2 h-12 w-12 rounded-full border border-[#52aaa5]/12" />
-        <div className="absolute right-1/4 top-2/3 h-14 w-14 rounded-2xl border border-[#52aaa5]/6" />
-        <div className="absolute left-2/3 top-1/3 h-18 w-18 rounded-full border-2 border-[#52aaa5]/7" />
-        <div className="absolute right-2/3 bottom-2/3 h-16 w-16 rounded-2xl border border-[#52aaa5]/9" />
+        <div className="absolute right-1/3 top-1/3 h-40 w-40 rounded-full border-4 border-[#52aaa5]/10" />
+        <div className="absolute left-2/3 bottom-2/3 h-32 w-32 rounded-2xl border-2 border-[#52aaa5]/15" />
+        <div className="absolute right-2/3 top-2/3 h-24 w-24 rounded-full border-3 border-[#52aaa5]/8" />
+        <div className="absolute left-1/3 bottom-1/3 h-20 w-20 rounded-xl border border-[#52aaa5]/12" />
         
-        {/* Thin lines */}
-        <div className="absolute left-1/3 top-1/4 h-2 w-24 rounded-full bg-[#52aaa5]/4 transform rotate-45" />
-        <div className="absolute right-1/3 bottom-1/4 h-24 w-2 rounded-full bg-[#52aaa5]/4 transform -rotate-45" />
-        <div className="absolute left-2/3 top-2/3 h-2 w-20 rounded-full bg-[#52aaa5]/6" />
-        <div className="absolute right-2/3 bottom-2/3 h-20 w-2 rounded-full bg-[#52aaa5]/6" />
-        <div className="absolute left-1/4 top-3/4 h-2 w-16 rounded-full bg-[#52aaa5]/5 transform -rotate-30" />
-        <div className="absolute right-1/4 bottom-3/4 h-16 w-2 rounded-full bg-[#52aaa5]/5 transform rotate-30" />
-        <div className="absolute left-3/4 top-1/4 h-2 w-28 rounded-full bg-[#52aaa5]/7" />
-        <div className="absolute right-3/4 bottom-1/4 h-28 w-2 rounded-full bg-[#52aaa5]/7" />
+        {/* Lines and bars */}
+        <div className="absolute left-0 top-1/2 h-1 w-1/3 bg-[#52aaa5]/10 transform -rotate-45" />
+        <div className="absolute right-0 bottom-1/3 h-1/4 w-1 bg-[#52aaa5]/8" />
+        <div className="absolute top-0 right-1/4 h-1/3 w-1 bg-[#52aaa5]/6" />
+        <div className="absolute bottom-0 left-1/3 h-1 w-1/4 bg-[#52aaa5]/12" />
+        
+        {/* Diagonal lines */}
+        <div className="absolute left-1/4 top-1/4 h-1/2 w-1 bg-[#52aaa5]/5 transform rotate-45" />
+        <div className="absolute right-1/3 bottom-1/3 h-1 w-1/2 bg-[#52aaa5]/7 transform -rotate-45" />
+        <div className="absolute left-2/3 top-1/3 h-1/3 w-1 bg-[#52aaa5]/9 transform rotate-30" />
+        <div className="absolute right-1/4 bottom-1/4 h-1 w-1/3 bg-[#52aaa5]/6 transform -rotate-30" />
+        
+        {/* Additional scattered elements */}
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={`scatter-${i}`}
+            className={`absolute h-${Math.floor(Math.random() * 8) + 2} w-${
+              Math.floor(Math.random() * 8) + 2
+            } rounded-full bg-[#52aaa5]/${Math.floor(Math.random() * 10) + 5}`}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              transform: `rotate(${Math.random() * 360}deg)`,
+            }}
+          />
+        ))}
       </div>
 
       <div className="relative mx-auto max-w-7xl">
