@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Card } from '../../../../components/ui/card'
 import { Button } from '../../../../components/ui/button'
 import { Input } from '../../../../components/ui/input'
-import { CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
 import type { FillInTheBlankQuestion } from '../data/mockData'
 
 interface FillInTheBlankQuestionProps {
@@ -32,34 +32,34 @@ const FillInTheBlankQuestion = ({ data, onAnswer }: FillInTheBlankQuestionProps)
   const questionParts = data.question.split('____')
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Question */}
-      <div className="rounded-xl bg-[#52aaa5]/5 p-6">
-        <div className="flex items-center gap-2 text-lg text-[#2D3748]">
+      <div className="rounded-2xl bg-[#52aaa5]/5 p-8">
+        <div className="flex flex-wrap items-center gap-2 text-xl text-[#2D3748]">
           {questionParts.map((part, index) => (
             <div key={index} className="flex items-center gap-2">
-              <span>{part}</span>
+              <span className="font-medium">{part}</span>
               {index < questionParts.length - 1 && (
-                <div className="relative inline-block min-w-[120px]">
+                <div className="relative inline-block min-w-[180px]">
                   <Input
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
                     disabled={showExplanation}
-                    className={`border-b-2 border-dotted bg-transparent focus:border-[#52aaa5] ${
+                    className={`h-12 border-b-2 border-dotted bg-transparent px-4 text-lg transition-colors focus-visible:ring-0 ${
                       showExplanation
                         ? isCorrect
                           ? 'border-green-500 text-green-700'
                           : 'border-red-500 text-red-700'
-                        : 'border-gray-400'
+                        : 'border-[#52aaa5] focus:border-[#52aaa5]'
                     }`}
                     placeholder="Điền vào chỗ trống"
                   />
                   {showExplanation && (
-                    <div className="absolute -right-7 top-1/2 -translate-y-1/2">
+                    <div className="absolute -right-10 top-1/2 -translate-y-1/2">
                       {isCorrect ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        <CheckCircle2 className="h-6 w-6 text-green-500" />
                       ) : (
-                        <XCircle className="h-5 w-5 text-red-500" />
+                        <XCircle className="h-6 w-6 text-red-500" />
                       )}
                     </div>
                   )}
@@ -72,24 +72,31 @@ const FillInTheBlankQuestion = ({ data, onAnswer }: FillInTheBlankQuestionProps)
 
       {/* Explanation */}
       {showExplanation && (
-        <Card className={isCorrect ? 'bg-green-50' : 'bg-red-50'}>
+        <Card className={`overflow-hidden border-2 ${isCorrect ? 'border-green-500' : 'border-red-500'}`}>
           <div className="p-6">
-            <div className="mb-4 flex items-center gap-2">
+            <div className="mb-4 flex items-center gap-3">
               {isCorrect ? (
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                <div className="flex items-center gap-2 text-green-600">
+                  <CheckCircle2 className="h-6 w-6" />
+                  <h4 className="text-lg font-medium">Chính xác!</h4>
+                </div>
               ) : (
-                <XCircle className="h-5 w-5 text-red-500" />
+                <>
+                  <div className="flex items-center gap-2 text-red-600">
+                    <XCircle className="h-6 w-6" />
+                    <h4 className="text-lg font-medium">Chưa chính xác</h4>
+                  </div>
+                  <span className="text-[#718096]">•</span>
+                  <div className="text-[#2D3748]">
+                    Đáp án đúng: <span className="font-medium">{data.answers[0].answer}</span>
+                  </div>
+                </>
               )}
-              <h4 className="font-medium text-[#2D3748]">
-                {isCorrect ? 'Chính xác!' : 'Chưa chính xác'}
-              </h4>
             </div>
-            {!isCorrect && (
-              <p className="mb-2 text-[#718096]">
-                Đáp án đúng: <span className="font-medium">{data.answers[0].answer}</span>
-              </p>
-            )}
-            <p className="text-[#718096]">{data.answers[0].explain}</p>
+            <div className="flex items-start gap-2 rounded-lg bg-[#52aaa5]/5 p-4">
+              <AlertCircle className="mt-0.5 h-5 w-5 text-[#52aaa5]" />
+              <p className="text-[#718096]">{data.answers[0].explain}</p>
+            </div>
           </div>
         </Card>
       )}
@@ -97,7 +104,7 @@ const FillInTheBlankQuestion = ({ data, onAnswer }: FillInTheBlankQuestionProps)
       {/* Action Button */}
       {!showExplanation && (
         <Button
-          className="w-full bg-[#52aaa5] text-white hover:bg-[#52aaa5]/90 disabled:bg-[#52aaa5]/50"
+          className="w-full bg-[#52aaa5] text-lg font-medium text-white hover:bg-[#52aaa5]/90 disabled:bg-[#52aaa5]/50"
           disabled={!answer.trim()}
           onClick={checkAnswer}
         >
