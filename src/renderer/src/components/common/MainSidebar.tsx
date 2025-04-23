@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
 import {
   Home,
   GraduationCap,
@@ -13,7 +14,8 @@ import {
   Wifi,
   Trophy,
   BarChart2,
-  Bell
+  Bell,
+  CheckSquare
 } from 'lucide-react'
 
 const MainSidebar = () => {
@@ -36,14 +38,22 @@ const MainSidebar = () => {
     }
   }
 
-  const navItems = [
+  interface NavItem {
+    path: string
+    icon: any
+    label: string
+    badge?: number
+  }
+
+  const navItems: NavItem[] = [
     { path: '/', icon: Home, label: 'Trang chủ' },
     { path: '/favorite', icon: GraduationCap, label: 'Khóa học' },
     { path: '/notes', icon: StickyNote, label: 'Ghi chú' },
     { path: '/offline', icon: Wifi, label: 'Ngoại tuyến' },
     { path: '/competition', icon: Trophy, label: 'Thi đấu' },
-    { path: '/statistics', icon: BarChart2, label: 'Thống kê' },
-    { path: '/notifications', icon: Bell, label: 'Thông báo' },
+    { path: '/analytics', icon: BarChart2, label: 'Thống kê' },
+    { path: '/notifications', icon: Bell, label: 'Thông báo', badge: 5 },
+    { path: '/tasks', icon: CheckSquare, label: 'Nhiệm vụ', badge: 3 },
     { path: '/notebook', icon: Book, label: 'Sổ tay' },
     { path: '/settings', icon: Settings, label: 'Cài đặt' },
   ]
@@ -77,8 +87,21 @@ const MainSidebar = () => {
                     : 'text-[#2D3748] hover:bg-[#52aaa5]/10'
                 }`}
               >
-                <item.icon className={`h-5 w-5 ${isActive(item.path) ? 'text-white' : 'text-[#52aaa5]'}`} />
-                {item.label}
+                <div className="flex items-center gap-3 flex-1">
+                  <item.icon className={`h-5 w-5 ${isActive(item.path) ? 'text-white' : 'text-[#52aaa5]'}`} />
+                  {item.label}
+                  {item.badge && (
+                    <Badge
+                      className={`ml-auto ${
+                        isActive(item.path)
+                          ? 'bg-white text-[#52aaa5]'
+                          : 'bg-[#52aaa5] text-white'
+                      }`}
+                    >
+                      {item.badge}
+                    </Badge>
+                  )}
+                </div>
               </Button>
             </Link>
           ))}
