@@ -3,6 +3,8 @@ import MainLayout from '../layouts/MainLayout'
 import HomePage from '../pages/Home'
 import CoursePage from '../pages/Course'
 import FavoritePage from '../pages/Favorite'
+import SettingPage from '../pages/Setting'
+import NotebookPage from '../pages/Notebook'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 
 export const routes: RouteObject[] = [
@@ -21,6 +23,14 @@ export const routes: RouteObject[] = [
       {
         path: 'favorite',
         element: <FavoritePage />
+      },
+      {
+        path: 'settings',
+        element: <SettingPage />
+      },
+      {
+        path: 'notebook',
+        element: <NotebookPage />
       }
     ]
   },
