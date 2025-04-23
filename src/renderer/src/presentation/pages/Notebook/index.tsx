@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Search, Plus, CloudOff, ScrollText } from 'lucide-react'
@@ -33,6 +34,7 @@ interface Notebook {
 }
 
 const NotebookPage = () => {
+  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [isOfflineMode] = useState(false)
 
@@ -53,7 +55,7 @@ const NotebookPage = () => {
   const showNoNotebooks = !isSearching && !hasMyNotebooks && !hasSharedNotebooks
 
   const handleNotebookClick = (notebookId: string) => {
-    console.log('Navigate to notebook:', notebookId)
+    navigate(`/notebook/${notebookId}`)
   }
 
   const renderEmptyState = () => (

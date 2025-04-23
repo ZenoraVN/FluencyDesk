@@ -5,6 +5,7 @@ import CoursePage from '../pages/Course'
 import FavoritePage from '../pages/Favorite'
 import SettingPage from '../pages/Setting'
 import NotebookPage from '../pages/Notebook'
+import NotebookWiki from '../pages/NotebookWiki'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 
 export const routes: RouteObject[] = [
@@ -31,6 +32,10 @@ export const routes: RouteObject[] = [
       {
         path: 'notebook',
         element: <NotebookPage />
+      },
+      {
+        path: 'notebook/:notebookId',
+        element: <NotebookWiki />
       }
     ]
   },
