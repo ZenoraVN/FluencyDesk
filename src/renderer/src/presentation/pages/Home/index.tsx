@@ -3,6 +3,7 @@ import TodayTask from './components/TodayTask'
 import LearningStats from './components/LearningStats'
 import NewsUpdates from './components/NewsUpdates'
 import CourseCard from './components/CourseCard'
+import QuizSection from './components/QuizSection'
 import { courses } from './data'
 import { useNavigate } from 'react-router-dom'
 
@@ -43,8 +44,9 @@ const HomePage = () => {
         {/* Main Content Grid */}
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Left Column - Current Courses & Daily Learning */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             <TodayTask />
+            <QuizSection />
           </div>
 
           {/* Right Column - Stats & News */}
