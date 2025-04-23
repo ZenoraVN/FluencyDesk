@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react'
+import { ArrowLeft, CloudOff, Heart } from 'lucide-react'
+import FavoriteStats from './components/FavoriteStats'
+import RecentActivities from './components/RecentActivities'
+import FavoriteCourseCard from './components/FavoriteCourseCard'
+import { favoriteCourses } from './data/mockData'
 import { Card } from '../../../components/ui/card'
-import { Heart, CloudOff, ArrowLeft } from 'lucide-react'
-import { courses } from '../Home/data'
-import { Badge } from '../../../components/ui/badge'
 
 const FavoritePage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isOfflineMode, setIsOfflineMode] = useState(false)
-
-  // Simulate some courses as favorites
-  const favoriteCourses = courses.slice(0, 3)
 
   const checkNetworkAndLoadData = async () => {
     setIsLoading(true)
@@ -25,6 +24,11 @@ const FavoritePage = () => {
   useEffect(() => {
     checkNetworkAndLoadData()
   }, [])
+
+  const handleCourseClick = (courseId: string) => {
+    // Handle course click
+    console.log('Navigate to course:', courseId)
+  }
 
   const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center px-6 text-center">
@@ -54,9 +58,9 @@ const FavoritePage = () => {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="h-[300px] animate-pulse bg-gray-100" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="h-[400px] animate-pulse bg-gray-100" />
           ))}
         </div>
       )
@@ -93,65 +97,29 @@ const FavoritePage = () => {
     return (
       <>
         {isOfflineMode && renderOfflineBanner()}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {favoriteCourses.map((course) => (
-            <Card 
-              key={course.id} 
-              className="group relative flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#52aaa5]/20 hover:ring-2 hover:ring-[#52aaa5]"
-            >
-              <div className="relative">
-                <img
-                  src={course.image_urls[0]}
-                  alt={course.title}
-                  className="aspect-square w-full object-cover"
+        
+        {/* Stats Overview */}
+        <FavoriteStats />
+
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Favorite Courses Grid */}
+          <div className="lg:col-span-2">
+            <h2 className="mb-4 text-xl font-semibold text-[#2D3748]">Khóa học yêu thích</h2>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {favoriteCourses.map((course) => (
+                <FavoriteCourseCard
+                  key={course.id}
+                  course={course}
+                  onClick={handleCourseClick}
                 />
-                <Badge 
-                  variant="secondary" 
-                  className="absolute right-3 top-3 bg-[#52aaa5] text-xs font-medium text-white"
-                >
-                  {course.band}
-                </Badge>
-                {/* Simulated progress bar */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
-                  <div 
-                    className="h-full bg-[#52aaa5]" 
-                    style={{ width: '60%' }}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col p-4">
-                <h3 className="line-clamp-1 text-lg font-medium text-[#2D3748]">
-                  {course.title}
-                </h3>
-                <div className="mt-2 flex-1">
-                  <div className="no-scrollbar flex gap-2 overflow-x-auto pb-2">
-                    {course.skills.map((skill, index) => {
-                      const colors = [
-                        'bg-[#FF69B4]/20 text-[#FF69B4]',
-                        'bg-[#4A90E2]/20 text-[#4A90E2]',
-                        'bg-[#3CB371]/20 text-[#3CB371]',
-                        'bg-[#9370DB]/20 text-[#9370DB]',
-                        'bg-[#FF7F50]/20 text-[#FF7F50]',
-                        'bg-[#FFD700]/20 text-[#FFD700]'
-                      ];
-                      return (
-                        <Badge 
-                          key={skill} 
-                          variant="secondary" 
-                          className={`${colors[index % colors.length]} shrink-0 text-xs font-medium`}
-                        >
-                          {skill}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                </div>
-                <p className="mt-2 text-sm text-[#718096]">
-                  60% hoàn thành
-                </p>
-              </div>
-            </Card>
-          ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Activities */}
+          <div>
+            <RecentActivities />
+          </div>
         </div>
       </>
     )
@@ -175,18 +143,5 @@ const FavoritePage = () => {
     </div>
   )
 }
-
-// Add styles to hide scrollbar but keep functionality
-const style = document.createElement('style');
-style.textContent = `
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-`;
-document.head.appendChild(style);
 
 export default FavoritePage
