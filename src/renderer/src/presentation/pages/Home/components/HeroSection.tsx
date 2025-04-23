@@ -1,71 +1,107 @@
 import { Button } from '../../../../components/ui/button'
+import { Badge } from '../../../../components/ui/badge'
 import { userProgressData } from '../data/mockData'
-import { Trophy, Clock, Flame } from 'lucide-react'
+import { Clock, Flame, BookOpen, Target } from 'lucide-react'
 
 const HeroSection = () => {
-  return (
-    <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-[#52aaa5] to-[#2D3748] p-8 text-white">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute left-0 top-0 h-64 w-64 rotate-45 transform rounded-full bg-white/20" />
-        <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-white/20" />
-      </div>
 
+  return (
+    <div className="relative mb-8 overflow-hidden rounded-xl">
       {/* Content */}
       <div className="relative">
         <div className="mb-6">
-          <h1 className="mb-2 text-3xl font-bold">Welcome Back!</h1>
-          <p className="text-lg text-white/80">Ready to continue your learning journey?</p>
+          <h1 className="mb-2 text-3xl font-bold text-[#2D3748]">Welcome Back!</h1>
+          <p className="text-lg text-gray-600">Ready to continue your learning journey?</p>
         </div>
 
         {/* Quick Stats */}
         <div className="mb-6 grid grid-cols-3 gap-4">
-          <div className="rounded-xl bg-white/10 p-4">
+          <div className="rounded-xl bg-[#52aaa5]/10 p-4 transition-all duration-200 hover:shadow-md">
             <div className="mb-2 flex items-center">
-              <Clock className="mr-2 h-5 w-5" />
-              <span className="text-sm">Today's Learning</span>
+              <Clock className="mr-2 h-5 w-5 text-[#52aaa5]" />
+              <span className="text-sm text-[#2D3748]">Today's Learning</span>
             </div>
-            <p className="text-2xl font-bold">{userProgressData.todayLearned} mins</p>
+            <p className="text-2xl font-bold text-[#52aaa5]">{userProgressData.todayLearned} mins</p>
           </div>
 
-          <div className="rounded-xl bg-white/10 p-4">
+          <div className="rounded-xl bg-orange-500/10 p-4 transition-all duration-200 hover:shadow-md">
             <div className="mb-2 flex items-center">
-              <Flame className="mr-2 h-5 w-5" />
-              <span className="text-sm">Streak</span>
+              <Flame className="mr-2 h-5 w-5 text-orange-500" />
+              <span className="text-sm text-[#2D3748]">Streak</span>
             </div>
-            <p className="text-2xl font-bold">{userProgressData.streakDays} days</p>
+            <p className="text-2xl font-bold text-orange-500">{userProgressData.streakDays} days</p>
           </div>
 
-          <div className="rounded-xl bg-white/10 p-4">
+          <div className="rounded-xl bg-purple-500/10 p-4 transition-all duration-200 hover:shadow-md">
             <div className="mb-2 flex items-center">
-              <Trophy className="mr-2 h-5 w-5" />
-              <span className="text-sm">Achievement</span>
+              <BookOpen className="mr-2 h-5 w-5 text-purple-500" />
+              <span className="text-sm text-[#2D3748]">Total Vocabulary</span>
             </div>
-            <p className="text-sm font-medium">{userProgressData.lastAchievement}</p>
+            <p className="text-2xl font-bold text-purple-500">{userProgressData.totalVocabulary}</p>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-4">
-          <Button 
-            size="lg"
-            className="bg-white font-semibold text-[#52aaa5] hover:bg-white/90"
-          >
-            Continue Learning
-          </Button>
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="border-white/20 bg-white/10 font-semibold text-white hover:bg-white/20"
-          >
-            View Progress
-          </Button>
-        </div>
+        {/* Current Lesson Overview */}
+        {userProgressData.currentLesson && (
+          <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 transition-all duration-200 hover:shadow-md">
+            <div className="flex">
+              {/* Left side - Square Image */}
+              <div className="relative h-64 w-64 flex-shrink-0">
+                <img
+                  src={userProgressData.currentLesson.imageUrl}
+                  alt={userProgressData.currentLesson.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
 
-        {/* Level Badge */}
-        <div className="absolute right-0 top-0 rounded-full bg-white/20 px-4 py-1 text-sm font-medium">
-          Level: {userProgressData.currentLevel}
-        </div>
+              {/* Right side - Content */}
+              <div className="flex-1 p-4">
+                <h2 className="mb-2 text-2xl font-bold text-[#2D3748]">
+                  {userProgressData.currentLesson.course}
+                </h2>
+                
+                <div className="mb-4">
+                  <h3 className="mb-2 text-lg font-semibold text-[#2D3748]">
+                    {userProgressData.currentLesson.title}
+                  </h3>
+                  <p className="text-sm text-gray-600">{userProgressData.currentLesson.overview}</p>
+                </div>
+
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {userProgressData.currentLesson.skills.map((skill) => (
+                    <Badge
+                      key={skill}
+                      variant="secondary"
+                      className="bg-[#52aaa5]/10 text-[#52aaa5]"
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="mb-4">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Target className="mr-2 h-4 w-4" />
+                    <span>Bài học tiếp theo: {userProgressData.currentLesson.nextMilestone}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Clock className="mr-1 h-4 w-4" />
+                    <span>Last studied {userProgressData.currentLesson.lastStudied}</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-[#52aaa5] text-white hover:bg-[#52aaa5]/90"
+                  >
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

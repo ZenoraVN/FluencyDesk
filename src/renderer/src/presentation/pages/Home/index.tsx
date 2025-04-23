@@ -1,6 +1,5 @@
 import HeroSection from './components/HeroSection'
-import CurrentCourses from './components/CurrentCourses'
-import DailyLearning from './components/DailyLearning'
+import TodayTask from './components/TodayTask'
 import LearningStats from './components/LearningStats'
 import NewsUpdates from './components/NewsUpdates'
 import CourseCard from './components/CourseCard'
@@ -45,8 +44,7 @@ const HomePage = () => {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Left Column - Current Courses & Daily Learning */}
           <div className="lg:col-span-2">
-            <CurrentCourses />
-            <DailyLearning />
+            <TodayTask />
           </div>
 
           {/* Right Column - Stats & News */}
