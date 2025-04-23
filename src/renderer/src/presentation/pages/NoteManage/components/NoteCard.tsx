@@ -46,7 +46,7 @@ const NoteCard = ({
               />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-[#2D3748]">{title}</h3>
+              <h3 className="text-lg font-medium text-[#2D3748] line-clamp-1">{title}</h3>
               {sharedBy && (
                 <p className="text-sm text-[#718096]">
                   Chia sẻ bởi {sharedBy}

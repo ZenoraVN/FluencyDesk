@@ -3,31 +3,24 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Search, Plus, CloudOff, StickyNote } from 'lucide-react'
-import { myNotes, sharedNotes } from './data/mockData'
+import { myNotes } from './data/mockData'
 import NoteCard from './components/NoteCard'
 
-const NotePage = () => {
+const NoteManagaPage = () => {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [isOfflineMode] = useState(false)
 
-  const filteredMyNotes = myNotes.filter(note =>
+  const filteredNotes = myNotes.filter((note: { title: string; overview: string; tags: string[] }) =>
     note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     note.overview.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    note.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
-  const filteredSharedNotes = sharedNotes.filter(note =>
-    note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    note.overview.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
-
-  const hasMyNotes = filteredMyNotes.length > 0
-  const hasSharedNotes = filteredSharedNotes.length > 0
+  const hasNotes = filteredNotes.length > 0
   const isSearching = searchQuery.trim().length > 0
-  const showNoResults = isSearching && !hasMyNotes && !hasSharedNotes
-  const showNoNotes = !isSearching && !hasMyNotes && !hasSharedNotes
+  const showNoResults = isSearching && !hasNotes
+  const showNoNotes = !isSearching && !hasNotes
 
   const handleNoteClick = (noteId: string) => {
     navigate(`/note/${noteId}`)
@@ -109,13 +102,13 @@ const NotePage = () => {
         ) : (
           <div className="space-y-8">
             {/* Pinned Notes */}
-            {hasMyNotes && filteredMyNotes.some(note => note.pinned) && (
+            {hasNotes && filteredNotes.some((note: { pinned: boolean }) => note.pinned) && (
               <div className="space-y-6">
                 <h2 className="text-xl font-medium text-[#2D3748]">Ghim</h2>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredMyNotes
-                    .filter(note => note.pinned)
-                    .map(note => (
+                  {filteredNotes
+                    .filter((note: { pinned: boolean }) => note.pinned)
+                    .map((note) => (
                       <NoteCard
                         key={note.id}
                         {...note}
@@ -127,35 +120,19 @@ const NotePage = () => {
             )}
 
             {/* My Notes */}
-            {hasMyNotes && (
+            {hasNotes && (
               <div className="space-y-6">
                 <h2 className="text-xl font-medium text-[#2D3748]">Ghi chú của tôi</h2>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredMyNotes
-                    .filter(note => !note.pinned)
-                    .map(note => (
+                  {filteredNotes
+                    .filter((note: { pinned: boolean }) => !note.pinned)
+                    .map((note) => (
                       <NoteCard
                         key={note.id}
                         {...note}
                         onClick={handleNoteClick}
                       />
                     ))}
-                </div>
-              </div>
-            )}
-
-            {/* Shared Notes */}
-            {hasSharedNotes && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-medium text-[#2D3748]">Ghi chú được chia sẻ</h2>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredSharedNotes.map(note => (
-                    <NoteCard
-                      key={note.id}
-                      {...note}
-                      onClick={handleNoteClick}
-                    />
-                  ))}
                 </div>
               </div>
             )}
@@ -166,4 +143,4 @@ const NotePage = () => {
   )
 }
 
-export default NotePage
+export default NoteManagaPage
