@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Card, CardContent } from '../../../../components/ui/card'
+import { Button } from '../../../../components/ui/button'
 
 interface Option {
   id: string
@@ -7,31 +9,16 @@ interface Option {
   explanation: string
 }
 
-interface MultipleChoiceQuestion {
+interface Question {
   id: string
-  type: 'multiple-choice'
   question: string
   options: Option[]
 }
-
-interface FillInBlankQuestion {
-  id: string
-  type: 'fill-in-blank'
-  question: string
-  blanks: {
-    id: string
-    answer: string
-    explanation: string
-  }[]
-}
-
-type Question = MultipleChoiceQuestion | FillInBlankQuestion
 
 // Mock data - Replace with actual API data later
 const mockQuestions: Question[] = [
   {
     id: '1',
-    type: 'multiple-choice',
     question: 'Which word means "to make something better"?',
     options: [
       {
@@ -59,18 +46,6 @@ const mockQuestions: Question[] = [
         explanation: '"Ignore" means to pay no attention to something.'
       }
     ]
-  },
-  {
-    id: '2',
-    type: 'fill-in-blank',
-    question: 'Complete the sentence: "She _____ to the store yesterday."',
-    blanks: [
-      {
-        id: 'blank1',
-        answer: 'went',
-        explanation: 'The past tense of "go" is "went".'
-      }
-    ]
   }
 ]
 
@@ -78,115 +53,93 @@ const QuizSection = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [showExplanation, setShowExplanation] = useState(false)
-  const [blankAnswer, setBlankAnswer] = useState('')
+  const [totalAnswered, setTotalAnswered] = useState(0)
+  const [correctAnswers, setCorrectAnswers] = useState(0)
 
   const currentQuestion = mockQuestions[currentQuestionIndex]
 
   const handleOptionClick = (optionId: string) => {
     setSelectedOption(optionId)
     setShowExplanation(true)
-  }
-
-  const handleBlankSubmit = () => {
-    setSelectedOption(blankAnswer.toLowerCase().trim())
-    setShowExplanation(true)
+    setTotalAnswered(prev => prev + 1)
+    
+    const isCorrect = currentQuestion.options.find(opt => opt.id === optionId)?.isCorrect
+    if (isCorrect) {
+      setCorrectAnswers(prev => prev + 1)
+    }
   }
 
   const handleNextQuestion = () => {
     setSelectedOption(null)
     setShowExplanation(false)
-    setBlankAnswer('')
-    setCurrentQuestionIndex((prev) => 
+    setCurrentQuestionIndex((prev) =>
       prev < mockQuestions.length - 1 ? prev + 1 : 0
     )
   }
 
   const getOptionStyle = (option: Option) => {
-    if (!selectedOption) return ''
+    if (!selectedOption) return 'border-[#e2e8f0] bg-white'
     if (option.id === selectedOption) {
-      return option.isCorrect ? 'border-b-2 border-green-500' : 'border-b-2 border-red-500'
+      return option.isCorrect
+        ? 'border-[#52aaa5] bg-[#52aaa5] bg-opacity-5 text-[#52aaa5]'
+        : 'border-red-400 bg-red-50 text-red-500'
     }
-    if (option.isCorrect) return 'border-b-2 border-green-500'
-    return ''
+    if (option.isCorrect) return 'border-[#52aaa5] bg-[#52aaa5] bg-opacity-5 text-[#52aaa5]'
+    return 'border-[#e2e8f0] bg-white'
   }
 
-  const renderMultipleChoice = (question: MultipleChoiceQuestion) => (
-    <div className="space-y-3">
-      {question.options.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => handleOptionClick(option.id)}
-          disabled={!!selectedOption}
-          className={`w-full py-2 px-3 text-left transition-all duration-200 
-            ${getOptionStyle(option)}
-            ${!selectedOption && 'hover:border-b-2 hover:border-[#52aaa5]'}
-            ${selectedOption ? 'cursor-default' : 'cursor-pointer'}
-          `}
-        >
-          <span className="font-medium text-gray-800">{option.text}</span>
-        </button>
-      ))}
-    </div>
-  )
-
-  const renderFillInBlank = (question: FillInBlankQuestion) => (
-    <div className="space-y-3">
-      <input
-        type="text"
-        value={blankAnswer}
-        onChange={(e) => setBlankAnswer(e.target.value)}
-        disabled={!!selectedOption}
-        placeholder="Type your answer..."
-        className={`w-full border-b py-2 px-3 outline-none transition-all duration-200
-          ${selectedOption === question.blanks[0].answer.toLowerCase() ? 'border-b-2 border-green-500' : ''}
-          ${selectedOption && selectedOption !== question.blanks[0].answer.toLowerCase() ? 'border-b-2 border-red-500' : ''}
-          ${!selectedOption ? 'border-gray-200 focus:border-b-2 focus:border-[#52aaa5]' : ''}
-        `}
-      />
-      {!selectedOption && (
-        <button
-          onClick={handleBlankSubmit}
-          className="w-full border-b-2 border-[#52aaa5] py-1.5 px-3 font-medium text-[#52aaa5] transition-all duration-200 hover:bg-[#52aaa5] hover:text-white"
-        >
-          Check Answer
-        </button>
-      )}
-    </div>
-  )
-
   return (
-    <div>
-      <h2 className="mb-4 text-xl font-semibold text-[#2D3748]">Quick Quiz</h2>
-      
-      <div className="border rounded-lg p-4">
-        <p className="text-lg text-gray-700 mb-4">{currentQuestion.question}</p>
-        
-        {currentQuestion.type === 'multiple-choice' 
-          ? renderMultipleChoice(currentQuestion)
-          : renderFillInBlank(currentQuestion)
-        }
-
-        {showExplanation && (
-          <div className="mt-3 text-sm text-gray-600">
-            <p className="font-medium text-gray-800">Explanation:</p>
-            <p>
-              {currentQuestion.type === 'multiple-choice'
-                ? currentQuestion.options.find(opt => opt.id === selectedOption)?.explanation
-                : currentQuestion.blanks[0].explanation
-              }
-            </p>
-          </div>
-        )}
-
-        {selectedOption && (
-          <button
-            onClick={handleNextQuestion}
-            className="mt-3 w-full px-3 py-1.5 font-medium text-[#52aaa5] transition-all duration-200 border-b-2 border-[#52aaa5] hover:text-white hover:bg-[#52aaa5]"
-          >
-            Next Question
-          </button>
-        )}
+    <div className="mb-8">
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-[#2D3748]">Quick Quiz</h2>
+        <p className="text-sm text-gray-600">
+          Test your vocabulary and grammar skills with quick quizzes
+        </p>
       </div>
+      
+      <Card className="group overflow-hidden transition-all duration-200 hover:shadow-md">
+        <CardContent className="p-6">
+          <div className="mb-8 flex items-center justify-between">
+            <div className="flex-1 pr-4">
+              <p className="text-lg font-medium text-[#2D3748]">{currentQuestion.question}</p>
+            </div>
+            <div className="flex items-center rounded-full bg-[#52aaa5] bg-opacity-10 px-4 py-2 text-sm">
+              <span className="font-semibold text-[#52aaa5]">{correctAnswers}</span>
+              <span className="mx-1 text-gray-500">/</span>
+              <span className="text-gray-600">{totalAnswered}</span>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            {currentQuestion.options.map((option) => (
+              <Button
+                key={option.id}
+                onClick={() => handleOptionClick(option.id)}
+                disabled={!!selectedOption}
+                variant="outline"
+                className={`group relative w-full justify-start py-6 px-5 text-left transition-all duration-200
+                  ${getOptionStyle(option)}
+                  ${!selectedOption && 'hover:border-[#52aaa5] hover:bg-[#52aaa5] hover:bg-opacity-5 hover:text-[#52aaa5]'}
+                  ${selectedOption ? 'cursor-default' : 'cursor-pointer'}
+                `}
+              >
+                <span className="text-base font-medium">
+                  {option.text}
+                </span>
+              </Button>
+            ))}
+          </div>
+
+          {selectedOption && (
+            <Button
+              onClick={handleNextQuestion}
+              className="mt-6 w-full bg-gradient-to-r from-[#52aaa5] to-[#478f8b] text-white transition-all duration-200 hover:from-[#478f8b] hover:to-[#3b7875]"
+            >
+              Next Question
+            </Button>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
