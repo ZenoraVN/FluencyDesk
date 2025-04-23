@@ -1,9 +1,36 @@
 import { useState } from 'react'
 import { Button } from '../../../components/ui/button'
-import { Card } from '../../../components/ui/card'
 import { Input } from '../../../components/ui/input'
-import { ScrollText, Search, Plus, Share2, CloudOff, ChevronRight } from 'lucide-react'
-import { myNotebooks, sharedNotebooks } from './data'
+import { Search, Plus, CloudOff, ScrollText } from 'lucide-react'
+import { myNotebooks, sharedNotebooks } from './data/mockData'
+import NotebookStats from './components/NotebookStats'
+import NotebookCard from './components/NotebookCard'
+import StudyReminders from './components/StudyReminders'
+import RecentActivities from './components/RecentActivities'
+
+interface Notebook {
+  id: string
+  title: string
+  description: string
+  totalNotes: number
+  color: string
+  lastUpdated: string
+  isShared: boolean
+  stats: {
+    mastered: number
+    learning: number
+    toReview: number
+    accuracy: number
+  }
+  categories: string[]
+  recentNotes: {
+    id: string
+    term: string
+    definition: string
+    example: string
+  }[]
+  sharedBy?: string
+}
 
 const NotebookPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -25,42 +52,9 @@ const NotebookPage = () => {
   const showNoResults = isSearching && !hasMyNotebooks && !hasSharedNotebooks
   const showNoNotebooks = !isSearching && !hasMyNotebooks && !hasSharedNotebooks
 
-  const renderNotebook = (notebook: typeof myNotebooks[0]) => (
-    <Card 
-      key={notebook.id}
-      className="group cursor-pointer overflow-hidden rounded-2xl border-[#52aaa5]/10 transition-all hover:scale-[1.02] hover:bg-[#52aaa5]/5 hover:shadow-lg hover:shadow-[#52aaa5]/10"
-    >
-      <div className="p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div 
-              className="flex h-12 w-12 items-center justify-center rounded-xl"
-              style={{ backgroundColor: `${notebook.color}10` }}
-            >
-              <ScrollText 
-                className="h-6 w-6"
-                style={{ color: notebook.color }}
-              />
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-[#2D3748]">{notebook.title}</h3>
-              <p className="text-sm text-[#718096]">{notebook.totalNotes} ghi chú</p>
-            </div>
-          </div>
-          {notebook.isShared && (
-            <Share2 className="h-5 w-5 text-[#52aaa5]" />
-          )}
-        </div>
-        <p className="mb-4 text-sm text-[#718096] line-clamp-2">
-          {notebook.description}
-        </p>
-        <div className="flex items-center justify-between text-sm text-[#718096]">
-          <span>Cập nhật {notebook.lastUpdated}</span>
-          <ChevronRight className="h-5 w-5 text-[#718096]/50" />
-        </div>
-      </div>
-    </Card>
-  )
+  const handleNotebookClick = (notebookId: string) => {
+    console.log('Navigate to notebook:', notebookId)
+  }
 
   const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -97,7 +91,7 @@ const NotebookPage = () => {
         <div className="absolute right-1/4 top-1/4 h-[350px] w-[350px] rounded-3xl bg-[#52aaa5]/4 transform rotate-45" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl">
+      <div className="relative mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-semibold text-[#2D3748]">Sổ ghi chú</h1>
@@ -110,6 +104,9 @@ const NotebookPage = () => {
             Tạo mới
           </Button>
         </div>
+
+        {/* Stats Overview */}
+        <NotebookStats />
 
         {/* Search Bar */}
         <div className="mb-8">
@@ -132,30 +129,51 @@ const NotebookPage = () => {
           </div>
         )}
 
-        {/* Content */}
+        {/* Main Content */}
         {showNoNotebooks || showNoResults ? (
           renderEmptyState()
         ) : (
-          <div className="space-y-8">
-            {/* My Notebooks */}
-            {hasMyNotebooks && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-medium text-[#2D3748]">Sổ ghi chú của tôi</h2>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {filteredMyNotebooks.map(renderNotebook)}
+          <div className="grid gap-8 lg:grid-cols-3">
+            {/* Notebooks Grid */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* My Notebooks */}
+              {hasMyNotebooks && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-medium text-[#2D3748]">Sổ ghi chú của tôi</h2>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    {filteredMyNotebooks.map((notebook: Notebook) => (
+                      <NotebookCard
+                        key={notebook.id}
+                        {...notebook}
+                        onClick={handleNotebookClick}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Shared Notebooks */}
-            {hasSharedNotebooks && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-medium text-[#2D3748]">Sổ ghi chú được chia sẻ</h2>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {filteredSharedNotebooks.map(renderNotebook)}
+              {/* Shared Notebooks */}
+              {hasSharedNotebooks && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-medium text-[#2D3748]">Sổ ghi chú được chia sẻ</h2>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    {filteredSharedNotebooks.map((notebook: Notebook) => (
+                      <NotebookCard
+                        key={notebook.id}
+                        {...notebook}
+                        onClick={handleNotebookClick}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
+            {/* Right Sidebar */}
+            <div className="space-y-8">
+              <StudyReminders />
+              <RecentActivities />
+            </div>
           </div>
         )}
       </div>
