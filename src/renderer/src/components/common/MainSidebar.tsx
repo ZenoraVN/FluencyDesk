@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Button } from '../../components/ui/button'
-import { 
+import {
   Home,
   GraduationCap,
   Book,
@@ -8,7 +8,12 @@ import {
   UserPlus,
   LogOut,
   RefreshCw,
-  User
+  User,
+  StickyNote,
+  Wifi,
+  Trophy,
+  BarChart2,
+  Bell
 } from 'lucide-react'
 
 const MainSidebar = () => {
@@ -34,6 +39,11 @@ const MainSidebar = () => {
   const navItems = [
     { path: '/', icon: Home, label: 'Trang chủ' },
     { path: '/favorite', icon: GraduationCap, label: 'Khóa học' },
+    { path: '/notes', icon: StickyNote, label: 'Ghi chú' },
+    { path: '/offline', icon: Wifi, label: 'Ngoại tuyến' },
+    { path: '/competition', icon: Trophy, label: 'Thi đấu' },
+    { path: '/statistics', icon: BarChart2, label: 'Thống kê' },
+    { path: '/notifications', icon: Bell, label: 'Thông báo' },
     { path: '/notebook', icon: Book, label: 'Sổ tay' },
     { path: '/settings', icon: Settings, label: 'Cài đặt' },
   ]

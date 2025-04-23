@@ -7,6 +7,7 @@ import SettingPage from '../pages/Setting'
 import NotebookPage from '../pages/Notebook'
 import NotebookWiki from '../pages/NotebookWiki'
 import LessonPage from '../pages/Lesson'
+import NotePage from '../pages/Note'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 
 export const routes: RouteObject[] = [
@@ -41,6 +42,10 @@ export const routes: RouteObject[] = [
       {
         path: 'notebook/:notebookId',
         element: <NotebookWiki />
+      },
+      {
+        path: 'notes',
+        element: <NotePage />
       }
     ]
   },
