@@ -11,6 +11,7 @@ import NoteManagaPage from '../pages/NoteManage'
 import NotePage from '../pages/Note'
 import AnalyticPage from '../pages/Analytic'
 import NotificationPage from '../pages/Notification'
+import MissionPage from '../pages/Misson'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 
 export const routes: RouteObject[] = [
@@ -61,6 +62,10 @@ export const routes: RouteObject[] = [
       {
         path: 'notifications',
         element: <NotificationPage />
+      },
+      {
+        path: 'tasks',
+        element: <MissionPage />
       }
     ]
   },
