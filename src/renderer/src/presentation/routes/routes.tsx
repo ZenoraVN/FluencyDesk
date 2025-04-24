@@ -14,8 +14,18 @@ import NotificationPage from '../pages/Notification'
 import MissionPage from '../pages/Misson'
 import SyncPage from '../pages/Sync'
 import NotFoundPage from '../pages/Other/NotFoundPage'
+import LoginPage from '../pages/Login'
+import RegisterPage from '../pages/Register'
 
 export const routes: RouteObject[] = [
+  {
+    path: '/login',
+    element: <LoginPage />
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />
+  },
   {
     path: '/',
     element: <MainLayout />,

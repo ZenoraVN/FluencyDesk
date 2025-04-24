@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Card } from '../../../../components/ui/card'
 import { Switch } from '../../../../components/ui/switch'
-import { Button } from '../../../../components/ui/button'
 import { Bell, Clock, Trophy, BookOpen, MessageSquare, Settings2, ChevronRight } from 'lucide-react'
 import { notificationSettings, learningPreferences } from '../data/mockData'
 import { ReminderDialog } from './ReminderDialog'
@@ -24,8 +23,8 @@ const NotificationSection = () => {
         <h2 className="text-base font-semibold text-[#2D3748]">Thông báo & Nhắc nhở</h2>
       </div>
 
-      <div className="space-y-4 p-6">
-        {/* Study Reminders */}
+      {/* Study Reminders */}
+      <div className="border-b border-[#52aaa5]/10 p-6 pb-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#52aaa5]/10">
@@ -40,34 +39,38 @@ const NotificationSection = () => {
         </div>
 
         {learningPreferences.studyReminders.enabled && (
-          <div
-            className="flex cursor-pointer items-center justify-between"
-            onClick={() => setDialogOpen(true)}
-          >
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#52aaa5]/10">
-                <Settings2 className="h-5 w-5 text-[#52aaa5]" />
-              </div>
-              <div>
-                <div className="font-medium text-[#2D3748]">Chỉnh sửa thời gian nhắc nhở</div>
-                <div className="text-sm text-[#718096]">
-                  {selectedTime} - {selectedDays.length} ngày đã chọn
+          <>
+            <div
+              className="flex cursor-pointer items-center justify-between"
+              onClick={() => setDialogOpen(true)}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#52aaa5]/10">
+                  <Settings2 className="h-5 w-5 text-[#52aaa5]" />
+                </div>
+                <div>
+                  <div className="font-medium text-[#2D3748]">Chỉnh sửa thời gian nhắc nhở</div>
+                  <div className="text-sm text-[#718096]">
+                    {selectedTime} - {selectedDays.length} ngày đã chọn
+                  </div>
                 </div>
               </div>
+              <ChevronRight className="h-5 w-5 text-[#718096]/50" />
             </div>
-            <ChevronRight className="h-5 w-5 text-[#718096]/50" />
-          </div>
+
+            <ReminderDialog
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              selectedTime={selectedTime}
+              selectedDays={selectedDays}
+              onSave={handleSaveReminders}
+            />
+          </>
         )}
+      </div>
 
-        <ReminderDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          selectedTime={selectedTime}
-          selectedDays={selectedDays}
-          onSave={handleSaveReminders}
-        />
-
-        {/* Other Notifications */}
+      {/* Other Notifications */}
+      <div className="space-y-4 p-6 pt-2">
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

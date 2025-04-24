@@ -43,7 +43,7 @@ export function ReminderDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white rounded-lg">
         <DialogHeader>
           <DialogTitle>Chỉnh sửa thời gian nhắc nhở</DialogTitle>
         </DialogHeader>
