@@ -1,4 +1,3 @@
-import ProgressStats from './components/ProgressStats'
 import StorageSection from './components/StorageSection'
 import SecuritySection from './components/SecuritySection'
 import NotificationSection from './components/NotificationSection'
@@ -36,7 +35,6 @@ const SettingPage = () => {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-8 lg:col-span-2">
-            <ProgressStats />
             <StorageSection />
             <SecuritySection />
           </div>
