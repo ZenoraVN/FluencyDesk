@@ -3,6 +3,7 @@ import MainLayout from '../layouts/MainLayout'
 import HomePage from '../pages/Home'
 import CoursePage from '../pages/Course'
 import FavoritePage from '../pages/Favorite'
+import MyCoursePage from '../pages/MyCourse'
 import SettingPage from '../pages/Setting'
 import NotebookPage from '../pages/Notebook'
 import NotebookWiki from '../pages/NotebookWiki'
@@ -45,6 +46,10 @@ export const routes: RouteObject[] = [
       {
         path: 'favorite',
         element: <FavoritePage />
+      },
+      {
+        path: 'my-course',
+        element: <MyCoursePage />
       },
       {
         path: 'settings',

@@ -15,7 +15,8 @@ import {
   Trophy,
   BarChart2,
   Bell,
-  CheckSquare
+  CheckSquare,
+  Heart
 } from 'lucide-react'
 
 const MainSidebar = () => {
@@ -47,7 +48,8 @@ const MainSidebar = () => {
 
   const navItems: NavItem[] = [
     { path: '/', icon: Home, label: 'Trang chủ' },
-    { path: '/favorite', icon: GraduationCap, label: 'Khóa học' },
+    { path: '/my-course', icon: GraduationCap, label: 'Khóa học' },
+    { path: '/favorite', icon: Heart, label: 'Yêu thích' },
     { path: '/notes', icon: StickyNote, label: 'Ghi chú' },
     { path: '/offline', icon: Wifi, label: 'Ngoại tuyến' },
     { path: '/competition', icon: Trophy, label: 'Thi đấu' },
