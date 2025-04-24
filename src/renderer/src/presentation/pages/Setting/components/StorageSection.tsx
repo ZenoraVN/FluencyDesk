@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Card } from '../../../../components/ui/card'
 import { Progress } from '../../../../components/ui/progress'
 import { Button } from '../../../../components/ui/button'
@@ -5,6 +6,7 @@ import { ScrollText, Download, RefreshCw, ChevronRight, HardDrive } from 'lucide
 import { storageInfo, dataUsage } from '../data/mockData'
 
 const StorageSection = () => {
+  const navigate = useNavigate()
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
       day: 'numeric',
@@ -98,7 +100,10 @@ const StorageSection = () => {
           <ChevronRight className="h-5 w-5 text-[#718096]/50" />
         </div>
 
-        <div className="flex cursor-pointer items-center gap-4 py-3 transition-colors hover:bg-[#52aaa5]/5">
+        <div
+          className="flex cursor-pointer items-center gap-4 py-3 transition-colors hover:bg-[#52aaa5]/5"
+          onClick={() => navigate('/sync')}
+        >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#52aaa5]/10">
             <RefreshCw className="h-5 w-5 text-[#52aaa5]" />
           </div>
@@ -108,13 +113,7 @@ const StorageSection = () => {
               Lần cuối: {formatDate(storageInfo.lastSync)}
             </div>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="text-[#52aaa5] hover:bg-[#52aaa5]/10"
-          >
-            Đồng bộ ngay
-          </Button>
+          <ChevronRight className="h-5 w-5 text-[#718096]/50" />
         </div>
       </div>
     </Card>

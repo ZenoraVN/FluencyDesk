@@ -12,6 +12,7 @@ import NotePage from '../pages/Note'
 import AnalyticPage from '../pages/Analytic'
 import NotificationPage from '../pages/Notification'
 import MissionPage from '../pages/Misson'
+import SyncPage from '../pages/Sync'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 
 export const routes: RouteObject[] = [
@@ -66,6 +67,10 @@ export const routes: RouteObject[] = [
       {
         path: 'tasks',
         element: <MissionPage />
+      },
+      {
+        path: 'sync',
+        element: <SyncPage />
       }
     ]
   },
