@@ -4,19 +4,53 @@ import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
 import {
-  Book,
-  User,
-  CheckSquare,
   Search,
   Filter,
+  Bell,
+  Volume2,
+  Clock,
+  Mail,
+  Settings,
+  GraduationCap,
+  Calendar,
+  User,
+  CheckSquare
 } from 'lucide-react'
+import { Switch } from '../../../components/ui/switch'
 import NotificationItem from './components/NotificationItem'
-import TaskItem from './components/TaskItem'
-import { notifications, tasks } from './data/mockData'
-import type { Notification } from './data/mockData'
+import { notifications } from './data/mockData'
+
 
 const NotificationPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    pushEnabled: true,
+    soundEnabled: true,
+    scheduleEnabled: false,
+    emailEnabled: true
+  })
+
+  const [typePrefs, setTypePrefs] = useState({
+    system: true,
+    learning: true,
+    calendar: true,
+    personal: true,
+    task: true
+  })
+
+  const handlePrefChange = (key: keyof typeof notificationPrefs) => {
+    setNotificationPrefs(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+
+  const handleTypePrefChange = (key: keyof typeof typePrefs) => {
+    setTypePrefs(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
 
   const handleDeleteNotification = (id: string) => {
     console.log('Delete notification:', id)
@@ -24,10 +58,6 @@ const NotificationPage = () => {
 
   const handleMarkAsRead = (id: string) => {
     console.log('Mark as read:', id)
-  }
-
-  const handleTaskClick = (id: string) => {
-    console.log('Task clicked:', id)
   }
 
   const filterNotifications = (type: string) => {
@@ -52,9 +82,9 @@ const NotificationPage = () => {
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-8 lg:grid-cols-4">
         {/* Main Content */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <Card className="overflow-hidden">
             {/* Search and Filter */}
             <div className="border-b border-[#52aaa5]/10 p-4">
@@ -169,25 +199,149 @@ const NotificationPage = () => {
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-8">
-          {/* Tasks */}
+        {/* Notification Preferences Sidebar */}
+        <div className="space-y-6">
           <Card className="p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-medium text-[#2D3748]">Nhiệm vụ</h2>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <CheckSquare className="h-4 w-4" />
-                Xem tất cả
-              </Button>
+            <div className="mb-6">
+              <h2 className="text-lg font-medium text-[#2D3748]">Cài Đặt Thông Báo</h2>
+              <p className="mt-1 text-sm text-[#718096]">Tùy chỉnh cách bạn nhận thông báo</p>
             </div>
-            <div className="space-y-4">
-              {tasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onClick={handleTaskClick}
+
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Bell className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Thông báo đẩy</p>
+                    <p className="text-sm text-[#718096]">Nhận thông báo trực tiếp</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={notificationPrefs.pushEnabled}
+                  onCheckedChange={() => handlePrefChange('pushEnabled')}
                 />
-              ))}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Volume2 className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Âm thanh</p>
+                    <p className="text-sm text-[#718096]">Bật âm thanh thông báo</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={notificationPrefs.soundEnabled}
+                  onCheckedChange={() => handlePrefChange('soundEnabled')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Lịch trình</p>
+                    <p className="text-sm text-[#718096]">Đặt thời gian nhận thông báo</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={notificationPrefs.scheduleEnabled}
+                  onCheckedChange={() => handlePrefChange('scheduleEnabled')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Mail className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Email</p>
+                    <p className="text-sm text-[#718096]">Nhận thông báo qua email</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={notificationPrefs.emailEnabled}
+                  onCheckedChange={() => handlePrefChange('emailEnabled')}
+                />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="mb-6">
+              <h2 className="text-lg font-medium text-[#2D3748]">Loại Thông Báo</h2>
+              <p className="mt-1 text-sm text-[#718096]">Chọn loại thông báo bạn muốn nhận</p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Settings className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Hệ thống</p>
+                    <p className="text-sm text-[#718096]">Thông báo từ hệ thống</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={typePrefs.system}
+                  onCheckedChange={() => handleTypePrefChange('system')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Học tập</p>
+                    <p className="text-sm text-[#718096]">Thông báo về hoạt động học tập</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={typePrefs.learning}
+                  onCheckedChange={() => handleTypePrefChange('learning')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Lịch</p>
+                    <p className="text-sm text-[#718096]">Thông báo về lịch học và sự kiện</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={typePrefs.calendar}
+                  onCheckedChange={() => handleTypePrefChange('calendar')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <User className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Cá nhân</p>
+                    <p className="text-sm text-[#718096]">Thông báo cá nhân</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={typePrefs.personal}
+                  onCheckedChange={() => handleTypePrefChange('personal')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <CheckSquare className="h-5 w-5 text-[#52aaa5]" />
+                  <div>
+                    <p className="font-medium text-[#2D3748]">Nhiệm vụ</p>
+                    <p className="text-sm text-[#718096]">Thông báo về nhiệm vụ</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={typePrefs.task}
+                  onCheckedChange={() => handleTypePrefChange('task')}
+                />
+              </div>
             </div>
           </Card>
         </div>

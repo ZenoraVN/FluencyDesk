@@ -52,7 +52,7 @@ const MissionPage = () => {
     }
   }
 
-  const TaskList = ({ tasks, title, isOverdue = false }: { tasks: Task[], title: string, isOverdue?: boolean }) => (
+  const TaskList = ({ tasks, isOverdue = false }: { tasks: Task[], title: string, isOverdue?: boolean }) => (
     <div className="space-y-4">
       {tasks.map(task => (
         <div
