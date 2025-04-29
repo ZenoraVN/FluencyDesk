@@ -77,7 +77,7 @@ const Calendar = ({ tasks, selectedDate, onSelectDate }: CalendarProps) => {
   const renderCalendar = () => {
     const days = getDaysInMonth(currentMonth)
     const firstDay = getFirstDayOfMonth(currentMonth)
-    const calendar = []
+    const calendar: JSX.Element[] = []
 
     // Header
     calendar.push(
@@ -91,7 +91,7 @@ const Calendar = ({ tasks, selectedDate, onSelectDate }: CalendarProps) => {
     )
 
     // Days
-    let cells = []
+    let cells: JSX.Element[] = []
     for (let i = 0; i < firstDay; i++) {
       cells.push(<div key={`empty-${i}`} className="p-2" />)
     }

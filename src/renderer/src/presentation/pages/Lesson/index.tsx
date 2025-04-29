@@ -10,7 +10,7 @@ import LessonProgress from './components/LessonProgress'
 
 const LessonPage = () => {
   const navigate = useNavigate()
-  const { courseId, lessonId } = useParams()
+  const { courseId } = useParams()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answeredQuestions, setAnsweredQuestions] = useState<boolean[]>([])
 

@@ -21,10 +21,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../../components/ui/dropdown-menu'
-import { syncVersions, syncStats, type SyncVersion } from './data/mockData'
+import { syncVersions, syncStats } from './data/mockData'
 
 const SyncPage = () => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [, setIsLoading] = useState(false)
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
@@ -42,7 +42,7 @@ const SyncPage = () => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
-  const handleSync = async (version?: string) => {
+  const handleSync = async (_version?: string) => {
     setIsLoading(true)
     // Simulate sync delay
     await new Promise(resolve => setTimeout(resolve, 2000))

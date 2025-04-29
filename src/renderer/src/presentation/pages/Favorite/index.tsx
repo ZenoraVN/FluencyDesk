@@ -8,8 +8,8 @@ import { Card } from '../../../components/ui/card'
 
 const FavoritePage = () => {
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isOfflineMode, setIsOfflineMode] = useState(false)
+  const [error] = useState<string | null>(null)
+  const [isOfflineMode] = useState(false)
 
   const checkNetworkAndLoadData = async () => {
     setIsLoading(true)

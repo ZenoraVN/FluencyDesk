@@ -52,7 +52,7 @@ const mockQuestions: Question[] = [
 const QuizSection = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
-  const [showExplanation, setShowExplanation] = useState(false)
+  const [, setShowExplanation] = useState(false)
   const [totalAnswered, setTotalAnswered] = useState(0)
   const [correctAnswers, setCorrectAnswers] = useState(0)
 

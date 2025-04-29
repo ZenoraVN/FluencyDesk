@@ -34,8 +34,8 @@ const analyticsData = {
 
 const MyCoursePage = () => {
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isOfflineMode, setIsOfflineMode] = useState(false)
+  const [error] = useState<string | null>(null)
+  const [isOfflineMode] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
   const checkNetworkAndLoadData = async () => {

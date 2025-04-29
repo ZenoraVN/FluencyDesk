@@ -1,1 +1,1 @@
-export { routes } from './routes.tsx'
+export { routes } from './routes'

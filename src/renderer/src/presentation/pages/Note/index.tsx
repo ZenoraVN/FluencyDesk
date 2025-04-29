@@ -7,7 +7,7 @@ import { noteDetail } from './data/mockData'
 import TextEditor from '../../../components/common/TextEditor'
 
 const NotePage = () => {
-  const { id } = useParams()
+  useParams()
   const navigate = useNavigate()
   const [isEditing, setIsEditing] = useState(false)
   const [content, setContent] = useState(noteDetail.content)
