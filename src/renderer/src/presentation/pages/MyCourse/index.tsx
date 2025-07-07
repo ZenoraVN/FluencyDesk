@@ -9,7 +9,8 @@ const myCourses = [
   {
     id: '1',
     title: 'IELTS Speaking Practice',
-    overview: 'Khóa học luyện tập kỹ năng nói IELTS với các chủ đề phổ biến, giúp học viên tự tin trong phần thi Speaking',
+    overview:
+      'Khóa học luyện tập kỹ năng nói IELTS với các chủ đề phổ biến, giúp học viên tự tin trong phần thi Speaking',
     skills: ['Speaking', 'Pronunciation', 'Fluency'],
     band: 7.0,
     thumbnail: 'https://example.com/course1.jpg'
@@ -17,7 +18,8 @@ const myCourses = [
   {
     id: '2',
     title: 'Business English Writing',
-    overview: 'Khóa học viết tiếng Anh thương mại chuyên nghiệp, tập trung vào các kỹ năng viết email, báo cáo và đề xuất',
+    overview:
+      'Khóa học viết tiếng Anh thương mại chuyên nghiệp, tập trung vào các kỹ năng viết email, báo cáo và đề xuất',
     skills: ['Writing', 'Business', 'Communication'],
     band: 6.5,
     thumbnail: 'https://example.com/course2.jpg'
@@ -60,9 +62,7 @@ const MyCoursePage = () => {
       <div className="mb-6 rounded-full bg-[#52aaa5]/10 p-6">
         <GraduationCap className="h-16 w-16 text-[#52aaa5]" />
       </div>
-      <h3 className="mb-3 text-xl font-semibold text-[#2D3748]">
-        Bạn chưa tạo khóa học nào
-      </h3>
+      <h3 className="mb-3 text-xl font-semibold text-[#2D3748]">Bạn chưa tạo khóa học nào</h3>
       <p className="max-w-md text-sm text-[#718096]">
         Hãy bắt đầu tạo khóa học đầu tiên của bạn để chia sẻ kiến thức với cộng đồng
       </p>
@@ -73,9 +73,7 @@ const MyCoursePage = () => {
     <div className="mb-4 rounded-2xl bg-[#52aaa5]/10 p-4">
       <div className="flex items-center gap-2">
         <CloudOff className="h-5 w-5 text-[#52aaa5]" />
-        <span className="text-sm font-medium text-[#52aaa5]">
-          Đang sử dụng dữ liệu ngoại tuyến
-        </span>
+        <span className="text-sm font-medium text-[#52aaa5]">Đang sử dụng dữ liệu ngoại tuyến</span>
       </div>
     </div>
   )
@@ -129,8 +127,8 @@ const MyCoursePage = () => {
     </div>
   )
 
-  const renderCourseCard = (course: typeof myCourses[0]) => (
-    <Card 
+  const renderCourseCard = (course: (typeof myCourses)[0]) => (
+    <Card
       key={course.id}
       className="overflow-hidden transition-all hover:shadow-lg"
       onClick={() => handleCourseClick(course.id)}
@@ -188,7 +186,9 @@ const MyCoursePage = () => {
           <div className="rounded-full bg-red-100 p-4">
             <CloudOff className="h-8 w-8 text-red-500" />
           </div>
-          <h3 className="text-xl font-semibold text-[#2D3748]">Không tìm thấy dữ liệu ngoại tuyến</h3>
+          <h3 className="text-xl font-semibold text-[#2D3748]">
+            Không tìm thấy dữ liệu ngoại tuyến
+          </h3>
           <p className="text-[#718096]">Vui lòng kết nối internet để tải dữ liệu</p>
         </div>
       )
@@ -198,16 +198,17 @@ const MyCoursePage = () => {
       return renderEmptyState()
     }
 
-    const filteredCourses = myCourses.filter(course => 
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.overview.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))
+    const filteredCourses = myCourses.filter(
+      (course) =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.overview.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase()))
     )
 
     return (
       <>
         {isOfflineMode && renderOfflineBanner()}
-        
+
         {/* Analytics Overview */}
         {renderAnalytics()}
 
@@ -237,7 +238,7 @@ const MyCoursePage = () => {
     <div className="min-h-screen bg-[#f6f6f0] p-6">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex items-center gap-4">
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="rounded-2xl p-2 text-[#2D3748] hover:bg-[#52aaa5]/10"
           >

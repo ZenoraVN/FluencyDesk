@@ -3,7 +3,6 @@ import MainLayout from '../layouts/MainLayout'
 import HomePage from '../pages/Home'
 import CoursePage from '../pages/CourseManage'
 import FavoritePage from '../pages/Favorite'
-import MyCoursePage from '../pages/MyCourse'
 import SettingPage from '../pages/Setting'
 import NotebookPage from '../pages/Notebook'
 import NotebookWiki from '../pages/NotebookWiki'
@@ -11,12 +10,12 @@ import LessonPage from '../pages/Lesson'
 import NoteManagaPage from '../pages/NoteManage'
 import NotePage from '../pages/Note'
 import AnalyticPage from '../pages/Analytic'
-import NotificationPage from '../pages/Notification'
-import MissionPage from '../pages/Misson'
 import SyncPage from '../pages/Sync'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 import LoginPage from '../pages/Login'
 import RegisterPage from '../pages/Register'
+
+import { RequireAuth } from '../providers/RequireAuth'
 
 export const routes: RouteObject[] = [
   {
@@ -33,59 +32,99 @@ export const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: (
+          <RequireAuth>
+            <HomePage />
+          </RequireAuth>
+        )
       },
       {
         path: 'course/:courseId',
-        element: <CoursePage />
+        element: (
+          <RequireAuth>
+            <CoursePage />
+          </RequireAuth>
+        )
       },
       {
         path: 'course/:courseId/lesson/:lessonId',
-        element: <LessonPage />
+        element: (
+          <RequireAuth>
+            <LessonPage />
+          </RequireAuth>
+        )
       },
       {
         path: 'favorite',
-        element: <FavoritePage />
+        element: (
+          <RequireAuth>
+            <FavoritePage />
+          </RequireAuth>
+        )
       },
       {
         path: 'my-course',
-        element: <MyCoursePage />
+        element: (
+          <RequireAuth>
+            <CoursePage />
+          </RequireAuth>
+        )
       },
       {
         path: 'settings',
-        element: <SettingPage />
+        element: (
+          <RequireAuth>
+            <SettingPage />
+          </RequireAuth>
+        )
       },
       {
         path: 'notebook',
-        element: <NotebookPage />
+        element: (
+          <RequireAuth>
+            <NotebookPage />
+          </RequireAuth>
+        )
       },
       {
         path: 'notebook/:notebookId',
-        element: <NotebookWiki />
+        element: (
+          <RequireAuth>
+            <NotebookWiki />
+          </RequireAuth>
+        )
       },
       {
         path: 'notes',
-        element: <NoteManagaPage />
+        element: (
+          <RequireAuth>
+            <NoteManagaPage />
+          </RequireAuth>
+        )
       },
       {
         path: 'note/:id',
-        element: <NotePage />
+        element: (
+          <RequireAuth>
+            <NotePage />
+          </RequireAuth>
+        )
       },
       {
         path: 'analytics',
-        element: <AnalyticPage />
-      },
-      {
-        path: 'notifications',
-        element: <NotificationPage />
-      },
-      {
-        path: 'tasks',
-        element: <MissionPage />
+        element: (
+          <RequireAuth>
+            <AnalyticPage />
+          </RequireAuth>
+        )
       },
       {
         path: 'sync',
-        element: <SyncPage />
+        element: (
+          <RequireAuth>
+            <SyncPage />
+          </RequireAuth>
+        )
       }
     ]
   },

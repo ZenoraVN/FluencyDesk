@@ -4,8 +4,7 @@ import CourseFilter from './components/CourseFilter'
 import CreateCourseDrawer from './components/CreateCourseDrawer'
 import ApiService from '../../../service/ApiService'
 import { CourseSearchRequest, Course, CreateCourseRequest } from './type/Course'
-import CustomTable from '../../../components/Table/CustomTable'
-import { getCourseColumns } from './components/CourseTableColumns'
+import CourseGrid from './components/CourseGrid'
 import { useNavigate } from 'react-router-dom'
 
 const CourseManagePage = () => {
@@ -14,7 +13,7 @@ const CourseManagePage = () => {
   const [loading, setLoading] = useState(false)
   const [, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize] = useState(5)
+  const [pageSize] = useState(10)
   const [filters, setFilters] = useState<CourseSearchRequest>({
     page: 1,
     page_size: 10,
@@ -137,10 +136,10 @@ const CourseManagePage = () => {
   }, [currentPage, pageSize, filters])
 
   // table columns
-  const columns = getCourseColumns(handleDelete, navigate, (currentPage - 1) * pageSize)
+  // const columns = getCourseColumns(handleDelete, navigate, (currentPage - 1) * pageSize)
 
   return (
-    <div className="h-screen  flex flex-col">
+    <div className="h-screen flex flex-col">
       {/* Header */}
       <div className="px-8 pt-8">
         <div className="flex justify-between items-center mb-4">
@@ -155,17 +154,16 @@ const CourseManagePage = () => {
       </div>
       {/* Main Content */}
       <div className="flex gap-4 flex-1 px-8 pt-0 pb-4 min-h-0 overflow-hidden">
-        {/* Left - Table */}
+        {/* Left - Grid */}
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 min-h-0">
-            <CustomTable<Course>
-              data={courses}
-              columns={columns}
-              loading={loading}
-              totalCount={totalCourses}
+            <CourseGrid
+              courses={courses}
+              total={totalCourses}
               currentPage={currentPage}
               pageSize={pageSize}
               onPageChange={setCurrentPage}
+              loading={loading}
               emptyMessage={
                 <>
                   <div className="mb-2 text-xl font-semibold text-[#2D3748]">
@@ -174,6 +172,9 @@ const CourseManagePage = () => {
                   <p className="text-[#718096]">Thử điều chỉnh bộ lọc tìm kiếm</p>
                 </>
               }
+              onView={(id) => navigate(`/course/view/${id}`)}
+              onEdit={(id) => navigate(`/course/edit/${id}`)}
+              onDelete={handleDelete}
             />
           </div>
         </div>

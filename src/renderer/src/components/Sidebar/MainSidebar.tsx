@@ -2,7 +2,17 @@ import { useState } from 'react'
 import { cn } from '../../shared/lib/utils'
 import { Button } from '../ui/button'
 import { motion } from 'framer-motion'
-import { BookOpen, GraduationCap, LogOut } from 'lucide-react'
+import {
+  LayoutDashboard,
+  GraduationCap,
+  Star,
+  StickyNote,
+  BarChart2,
+  Bell,
+  BookOpen,
+  Settings,
+  LogOut
+} from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTheme } from '../../presentation/providers/theme-provider'
 
@@ -10,28 +20,52 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const menuItems = [
   {
-    icon: GraduationCap,
-    label: 'Trang chủ',
+    icon: LayoutDashboard,
+    label: 'Dashboard',
     iconClassName: 'text-[#52aaa5]',
     href: '/'
   },
   {
-    icon: BookOpen,
-    label: 'Khóa học',
+    icon: GraduationCap,
+    label: 'My Course',
     iconClassName: 'text-[#52aaa5]',
-    href: '/course'
+    href: '/my-course'
+  },
+  {
+    icon: Star,
+    label: 'Favorite Course',
+    iconClassName: 'text-[#52aaa5]',
+    href: '/favorite'
+  },
+  {
+    icon: StickyNote,
+    label: 'Note',
+    iconClassName: 'text-[#52aaa5]',
+    href: '/note'
+  },
+  {
+    icon: BarChart2,
+    label: 'Analytic',
+    iconClassName: 'text-[#52aaa5]',
+    href: '/analytics'
+  },
+  {
+    icon: Bell,
+    label: 'Notification',
+    iconClassName: 'text-[#52aaa5]',
+    href: '/notification'
   },
   {
     icon: BookOpen,
-    label: 'Câu hỏi',
+    label: 'Notebook',
     iconClassName: 'text-[#52aaa5]',
-    href: '/question'
+    href: '/notebook'
   },
   {
-    icon: BookOpen,
-    label: 'Từ điển',
+    icon: Settings,
+    label: 'Setting',
     iconClassName: 'text-[#52aaa5]',
-    href: '/wiki'
+    href: '/settings'
   }
 ]
 
@@ -41,7 +75,7 @@ const sidebarVariants = {
     x: 0,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 100,
       damping: 20
     }
