@@ -1,6 +1,5 @@
 import { FC, useMemo, useRef, useState, KeyboardEvent, useEffect } from 'react'
 import { ChevronDown, Search, X as XIcon } from 'lucide-react'
-// import { cn } from '../../shared/lib/utils'
 import { cn } from '../../shared/lib/utils'
 type Option = {
   value: string
@@ -311,19 +310,19 @@ const ComboboxInput: FC<Omit<CustomComboboxProps, 'searchable'> & { isInput?: bo
       </div>
       {/* BADGES cho multiple, đặt ngoài input+dropdown */}
       {isMulti && selectedOpts.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2 pr-2 pb-2 relative z-10">
+        <div className="flex flex-wrap gap-2 mt-2">
           {selectedOpts.map((opt) => (
             <span
               key={opt.value}
-              className="bg-[#52aaa5]/10 text-[#52aaa5] text-sm px-2 py-1 rounded-lg flex items-center gap-0.5"
+              className="bg-[#52aaa5]/10 text-[#52aaa5] text-sm px-3 py-1 rounded-lg flex items-center gap-1"
             >
               {opt.label}
               <button
                 type="button"
-                className="ml-1 text-xs hover:text-red-500"
+                className="ml-1 hover:text-red-500 focus:outline-none"
                 onClick={() => handleRemoveBadge(opt.value)}
               >
-                ×
+                <XIcon className="w-4 h-4" />
               </button>
             </span>
           ))}

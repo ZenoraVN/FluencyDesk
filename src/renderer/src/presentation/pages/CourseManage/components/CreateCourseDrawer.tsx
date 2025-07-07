@@ -188,7 +188,7 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
         {/* HEADER */}
         <div className="sticky top-0 z-10 bg-[#f6f6f0] px-6 py-4 border-b border-[#52aaa5]/10 flex items-center justify-between w-full min-h-[64px]">
           {/* Title left */}
-          <h2 className="text-2xl font-semibold text-[#2D3748] flex-1 text-left">
+          <h2 className="text-lg font-semibold text-[#2D3748] flex-1 text-left">
             Tạo khóa học mới
           </h2>
           {/* Buttons right */}
@@ -270,6 +270,43 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
               </p>
             ))}
           </div>
+          {/* TAGS */}
+          <div>
+            <label className="block text-[#2D3748] font-medium mb-2">Thẻ</label>
+            <CustomCombobox
+              label=""
+              value={newCourse.tags}
+              options={SUGGESTED_TAGS.map((tag) => ({
+                value: tag,
+                label: tag
+              }))}
+              onChange={(tags) => {
+                // đảm bảo tags luôn là string[]
+                if (Array.isArray(tags)) {
+                  onCourseChange({
+                    ...newCourse,
+                    tags
+                  })
+                } else if (typeof tags === 'string' && !newCourse.tags.includes(tags)) {
+                  onCourseChange({
+                    ...newCourse,
+                    tags: [...newCourse.tags, tags]
+                  })
+                }
+              }}
+              placeholder="Tìm kiếm hoặc thêm thẻ mới"
+              searchable
+              multiple
+              creatable // nếu bạn muốn cho phép tạo thêm tag mới
+              className="mb-2"
+            />
+
+            {validationErrors.tags?.map((error, i) => (
+              <p key={i} className="mt-1 text-sm text-red-500">
+                {error}
+              </p>
+            ))}
+          </div>
           {/* COURSE TYPE */}
           <div>
             <label className="block text-[#2D3748] font-medium mb-2">Loại khóa học</label>
@@ -321,72 +358,6 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
             />
 
             {validationErrors.level?.map((error, i) => (
-              <p key={i} className="mt-1 text-sm text-red-500">
-                {error}
-              </p>
-            ))}
-          </div>
-          {/* TAGS */}
-          <div>
-            <label className="block text-[#2D3748] font-medium mb-2">Thẻ</label>
-            <CustomCombobox
-              label=""
-              value={newCourse.tags}
-              options={SUGGESTED_TAGS.map((tag) => ({
-                value: tag,
-                label: tag
-              }))}
-              onChange={(tags) => {
-                // đảm bảo tags luôn là string[]
-                if (Array.isArray(tags)) {
-                  onCourseChange({
-                    ...newCourse,
-                    tags
-                  })
-                } else if (typeof tags === 'string' && !newCourse.tags.includes(tags)) {
-                  onCourseChange({
-                    ...newCourse,
-                    tags: [...newCourse.tags, tags]
-                  })
-                }
-              }}
-              placeholder="Tìm kiếm hoặc thêm thẻ mới"
-              searchable
-              multiple
-              creatable // nếu bạn muốn cho phép tạo thêm tag mới
-              className="mb-2"
-            />
-
-            <div className="flex flex-wrap gap-2 mt-2">
-              {newCourse.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#52aaa5]/10 text-[#52aaa5]"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onCourseChange({
-                        ...newCourse,
-                        tags: newCourse.tags.filter((t) => t !== tag)
-                      })
-                    }
-                    className="hover:text-red-500 ml-1"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              ))}
-            </div>
-            {validationErrors.tags?.map((error, i) => (
               <p key={i} className="mt-1 text-sm text-red-500">
                 {error}
               </p>
