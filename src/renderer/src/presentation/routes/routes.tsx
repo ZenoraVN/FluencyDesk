@@ -1,7 +1,7 @@
 import { RouteObject } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import HomePage from '../pages/Home'
-import CoursePage from '../pages/Course'
+import CoursePage from '../pages/CourseManage'
 import FavoritePage from '../pages/Favorite'
 import MyCoursePage from '../pages/MyCourse'
 import SettingPage from '../pages/Setting'

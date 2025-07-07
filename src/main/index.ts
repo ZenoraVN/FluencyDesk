@@ -32,7 +32,7 @@ function createWindow(): void {
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-    mainWindow.webContents.openDevTools()
+    // mainWindow.webContents.openDevTools() // Disable default, handle below
 
     // Enable auto-reload in development
     mainWindow.webContents.on('did-fail-load', () => {
@@ -40,6 +40,16 @@ function createWindow(): void {
         mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] as string)
       }
     })
+    // Ensure focus stays on code editor during hot reload in dev.
+    if (is.dev && mainWindow) {
+      mainWindow.webContents.on('did-finish-load', () => {
+        if (mainWindow) {
+          mainWindow.blur()
+          // Open DevTools in detached mode so Electron does not steal focus!
+          mainWindow.webContents.openDevTools({ mode: 'detach' })
+        }
+      })
+    }
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
