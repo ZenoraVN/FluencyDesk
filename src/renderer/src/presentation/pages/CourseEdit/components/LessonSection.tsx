@@ -1,58 +1,48 @@
-import { FC, useState, useRef, useEffect } from "react";
-import { PlusCircle, ArrowUpDown } from "lucide-react";
-import { Course } from "../types/course";
-import { QuestionDetail } from "../types/questionDetail";
-import { ViewQuestionDrawer } from "./ViewQuestionDrawer";
-import { LessonItem } from "./LessonItem";
-import ApiService from "@/service/ApiService";
-import { Button } from "@/presentation/components/ui/button";
-import { Input } from "@/presentation/components/ui/input";
-import { Loader2 } from "lucide-react";
-import { CustomInput } from "@/presentation/components/Input/CustomInput";
-import { RichtextchtEditor } from "@/presentation/components/Input/CustomRichtext";
+import { FC, useState, useRef, useEffect } from 'react'
+import { PlusCircle, ArrowUpDown } from 'lucide-react'
+import { Course } from '../types/course'
+import { QuestionDetail } from '../types/questionDetail'
+import { ViewQuestionDrawer } from './ViewQuestionDrawer'
+import { LessonItem } from './LessonItem'
+import ApiService from '../../../../service/ApiService'
+import { Button } from '../../../../components/ui/button'
+import { Input } from '../../../../components/ui/input'
+import { Loader2 } from 'lucide-react'
+import { CustomInput } from '../../../../components/Input/CustomInput'
+import { RichtextchtEditor } from '../../../../components/Input/CustomRichtext'
 
 interface LessonSectionProps {
-  course: Course;
-  editingLesson: string | null;
-  newLessonTitle: string;
-  newLessonOverview: string;
+  course: Course
+  editingLesson: string | null
+  newLessonTitle: string
+  newLessonOverview: string
   showCreateQuestion: {
-    lessonId: string;
-    questionSequence: number;
-  } | null;
-  selectedLessonId: string | null;
-  onCourseChange: (course: Course) => void;
-  onSetEditingLesson: (lessonId: string | null) => void;
-  onSetNewLessonTitle: (title: string) => void;
-  onSetNewLessonOverview: (overview: string) => void;
-  onShowCreateQuestion: (lessonId: string, questionSequence: number) => void;
-  onCloseCreateQuestion: () => void;
+    lessonId: string
+    questionSequence: number
+  } | null
+  selectedLessonId: string | null
+  onCourseChange: (course: Course) => void
+  onSetEditingLesson: (lessonId: string | null) => void
+  onSetNewLessonTitle: (title: string) => void
+  onSetNewLessonOverview: (overview: string) => void
+  onShowCreateQuestion: (lessonId: string, questionSequence: number) => void
+  onCloseCreateQuestion: () => void
 }
 
 // NewLessonForm với CustomInput và RichtextchtEditor
 const NewLessonForm: FC<{
-  title: string;
-  overview: string;
-  loading: boolean;
-  onTitleChange: (val: string) => void;
-  onOverviewChange: (val: string) => void;
-  onCancel: () => void;
-  onCreate: () => void;
-}> = ({
-  title,
-  overview,
-  loading,
-  onTitleChange,
-  onOverviewChange,
-  onCancel,
-  onCreate,
-}) => (
+  title: string
+  overview: string
+  loading: boolean
+  onTitleChange: (val: string) => void
+  onOverviewChange: (val: string) => void
+  onCancel: () => void
+  onCreate: () => void
+}> = ({ title, overview, loading, onTitleChange, onOverviewChange, onCancel, onCreate }) => (
   <div className="border rounded-lg p-4 mb-3 bg-transparent border-[#ddd] hover:border-[#52aaaf]">
     <div className="flex flex-col gap-3">
       <div>
-        <label className="block font-medium mb-1 text-gray-700 text-sm">
-          Tiêu đề
-        </label>
+        <label className="block font-medium mb-1 text-gray-700 text-sm">Tiêu đề</label>
         <CustomInput
           value={title}
           onChange={onTitleChange}
@@ -60,9 +50,7 @@ const NewLessonForm: FC<{
         />
       </div>
       <div>
-        <label className="block font-medium mb-1 text-gray-700 text-sm">
-          Tổng quan
-        </label>
+        <label className="block font-medium mb-1 text-gray-700 text-sm">Tổng quan</label>
         <RichtextchtEditor
           value={overview}
           onChange={onOverviewChange}
@@ -83,12 +71,7 @@ const NewLessonForm: FC<{
         </Button>
         <Button
           onClick={onCreate}
-          disabled={
-            loading ||
-            !title.trim() ||
-            !overview.trim() ||
-            overview === "<p></p>"
-          }
+          disabled={loading || !title.trim() || !overview.trim() || overview === '<p></p>'}
           className="flex gap-2 border border-[#52aaaf] bg-transparent text-[#52aaaf] hover:bg-[#52aaaf] hover:text-white"
         >
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -97,7 +80,7 @@ const NewLessonForm: FC<{
       </div>
     </div>
   </div>
-);
+)
 
 export const LessonSection: FC<LessonSectionProps> = ({
   course,
@@ -107,106 +90,88 @@ export const LessonSection: FC<LessonSectionProps> = ({
   onCourseChange,
   onSetNewLessonTitle,
   onSetNewLessonOverview,
-  onShowCreateQuestion,
+  onShowCreateQuestion
 }) => {
-  const listRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
-  const [showNewLessonForm, setShowNewLessonForm] = useState(false);
-  const [creatingLesson, setCreatingLesson] = useState(false);
-  const [showViewQuestion, setShowViewQuestion] = useState(false);
+  const [showNewLessonForm, setShowNewLessonForm] = useState(false)
+  const [creatingLesson, setCreatingLesson] = useState(false)
   const [showQuestionForm, setShowQuestionForm] = useState<{
-    lessonId: string;
-    questionSequence: number;
-  } | null>(null);
-  const [newQuestionId, setNewQuestionId] = useState("");
-  const [foundQuestion, setFoundQuestion] = useState<QuestionDetail | null>(
-    null
-  );
-  const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
-  const [reverseOrder, setReverseOrder] = useState(false);
-  const [filterSequence, setFilterSequence] = useState("");
+    lessonId: string
+    questionSequence: number
+  } | null>(null)
+  const [newQuestionId, setNewQuestionId] = useState('')
+  const [foundQuestion, setFoundQuestion] = useState<QuestionDetail | null>(null)
+  const [expandedLesson, setExpandedLesson] = useState<string | null>(null)
+  const [reverseOrder, setReverseOrder] = useState(false)
+  const [filterSequence, setFilterSequence] = useState('')
 
-  const [drawerQuestion, setDrawerQuestion] = useState<QuestionDetail | null>(
-    null
-  );
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerQuestion, setDrawerQuestion] = useState<QuestionDetail | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   useEffect(() => {
     if (editingLesson && bottomRef.current && !reverseOrder) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [editingLesson, reverseOrder]);
+  }, [editingLesson, reverseOrder])
 
-  const getLessons = () => course.lessons ?? [];
+  const getLessons = () => course.lessons ?? []
 
   const handleShowNewLessonForm = () => {
-    setShowNewLessonForm(true);
-    onSetNewLessonTitle("");
-    onSetNewLessonOverview("");
-  };
+    setShowNewLessonForm(true)
+    onSetNewLessonTitle('')
+    onSetNewLessonOverview('')
+  }
 
   const handleViewQuestion = async (questionId: string) => {
     try {
       // Có thể set loading state nữa nếu muốn
-      const detail = await ApiService.get<QuestionDetail>(
-        `/question/${questionId}`
-      );
-      setDrawerQuestion(detail);
-      setDrawerOpen(true);
+      const detail = await ApiService.get<QuestionDetail>(`/question/${questionId}`)
+      setDrawerQuestion(detail)
+      setDrawerOpen(true)
     } catch (err) {
-      alert("Không lấy được chi tiết câu hỏi!");
+      alert('Không lấy được chi tiết câu hỏi!')
     }
-  };
+  }
 
   const handleCreateLesson = async () => {
-    if (
-      !newLessonTitle.trim() ||
-      !newLessonOverview.trim() ||
-      newLessonOverview === "<p></p>"
-    )
-      return;
+    if (!newLessonTitle.trim() || !newLessonOverview.trim() || newLessonOverview === '<p></p>')
+      return
     try {
-      setCreatingLesson(true);
-      const newSequence = reverseOrder ? 1 : getLessons().length + 1;
-      await ApiService.post("/lesson", {
+      setCreatingLesson(true)
+      const newSequence = reverseOrder ? 1 : getLessons().length + 1
+      await ApiService.post('/lesson', {
         course_id: course.id,
         sequence: newSequence,
         title: newLessonTitle.trim(),
-        overview: newLessonOverview.trim(),
-      });
-      const updatedCourse = await ApiService.get<Course>(
-        `/course/${course.id}`
-      );
-      onCourseChange(updatedCourse);
+        overview: newLessonOverview.trim()
+      })
+      const updatedCourse = await ApiService.get<Course>(`/course/${course.id}`)
+      onCourseChange(updatedCourse)
 
-      setShowNewLessonForm(false);
-      onSetNewLessonTitle("");
-      onSetNewLessonOverview("");
+      setShowNewLessonForm(false)
+      onSetNewLessonTitle('')
+      onSetNewLessonOverview('')
     } catch (err) {
-      alert((err as Error).message || "Lỗi tạo bài học");
+      alert((err as Error).message || 'Lỗi tạo bài học')
     } finally {
-      setCreatingLesson(false);
+      setCreatingLesson(false)
     }
-  };
+  }
 
-  const handleRemoveLesson = async (
-    lessonId: string,
-    setLoading: (loading: boolean) => void
-  ) => {
+  const handleRemoveLesson = async (lessonId: string, setLoading: (loading: boolean) => void) => {
     try {
-      setLoading(true);
-      await ApiService.delete(`/lesson/${lessonId}`);
-      const updatedCourse = await ApiService.get<Course>(
-        `/course/${course.id}`
-      );
-      onCourseChange(updatedCourse);
+      setLoading(true)
+      await ApiService.delete(`/lesson/${lessonId}`)
+      const updatedCourse = await ApiService.get<Course>(`/course/${course.id}`)
+      onCourseChange(updatedCourse)
     } catch (err) {
-      alert((err as Error).message || "Lỗi xóa bài học");
+      alert((err as Error).message || 'Lỗi xóa bài học')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleRemoveQuestion = async (
     _lessonId: string,
@@ -214,34 +179,30 @@ export const LessonSection: FC<LessonSectionProps> = ({
     setLoadingId: (id: string | null) => void
   ) => {
     try {
-      setLoadingId(questionId);
-      await ApiService.delete(`/lesson-question/${questionId}`);
-      const updatedCourse = await ApiService.get<Course>(
-        `/course/${course.id}`
-      );
-      onCourseChange(updatedCourse);
+      setLoadingId(questionId)
+      await ApiService.delete(`/lesson-question/${questionId}`)
+      const updatedCourse = await ApiService.get<Course>(`/course/${course.id}`)
+      onCourseChange(updatedCourse)
     } catch (err) {
-      alert((err as Error).message || "Lỗi xóa câu hỏi");
+      alert((err as Error).message || 'Lỗi xóa câu hỏi')
     } finally {
-      setLoadingId(null);
+      setLoadingId(null)
     }
-  };
+  }
 
-  const handleCheckQuestion = () => setFoundQuestion(null);
+  const handleCheckQuestion = () => setFoundQuestion(null)
 
   const filteredLessons = getLessons().filter(
     (lesson) => !filterSequence || lesson.sequence.toString() === filterSequence
-  );
+  )
   const sortedLessons = reverseOrder
     ? [...filteredLessons].sort((a, b) => b.sequence - a.sequence)
-    : filteredLessons;
+    : filteredLessons
 
   return (
     <div className="rounded-lg transition-colors h-full overflow-y-auto ">
       <div className="flex items-center justify-between mb-4" ref={listRef}>
-        <h2 className="text-xl font-semibold text-[#2D3748]">
-          Quản lý bài học
-        </h2>
+        <h2 className="text-xl font-semibold text-[#2D3748]">Quản lý bài học</h2>
         <div className="flex items-center gap-3">
           <Input
             type="number"
@@ -296,19 +257,19 @@ export const LessonSection: FC<LessonSectionProps> = ({
             onRemoveLesson={handleRemoveLesson}
             onToggleQuestionForm={(lessonId) => {
               if (showQuestionForm?.lessonId === lessonId) {
-                setShowQuestionForm(null);
+                setShowQuestionForm(null)
               } else {
-                const lesson = getLessons().find((l) => l.id === lessonId);
-                const nextSequence = (lesson?.questions?.length ?? 0) + 1;
+                const lesson = getLessons().find((l) => l.id === lessonId)
+                const nextSequence = (lesson?.questions?.length ?? 0) + 1
                 setShowQuestionForm({
                   lessonId,
-                  questionSequence: nextSequence,
-                });
+                  questionSequence: nextSequence
+                })
               }
             }}
             onCreateQuestion={() => {
-              const nextSequence = (lesson.questions?.length ?? 0) + 1;
-              onShowCreateQuestion(lesson.id, nextSequence);
+              const nextSequence = (lesson.questions?.length ?? 0) + 1
+              onShowCreateQuestion(lesson.id, nextSequence)
             }}
             onQuestionIdChange={setNewQuestionId}
             onCheckQuestion={handleCheckQuestion}
@@ -329,5 +290,5 @@ export const LessonSection: FC<LessonSectionProps> = ({
       />
       <div ref={bottomRef} />
     </div>
-  );
-};
+  )
+}

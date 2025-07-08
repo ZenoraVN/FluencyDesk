@@ -1,82 +1,77 @@
-import { FC, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FC, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-} from "@/presentation/components/ui/form";
-import { Button } from "@/presentation/components/ui/button";
-import { X } from "lucide-react";
-import { RichtextchtEditor } from "@/presentation/components/Input/CustomRichtext";
-import { CustomInput } from "@/presentation/components/Input/CustomInput";
-import { MultiImageDropzone } from "@/presentation/components/Image/CustomMultiImageDropzone";
+  FormLabel
+} from '../../../../../components/ui/form'
+import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomInput } from '../../../../../components/Input/CustomInput'
+import { MultiImageDropzone } from '../../../../../components/Image/CustomMultiImageDropzone'
 
 export interface ReadingDetailFormData {
-  title?: string;
-  passage: string;
-  image_files?: File[];
+  title?: string
+  passage: string
+  image_files?: File[]
 }
 
 interface ReadingDetailFormProps {
-  onChange: (data: ReadingDetailFormData) => void;
+  onChange: (data: ReadingDetailFormData) => void
   initialData?: {
-    title?: string;
-    passage?: string;
-    image_files?: File[];
-  };
+    title?: string
+    passage?: string
+    image_files?: File[]
+  }
 }
 
-export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({
-  initialData,
-  onChange,
-}) => {
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({ initialData, onChange }) => {
+  const [, setImageUrls] = useState<string[]>([])
 
   const form = useForm<ReadingDetailFormData>({
     defaultValues: {
-      title: initialData?.title || "",
-      passage: initialData?.passage || "",
-      image_files: initialData?.image_files || [],
-    },
-  });
+      title: initialData?.title || '',
+      passage: initialData?.passage || '',
+      image_files: initialData?.image_files || []
+    }
+  })
 
   // Force validation for required passage on mount
   useEffect(() => {
-    form.trigger("passage");
-  }, []);
+    form.trigger('passage')
+  }, [])
 
   // Set initial images
   useEffect(() => {
     if (initialData?.image_files?.length) {
-      form.setValue("image_files", initialData.image_files);
+      form.setValue('image_files', initialData.image_files)
     }
-  }, [initialData, form]);
+  }, [initialData, form])
 
   // Watch for form value changes
   useEffect(() => {
     const subscription = form.watch((values) => {
-      onChange(values as ReadingDetailFormData);
-    });
-    return () => subscription.unsubscribe();
-  }, [form, onChange]);
+      onChange(values as ReadingDetailFormData)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, onChange])
 
   // Generate image preview URLs
   useEffect(() => {
-    const imageFiles = form.watch("image_files") || [];
-    const urls = imageFiles.map((file) => URL.createObjectURL(file));
-    setImageUrls(urls);
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [form.watch("image_files")]);
+    const imageFiles = form.watch('image_files') || []
+    const urls = imageFiles.map((file) => URL.createObjectURL(file))
+    setImageUrls(urls)
+    return () => urls.forEach((url) => URL.revokeObjectURL(url))
+  }, [form.watch('image_files')])
 
   // Image drop handler for MultiImageDropzone
   const handleImageDrop = (newFiles: File[]) => {
-    form.setValue("image_files", newFiles, {
+    form.setValue('image_files', newFiles, {
       shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
+      shouldDirty: true
+    })
+  }
 
   return (
     <Form {...form}>
@@ -93,7 +88,7 @@ export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({
                 </FormLabel>
                 <FormControl>
                   <CustomInput
-                    value={field.value || ""}
+                    value={field.value || ''}
                     onChange={field.onChange}
                     className="bg-white text-[#2D3748]"
                   />
@@ -106,40 +101,30 @@ export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({
           <FormField
             control={form.control}
             name="passage"
-            rules={{ required: "Vui lòng nhập nội dung bài đọc" }}
+            rules={{ required: 'Vui lòng nhập nội dung bài đọc' }}
             render={({ field, fieldState: { error } }) => (
               <FormItem>
-                <FormLabel className="text-[#2D3748] font-medium">
-                  Nội dung bài đọc
-                </FormLabel>
+                <FormLabel className="text-[#2D3748] font-medium">Nội dung bài đọc</FormLabel>
                 <FormControl>
                   <RichtextchtEditor
-                    value={field.value || ""}
+                    value={field.value || ''}
                     onChange={field.onChange}
                     className={`rounded-lg overflow-hidden ${
-                      error
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-[#52aaa5]/20"
+                      error ? 'border-red-500 focus:ring-red-500' : 'border-[#52aaa5]/20'
                     }`}
                   />
                 </FormControl>
-                {error && (
-                  <div className="text-sm text-red-500 mt-1">
-                    {error.message}
-                  </div>
-                )}
+                {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
               </FormItem>
             )}
           />
 
           {/* Image Upload */}
           <FormItem>
-            <FormLabel className="text-[#2D3748] font-medium">
-              Hình ảnh (Không bắt buộc)
-            </FormLabel>
+            <FormLabel className="text-[#2D3748] font-medium">Hình ảnh (Không bắt buộc)</FormLabel>
             <FormControl>
               <MultiImageDropzone
-                files={form.watch("image_files") || []}
+                files={form.watch('image_files') || []}
                 onChange={handleImageDrop}
               />
             </FormControl>
@@ -177,5 +162,5 @@ export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({
         </div>
       </form>
     </Form>
-  );
-};
+  )
+}

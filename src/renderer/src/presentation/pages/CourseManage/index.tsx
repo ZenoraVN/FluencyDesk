@@ -173,7 +173,7 @@ const CourseManagePage = () => {
                 </>
               }
               onView={(id) => navigate(`/course/view/${id}`)}
-              onEdit={(id) => navigate(`/course/edit/${id}`)}
+              onEdit={(id) => navigate(`/course/${id}/edit`)}
               onDelete={handleDelete}
             />
           </div>

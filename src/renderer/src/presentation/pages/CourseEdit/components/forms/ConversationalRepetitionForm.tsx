@@ -1,69 +1,71 @@
-import { FC, useEffect, useRef } from 'react';
-import { useFormContext, useFieldArray } from 'react-hook-form';
+import { FC, useEffect, useRef } from 'react'
+import { useFormContext, useFieldArray } from 'react-hook-form'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/presentation/components/ui/form';
-import { Input } from '@/presentation/components/ui/input';
-import { Button } from '@/presentation/components/ui/button';
-import { Plus, Minus } from 'lucide-react';
+  FormMessage
+} from '../../../../../components/ui/form'
+import { Input } from '../../../../../components/ui/input'
+import { Button } from '../../../../../components/ui/button'
+import { Plus, Minus } from 'lucide-react'
 
 export interface ConversationalRepetitionFormData {
   conversational_repetition: {
-    title: string;
-    overview: string;
-  };
+    title: string
+    overview: string
+  }
   conversational_repetition_qa: Array<{
-    question: string;
-    answer: string;
-    mean_of_question: string;
-    mean_of_answer: string;
-  }>;
+    question: string
+    answer: string
+    mean_of_question: string
+    mean_of_answer: string
+  }>
 }
 
 interface ConversationalRepetitionFormProps {
-  initialData?: ConversationalRepetitionFormData;
+  initialData?: ConversationalRepetitionFormData
 }
 
 export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps> = ({
-  initialData,
+  initialData
 }): JSX.Element => {
-  const form = useFormContext<ConversationalRepetitionFormData>();
-  const initialized = useRef(false);
+  const form = useFormContext<ConversationalRepetitionFormData>()
+  const initialized = useRef(false)
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "conversational_repetition_qa",
+    name: 'conversational_repetition_qa',
     rules: {
       required: 'Vui lòng thêm ít nhất một cặp hội thoại'
     }
-  });
+  })
 
   // Initialize with default data if no initial data
   useEffect(() => {
     if (!initialized.current) {
-      initialized.current = true;
-      const hasInitialItems = initialData?.conversational_repetition_qa && initialData.conversational_repetition_qa.length > 0;
-      
+      initialized.current = true
+      const hasInitialItems =
+        initialData?.conversational_repetition_qa &&
+        initialData.conversational_repetition_qa.length > 0
+
       if (!hasInitialItems && fields.length === 0) {
         append({
           question: '',
           answer: '',
           mean_of_question: '',
           mean_of_answer: ''
-        });
+        })
       }
     }
-  }, [initialData, fields.length, append]);
+  }, [initialData, fields.length, append])
 
   // Trigger initial validation
   useEffect(() => {
-    form.trigger(['conversational_repetition', 'conversational_repetition_qa']);
-  }, []); // Run only once on mount
+    form.trigger(['conversational_repetition', 'conversational_repetition_qa'])
+  }, []) // Run only once on mount
 
   return (
     <Form {...form}>
@@ -112,9 +114,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                           : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
                       }`}
                       onInput={(e) => {
-                        const textarea = e.target as HTMLTextAreaElement;
-                        textarea.style.height = 'auto';
-                        textarea.style.height = `${textarea.scrollHeight}px`;
+                        const textarea = e.target as HTMLTextAreaElement
+                        textarea.style.height = 'auto'
+                        textarea.style.height = `${textarea.scrollHeight}px`
                       }}
                     />
                   </FormControl>
@@ -138,12 +140,14 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
             </div>
             <Button
               type="button"
-              onClick={() => append({
-                question: '',
-                answer: '',
-                mean_of_question: '',
-                mean_of_answer: ''
-              })}
+              onClick={() =>
+                append({
+                  question: '',
+                  answer: '',
+                  mean_of_question: '',
+                  mean_of_answer: ''
+                })
+              }
               className="flex items-center gap-2 px-4 py-1.5 text-sm bg-[#52aaa5]/10 text-[#52aaa5] hover:bg-[#52aaa5]/20 rounded-lg transition-colors"
             >
               <Plus className="h-4 w-4" />
@@ -193,9 +197,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                                       : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
                                   }`}
                                   onInput={(e) => {
-                                    const target = e.target as HTMLTextAreaElement;
-                                    target.style.height = 'auto';
-                                    target.style.height = target.scrollHeight + 'px';
+                                    const target = e.target as HTMLTextAreaElement
+                                    target.style.height = 'auto'
+                                    target.style.height = target.scrollHeight + 'px'
                                   }}
                                 />
                               </FormControl>
@@ -210,7 +214,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                           rules={{ required: 'Vui lòng nhập nghĩa câu hỏi' }}
                           render={({ field, fieldState: { error } }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2D3748] font-medium">Nghĩa câu hỏi</FormLabel>
+                              <FormLabel className="text-[#2D3748] font-medium">
+                                Nghĩa câu hỏi
+                              </FormLabel>
                               <FormControl>
                                 <textarea
                                   {...field}
@@ -221,9 +227,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                                       : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
                                   }`}
                                   onInput={(e) => {
-                                    const target = e.target as HTMLTextAreaElement;
-                                    target.style.height = 'auto';
-                                    target.style.height = target.scrollHeight + 'px';
+                                    const target = e.target as HTMLTextAreaElement
+                                    target.style.height = 'auto'
+                                    target.style.height = target.scrollHeight + 'px'
                                   }}
                                 />
                               </FormControl>
@@ -248,7 +254,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                           rules={{ required: 'Vui lòng nhập câu trả lời' }}
                           render={({ field, fieldState: { error } }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2D3748] font-medium">Câu trả lời</FormLabel>
+                              <FormLabel className="text-[#2D3748] font-medium">
+                                Câu trả lời
+                              </FormLabel>
                               <FormControl>
                                 <textarea
                                   {...field}
@@ -259,9 +267,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                                       : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
                                   }`}
                                   onInput={(e) => {
-                                    const target = e.target as HTMLTextAreaElement;
-                                    target.style.height = 'auto';
-                                    target.style.height = target.scrollHeight + 'px';
+                                    const target = e.target as HTMLTextAreaElement
+                                    target.style.height = 'auto'
+                                    target.style.height = target.scrollHeight + 'px'
                                   }}
                                 />
                               </FormControl>
@@ -276,7 +284,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                           rules={{ required: 'Vui lòng nhập nghĩa câu trả lời' }}
                           render={({ field, fieldState: { error } }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2D3748] font-medium">Nghĩa câu trả lời</FormLabel>
+                              <FormLabel className="text-[#2D3748] font-medium">
+                                Nghĩa câu trả lời
+                              </FormLabel>
                               <FormControl>
                                 <textarea
                                   {...field}
@@ -287,9 +297,9 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
                                       : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
                                   }`}
                                   onInput={(e) => {
-                                    const target = e.target as HTMLTextAreaElement;
-                                    target.style.height = 'auto';
-                                    target.style.height = target.scrollHeight + 'px';
+                                    const target = e.target as HTMLTextAreaElement
+                                    target.style.height = 'auto'
+                                    target.style.height = target.scrollHeight + 'px'
                                   }}
                                 />
                               </FormControl>
@@ -307,5 +317,5 @@ export const ConversationalRepetitionForm: FC<ConversationalRepetitionFormProps>
         </div>
       </div>
     </Form>
-  );
-};
+  )
+}

@@ -1,81 +1,74 @@
-import { FC, useMemo, useState } from "react";
-import { Trash2, Eye, Move, ClipboardCheck } from "lucide-react";
-import { Question } from "../types/course";
-import clsx from "clsx";
-import CustomTable from "@/presentation/components/Table/CustomTable";
+import { FC, useMemo, useState } from 'react'
+import { Trash2, Eye, Move, ClipboardCheck } from 'lucide-react'
+import { Question } from '../types/course'
+import clsx from 'clsx'
+import CustomTable from '../../../../components/Table/CustomTable'
 
 interface LessonQuestionTableProps {
-  questions: Question[];
-  onRemoveQuestion: (
-    questionId: string,
-    setLoadingId: (id: string | null) => void
-  ) => void;
-  onViewQuestion: (questionId: string) => void;
+  questions: Question[]
+  onRemoveQuestion: (questionId: string, setLoadingId: (id: string | null) => void) => void
+  onViewQuestion: (questionId: string) => void
 }
 
 const skillLabel: Record<string, { label: string; color: string }> = {
-  grammar: { label: "Ngữ pháp", color: "bg-blue-100 text-blue-800" },
-  vocab: { label: "Từ vựng", color: "bg-green-100 text-green-800" },
-  listening: { label: "Nghe", color: "bg-purple-100 text-purple-800" },
-  reading: { label: "Đọc", color: "bg-orange-100 text-orange-800" },
-};
+  grammar: { label: 'Ngữ pháp', color: 'bg-blue-100 text-blue-800' },
+  vocab: { label: 'Từ vựng', color: 'bg-green-100 text-green-800' },
+  listening: { label: 'Nghe', color: 'bg-purple-100 text-purple-800' },
+  reading: { label: 'Đọc', color: 'bg-orange-100 text-orange-800' }
+}
 const typeLabel: Record<string, { label: string; color: string }> = {
   fill_in_the_blank: {
-    label: "Điền chỗ trống",
-    color: "bg-teal-100 text-teal-800",
+    label: 'Điền chỗ trống',
+    color: 'bg-teal-100 text-teal-800'
   },
-  multiple_choice: { label: "Trắc nghiệm", color: "bg-pink-100 text-pink-800" },
-  short_answer: { label: "Tự luận", color: "bg-yellow-100 text-yellow-800" },
-};
-const ROWS_PER_PAGE = 5;
+  multiple_choice: { label: 'Trắc nghiệm', color: 'bg-pink-100 text-pink-800' },
+  short_answer: { label: 'Tự luận', color: 'bg-yellow-100 text-yellow-800' }
+}
+const ROWS_PER_PAGE = 5
 
 const LessonQuestionTable: FC<LessonQuestionTableProps> = ({
   questions,
   onRemoveQuestion,
-  onViewQuestion,
+  onViewQuestion
 }) => {
-  const [page, setPage] = useState(1);
-  const [copied, setCopied] = useState<string | null>(null);
-  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1)
+  const [copied, setCopied] = useState<string | null>(null)
+  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   // Pagination
-  const totalCount = questions.length;
+  const totalCount = questions.length
   const pagedQuestions = useMemo(
-    () =>
-      questions.slice(
-        (page - 1) * ROWS_PER_PAGE,
-        (page - 1) * ROWS_PER_PAGE + ROWS_PER_PAGE
-      ),
+    () => questions.slice((page - 1) * ROWS_PER_PAGE, (page - 1) * ROWS_PER_PAGE + ROWS_PER_PAGE),
     [page, questions]
-  );
+  )
 
   // Column definitions theo TanStack Table
   const columns = useMemo(
     () => [
       {
-        header: "STT",
+        header: 'STT',
         cell: (info: any) => (
           <span className="inline-block px-3 py-1 bg-gray-100 text-gray-500 rounded text-xs font-semibold">
             {(page - 1) * ROWS_PER_PAGE + info.row.index + 1}
           </span>
-        ),
+        )
       },
       {
-        header: "ID",
+        header: 'ID',
         cell: (info: any) => {
-          const q = info.row.original as Question;
-          const id = q.question_id || q.id;
+          const q = info.row.original as Question
+          const id = q.question_id || q.id
           return (
             <span
               className={clsx(
-                "font-mono text-xs text-[#319795] cursor-pointer select-all relative",
-                "hover:underline"
+                'font-mono text-xs text-[#319795] cursor-pointer select-all relative',
+                'hover:underline'
               )}
               onClick={async (e) => {
-                e.preventDefault();
-                await navigator.clipboard.writeText(id);
-                setCopied(id);
-                setTimeout(() => setCopied(null), 1200);
+                e.preventDefault()
+                await navigator.clipboard.writeText(id)
+                setCopied(id)
+                setTimeout(() => setCopied(null), 1200)
               }}
               title="Click để copy ID"
             >
@@ -86,51 +79,39 @@ const LessonQuestionTable: FC<LessonQuestionTableProps> = ({
                 </span>
               )}
             </span>
-          );
-        },
+          )
+        }
       },
       {
-        header: "Kĩ năng",
+        header: 'Kĩ năng',
         cell: (info: any) => {
-          const q = info.row.original as Question;
-          const label = skillLabel[q.question_skill]?.label || q.question_skill;
-          const color =
-            skillLabel[q.question_skill]?.color || "bg-gray-100 text-gray-500";
+          const q = info.row.original as Question
+          const label = skillLabel[q.question_skill]?.label || q.question_skill
+          const color = skillLabel[q.question_skill]?.color || 'bg-gray-100 text-gray-500'
           return (
-            <span
-              className={clsx(
-                "inline-block px-2 py-1 rounded text-xs font-semibold",
-                color
-              )}
-            >
+            <span className={clsx('inline-block px-2 py-1 rounded text-xs font-semibold', color)}>
               {label}
             </span>
-          );
-        },
+          )
+        }
       },
       {
-        header: "Loại",
+        header: 'Loại',
         cell: (info: any) => {
-          const q = info.row.original as Question;
-          const label = typeLabel[q.question_type]?.label || q.question_type;
-          const color =
-            typeLabel[q.question_type]?.color || "bg-gray-100 text-gray-500";
+          const q = info.row.original as Question
+          const label = typeLabel[q.question_type]?.label || q.question_type
+          const color = typeLabel[q.question_type]?.color || 'bg-gray-100 text-gray-500'
           return (
-            <span
-              className={clsx(
-                "inline-block px-2 py-1 rounded text-xs font-semibold",
-                color
-              )}
-            >
+            <span className={clsx('inline-block px-2 py-1 rounded text-xs font-semibold', color)}>
               {label}
             </span>
-          );
-        },
+          )
+        }
       },
       {
-        header: "Hành động",
+        header: 'Hành động',
         cell: (info: any) => {
-          const q = info.row.original as Question;
+          const q = info.row.original as Question
           return (
             <div className="flex gap-2">
               <button
@@ -157,10 +138,7 @@ const LessonQuestionTable: FC<LessonQuestionTableProps> = ({
                 disabled={loadingId === q.id}
               >
                 {loadingId === q.id ? (
-                  <svg
-                    className="animate-spin w-5 h-5 text-red-400"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="animate-spin w-5 h-5 text-red-400" viewBox="0 0 24 24">
                     <circle
                       className="opacity-25"
                       cx="12"
@@ -180,16 +158,16 @@ const LessonQuestionTable: FC<LessonQuestionTableProps> = ({
                 )}
               </button>
             </div>
-          );
-        },
-      },
+          )
+        }
+      }
     ],
     [copied, loadingId, onRemoveQuestion, onViewQuestion, page]
-  );
+  )
 
   // Xử lý reset page khi đang ở page > maxPage mà xóa bớt câu hỏi
-  const maxPage = Math.max(1, Math.ceil(totalCount / ROWS_PER_PAGE));
-  if (page > maxPage) setPage(maxPage);
+  const maxPage = Math.max(1, Math.ceil(totalCount / ROWS_PER_PAGE))
+  if (page > maxPage) setPage(maxPage)
 
   return (
     <CustomTable<Question>
@@ -201,7 +179,7 @@ const LessonQuestionTable: FC<LessonQuestionTableProps> = ({
       onPageChange={(nextPage) => setPage(nextPage)}
       emptyMessage="Không có câu hỏi nào"
     />
-  );
-};
+  )
+}
 
-export default LessonQuestionTable;
+export default LessonQuestionTable

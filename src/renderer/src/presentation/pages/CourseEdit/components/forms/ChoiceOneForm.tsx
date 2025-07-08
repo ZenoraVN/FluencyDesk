@@ -1,103 +1,92 @@
-import { FC, useEffect, useRef } from "react";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { FC, useEffect, useRef } from 'react'
+import { useFormContext, useFieldArray } from 'react-hook-form'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "@/presentation/components/ui/form";
-import { Button } from "@/presentation/components/ui/button";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/presentation/components/ui/radio-group";
-import { Plus, Minus } from "lucide-react";
-import { RichtextchtEditor } from "@/presentation/components/Input/CustomRichtext";
-import { CustomInput } from "@/presentation/components/Input/CustomInput";
+  FormMessage
+} from '../../../../../components/ui/form'
+import { Button } from '../../../../../components/ui/button'
+import { RadioGroup, RadioGroupItem } from '../../../../../components/ui/radio-group'
+import { Plus, Minus } from 'lucide-react'
+import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomInput } from '../../../../../components/Input/CustomInput'
 
 export interface ChoiceOneFormData {
   choice_one_question: {
-    question: string;
-    explain: string;
-  };
+    question: string
+    explain: string
+  }
   choice_one_options: Array<{
-    option: string;
-    is_correct: boolean;
-  }>;
+    option: string
+    is_correct: boolean
+  }>
 }
 
 interface ChoiceOneFormProps {
-  initialData?: ChoiceOneFormData;
+  initialData?: ChoiceOneFormData
 }
 
-export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({
-  initialData,
-}): JSX.Element => {
-  const form = useFormContext<ChoiceOneFormData>();
-  const initialized = useRef(false);
+export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({ initialData }): JSX.Element => {
+  const form = useFormContext<ChoiceOneFormData>()
+  const initialized = useRef(false)
 
   const { fields, append, remove } = useFieldArray<ChoiceOneFormData>({
     control: form.control,
-    name: "choice_one_options",
+    name: 'choice_one_options',
     rules: {
-      required: "Vui lòng thêm ít nhất một lựa chọn",
+      required: 'Vui lòng thêm ít nhất một lựa chọn',
       validate: {
         atLeastTwo: (value: Array<{ option: string; is_correct: boolean }>) =>
-          (value && value.length >= 2) || "Phải có ít nhất 2 lựa chọn",
+          (value && value.length >= 2) || 'Phải có ít nhất 2 lựa chọn',
         maxTen: (value: Array<{ option: string; is_correct: boolean }>) =>
-          (value && value.length <= 10) || "Chỉ được tối đa 10 lựa chọn",
-        hasCorrectAnswer: (
-          value: Array<{ option: string; is_correct: boolean }>
-        ) => value?.some((opt) => opt.is_correct) || "Cần chọn 1 option true",
-        noDuplicates: (
-          value: Array<{ option: string; is_correct: boolean }>
-        ) => {
-          if (!value) return true;
-          const options = value.map((v) => v.option.trim());
-          const uniqueOptions = new Set(options);
-          return (
-            options.length === uniqueOptions.size ||
-            "Các lựa chọn không được trùng nhau"
-          );
-        },
-      },
-    },
-  });
+          (value && value.length <= 10) || 'Chỉ được tối đa 10 lựa chọn',
+        hasCorrectAnswer: (value: Array<{ option: string; is_correct: boolean }>) =>
+          value?.some((opt) => opt.is_correct) || 'Cần chọn 1 option true',
+        noDuplicates: (value: Array<{ option: string; is_correct: boolean }>) => {
+          if (!value) return true
+          const options = value.map((v) => v.option.trim())
+          const uniqueOptions = new Set(options)
+          return options.length === uniqueOptions.size || 'Các lựa chọn không được trùng nhau'
+        }
+      }
+    }
+  })
 
   // Initialize with 2 default options if no initial data
   useEffect(() => {
     if (!initialized.current) {
-      initialized.current = true;
+      initialized.current = true
       const hasInitialOptions =
         initialData &&
         Array.isArray(initialData.choice_one_options) &&
-        initialData.choice_one_options.length > 0;
+        initialData.choice_one_options.length > 0
       if (!hasInitialOptions && fields.length === 0) {
         append([
-          { option: "", is_correct: false },
-          { option: "", is_correct: false },
-        ]);
+          { option: '', is_correct: false },
+          { option: '', is_correct: false }
+        ])
       }
     }
-  }, [initialData, fields.length, append]);
+  }, [initialData, fields.length, append])
 
   // Trigger initial validation
   useEffect(() => {
     form.trigger([
-      "choice_one_question.question",
-      "choice_one_question.explain",
-      "choice_one_options",
-    ]);
-  }, []); // Run only once on mount
+      'choice_one_question.question',
+      'choice_one_question.explain',
+      'choice_one_options'
+    ])
+  }, []) // Run only once on mount
 
   // Trigger validation when fields change
   useEffect(() => {
     if (fields.length > 0) {
-      form.trigger("choice_one_options");
+      form.trigger('choice_one_options')
     }
-  }, [fields.length]); // Run when number of fields changes
+  }, [fields.length]) // Run when number of fields changes
 
   return (
     <Form {...form}>
@@ -109,44 +98,34 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({
               control={form.control}
               name="choice_one_question.question"
               rules={{
-                required: "Vui lòng nhập câu hỏi",
+                required: 'Vui lòng nhập câu hỏi',
                 validate: (value) => {
-                  const plain = (value || "")
-                    .replace(/<p>|<\/p>|<br\s*\/?>/gi, "")
-                    .trim();
-                  if (!plain) return "Vui lòng nhập câu hỏi";
-                  return true;
-                },
+                  const plain = (value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
+                  if (!plain) return 'Vui lòng nhập câu hỏi'
+                  return true
+                }
               }}
               render={({ field }) => {
-                const plain = (field.value || "")
-                  .replace(/<p>|<\/p>|<br\s*\/?>/gi, "")
-                  .trim();
+                const plain = (field.value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
                 return (
                   <FormItem>
-                    <FormLabel className="text-[#2D3748] font-medium">
-                      Câu hỏi
-                    </FormLabel>
+                    <FormLabel className="text-[#2D3748] font-medium">Câu hỏi</FormLabel>
                     <FormControl>
                       <div className="mt-2">
                         <RichtextchtEditor
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           className={
-                            !plain
-                              ? "border-red-500 text-red-500"
-                              : "hover:border-[#52aaaf]"
+                            !plain ? 'border-red-500 text-red-500' : 'hover:border-[#52aaaf]'
                           }
                         />
                       </div>
                     </FormControl>
                     {!plain && (
-                      <div className="text-sm text-red-500 mt-1">
-                        Vui lòng nhập câu hỏi
-                      </div>
+                      <div className="text-sm text-red-500 mt-1">Vui lòng nhập câu hỏi</div>
                     )}
                   </FormItem>
-                );
+                )
               }}
             />
           </div>
@@ -156,9 +135,7 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({
         <div className="space-y-4">
           <div className="flex justify-between items-center pb-3">
             <div>
-              <h4 className="text-sm font-medium text-[#2D3748]">
-                Các lựa chọn
-              </h4>
+              <h4 className="text-sm font-medium text-[#2D3748]">Các lựa chọn</h4>
               {form.formState.errors.choice_one_options?.root && (
                 <div className="text-sm text-red-500 mt-1">
                   {form.formState.errors.choice_one_options.root.message}
@@ -168,7 +145,7 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({
             {fields.length < 10 && (
               <Button
                 type="button"
-                onClick={() => append({ option: "", is_correct: false })}
+                onClick={() => append({ option: '', is_correct: false })}
                 className="flex items-center gap-2 px-4 py-1.5 text-sm bg-[#52aaa5]/10 text-[#52aaa5] hover:bg-[#52aaa5]/20 rounded-lg transition-colors"
               >
                 <Plus className="h-4 w-4" />
@@ -191,15 +168,15 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({
                             <RadioGroup
                               onValueChange={() => {
                                 const newOptions = form
-                                  .getValues("choice_one_options")
+                                  .getValues('choice_one_options')
                                   .map((opt, i) => ({
                                     ...opt,
-                                    is_correct: i === index,
-                                  }));
-                                form.setValue("choice_one_options", newOptions);
-                                form.trigger("choice_one_options");
+                                    is_correct: i === index
+                                  }))
+                                form.setValue('choice_one_options', newOptions)
+                                form.trigger('choice_one_options')
                               }}
-                              value={radioField.value ? "true" : ""}
+                              value={radioField.value ? 'true' : ''}
                             >
                               <RadioGroupItem value="true" />
                             </RadioGroup>
@@ -214,27 +191,23 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({
                       control={form.control}
                       name={`choice_one_options.${index}.option`}
                       rules={{
-                        required: "Vui lòng nhập lựa chọn",
+                        required: 'Vui lòng nhập lựa chọn'
                       }}
-                      render={({
-                        field: inputField,
-                        fieldState: { error },
-                      }) => (
+                      render={({ field: inputField, fieldState: { error } }) => (
                         <FormItem>
                           <FormControl>
                             {/* BLOCK này đảm bảo context block và full width */}
                             <div className="block w-full">
                               <CustomInput
-                                value={inputField.value || ""}
+                                value={inputField.value || ''}
                                 onChange={(val) => {
-                                  inputField.onChange(val);
-                                  form.trigger("choice_one_options");
+                                  inputField.onChange(val)
+                                  form.trigger('choice_one_options')
                                 }}
                                 className={`w-full bg-transparent text-[#2D3748] min-h-[40px] py-1.5 my-1 ${
-                                  error ||
-                                  form.formState.errors.choice_one_options?.root
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20"
+                                  error || form.formState.errors.choice_one_options?.root
+                                    ? 'border-red-500 focus:ring-red-500'
+                                    : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
                                 }`}
                               />
                             </div>
@@ -268,49 +241,39 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({
               control={form.control}
               name="choice_one_question.explain"
               rules={{
-                required: "Vui lòng nhập giải thích",
+                required: 'Vui lòng nhập giải thích',
                 validate: (value) => {
-                  const plain = (value || "")
-                    .replace(/<p>|<\/p>|<br\s*\/?>/gi, "")
-                    .trim();
-                  if (!plain) return "Vui lòng nhập giải thích";
-                  return true;
-                },
+                  const plain = (value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
+                  if (!plain) return 'Vui lòng nhập giải thích'
+                  return true
+                }
               }}
               render={({ field, fieldState: { error } }) => {
-                const plain = (field.value || "")
-                  .replace(/<p>|<\/p>|<br\s*\/?>/gi, "")
-                  .trim();
+                const plain = (field.value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
                 return (
                   <FormItem>
-                    <FormLabel className="text-[#2D3748] font-medium">
-                      Giải thích
-                    </FormLabel>
+                    <FormLabel className="text-[#2D3748] font-medium">Giải thích</FormLabel>
                     <FormControl>
                       <div className="mt-2">
                         <RichtextchtEditor
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           className={
-                            !plain
-                              ? "border-red-500 text-red-500"
-                              : "hover:border-[#52aaaf]"
+                            !plain ? 'border-red-500 text-red-500' : 'hover:border-[#52aaaf]'
                           }
                         />
                       </div>
                     </FormControl>
                     {!plain && (
-                      <div className="text-sm text-red-500 mt-1">
-                        Vui lòng nhập giải thích
-                      </div>
+                      <div className="text-sm text-red-500 mt-1">Vui lòng nhập giải thích</div>
                     )}
                   </FormItem>
-                );
+                )
               }}
             />
           </div>
         </div>
       </div>
     </Form>
-  );
-};
+  )
+}

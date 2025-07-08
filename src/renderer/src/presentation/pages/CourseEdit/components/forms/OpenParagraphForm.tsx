@@ -1,54 +1,50 @@
-import { FC, useState } from "react";
-import { useFormContext, Controller } from "react-hook-form";
+import { FC, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-} from "@/presentation/components/ui/form";
-import { Button } from "@/presentation/components/ui/button";
-import { Plus, Minus } from "lucide-react";
-import { RichtextchtEditor } from "@/presentation/components/Input/CustomRichtext";
+  FormLabel
+} from '../../../../..//components/ui/form'
+import { Button } from '../../../../..//components/ui/button'
+import { Plus, Minus } from 'lucide-react'
+import { RichtextchtEditor } from '../../../../..//components/Input/CustomRichtext'
 
 // Type definitions
 export interface OpenParagraphFormData {
   open_paragraph: {
-    example_paragraph: string;
-    mean_example_paragraph: string;
-    tips?: string[];
-  };
+    example_paragraph: string
+    mean_example_paragraph: string
+    tips?: string[]
+  }
 }
 interface OpenParagraphFormProps {
-  initialData?: OpenParagraphFormData;
+  initialData?: OpenParagraphFormData
 }
 
-export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({
-  initialData,
-}) => {
-  const form = useFormContext<OpenParagraphFormData>();
-  const [tips, setTips] = useState<string[]>(
-    initialData?.open_paragraph?.tips || []
-  );
+export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({ initialData }) => {
+  const form = useFormContext<OpenParagraphFormData>()
+  const [tips, setTips] = useState<string[]>(initialData?.open_paragraph?.tips || [])
 
   const addTip = () => {
-    const newTips = [...tips, ""];
-    setTips(newTips);
-    form.setValue("open_paragraph.tips", newTips);
-  };
+    const newTips = [...tips, '']
+    setTips(newTips)
+    form.setValue('open_paragraph.tips', newTips)
+  }
 
   const removeTip = (index: number) => {
-    const newTips = tips.filter((_, i) => i !== index);
-    setTips(newTips);
-    form.setValue("open_paragraph.tips", newTips);
-  };
+    const newTips = tips.filter((_, i) => i !== index)
+    setTips(newTips)
+    form.setValue('open_paragraph.tips', newTips)
+  }
 
   const updateTip = (index: number, value: string) => {
-    const newTips = [...tips];
-    newTips[index] = value;
-    setTips(newTips);
-    form.setValue("open_paragraph.tips", newTips);
-  };
+    const newTips = [...tips]
+    newTips[index] = value
+    setTips(newTips)
+    form.setValue('open_paragraph.tips', newTips)
+  }
 
   return (
     <Form {...form}>
@@ -59,30 +55,22 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({
             control={form.control}
             name="open_paragraph.example_paragraph"
             rules={{
-              required: "Vui lòng nhập đoạn văn mẫu",
+              required: 'Vui lòng nhập đoạn văn mẫu',
               validate: (v?: string) =>
-                v?.replace(/<[^>]*>/g, "").trim()
-                  ? true
-                  : "Vui lòng nhập đoạn văn mẫu",
+                v?.replace(/<[^>]*>/g, '').trim() ? true : 'Vui lòng nhập đoạn văn mẫu'
             }}
             render={({ field, fieldState: { error } }) => (
               <FormItem>
-                <FormLabel className="text-[#2D3748] font-medium">
-                  Đoạn văn mẫu
-                </FormLabel>
+                <FormLabel className="text-[#2D3748] font-medium">Đoạn văn mẫu</FormLabel>
                 <FormControl>
                   <RichtextchtEditor
-                    value={field.value || ""}
+                    value={field.value || ''}
                     onChange={field.onChange}
                     placeholder="Nhập đoạn văn mẫu bằng tiếng Anh..."
                     className="hover:border-[#52aaaf]"
                   />
                 </FormControl>
-                {error && (
-                  <div className="text-sm text-red-500 mt-1">
-                    {error.message}
-                  </div>
-                )}
+                {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
               </FormItem>
             )}
           />
@@ -94,30 +82,22 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({
             control={form.control}
             name="open_paragraph.mean_example_paragraph"
             rules={{
-              required: "Vui lòng nhập nghĩa đoạn văn mẫu",
+              required: 'Vui lòng nhập nghĩa đoạn văn mẫu',
               validate: (v?: string) =>
-                v?.replace(/<[^>]*>/g, "").trim()
-                  ? true
-                  : "Vui lòng nhập nghĩa đoạn văn mẫu",
+                v?.replace(/<[^>]*>/g, '').trim() ? true : 'Vui lòng nhập nghĩa đoạn văn mẫu'
             }}
             render={({ field, fieldState: { error } }) => (
               <FormItem>
-                <FormLabel className="text-[#2D3748] font-medium">
-                  Nghĩa đoạn văn mẫu
-                </FormLabel>
+                <FormLabel className="text-[#2D3748] font-medium">Nghĩa đoạn văn mẫu</FormLabel>
                 <FormControl>
                   <RichtextchtEditor
-                    value={field.value || ""}
+                    value={field.value || ''}
                     onChange={field.onChange}
                     placeholder="Nhập nghĩa tiếng Việt của đoạn văn mẫu..."
                     className="hover:border-[#52aaaf]"
                   />
                 </FormControl>
-                {error && (
-                  <div className="text-sm text-red-500 mt-1">
-                    {error.message}
-                  </div>
-                )}
+                {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
               </FormItem>
             )}
           />
@@ -126,9 +106,7 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({
         {/* Tips Section */}
         <div className="space-y-4">
           <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-            <h4 className="text-sm font-medium text-[#2D3748]">
-              Mẹo viết (không bắt buộc)
-            </h4>
+            <h4 className="text-sm font-medium text-[#2D3748]">Mẹo viết (không bắt buộc)</h4>
             <Button
               type="button"
               onClick={addTip}
@@ -142,9 +120,7 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({
             {tips.map((tip, index) => (
               <div key={index} className="relative rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <h5 className="text-sm font-medium text-[#2D3748]">
-                    Mẹo {index + 1}
-                  </h5>
+                  <h5 className="text-sm font-medium text-[#2D3748]">Mẹo {index + 1}</h5>
                   <Button
                     type="button"
                     onClick={() => removeTip(index)}
@@ -165,5 +141,5 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({
         </div>
       </div>
     </Form>
-  );
-};
+  )
+}

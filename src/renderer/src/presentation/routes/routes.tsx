@@ -10,6 +10,7 @@ import LessonPage from '../pages/Lesson'
 import NoteManagaPage from '../pages/NoteManage'
 import NotePage from '../pages/Note'
 import AnalyticPage from '../pages/Analytic'
+import CourseEditPage from '../pages/CourseEdit'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 import LoginPage from '../pages/Login'
 import RegisterPage from '../pages/Register'
@@ -42,6 +43,14 @@ export const routes: RouteObject[] = [
         element: (
           <RequireAuth>
             <CoursePage />
+          </RequireAuth>
+        )
+      },
+      {
+        path: 'course/:courseId/edit',
+        element: (
+          <RequireAuth>
+            <CourseEditPage />
           </RequireAuth>
         )
       },

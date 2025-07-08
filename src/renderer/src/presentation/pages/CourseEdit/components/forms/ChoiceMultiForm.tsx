@@ -1,110 +1,99 @@
-import { FC, useEffect, useRef } from "react";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { FC, useEffect, useRef } from 'react'
+import { useFormContext, useFieldArray } from 'react-hook-form'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "@/presentation/components/ui/form";
-import { Button } from "@/presentation/components/ui/button";
-import { Checkbox } from "@/presentation/components/ui/checkbox";
-import { Plus, Minus } from "lucide-react";
-import { RichtextchtEditor } from "@/presentation/components/Input/CustomRichtext";
-import { CustomInput } from "@/presentation/components/Input/CustomInput";
+  FormMessage
+} from '../../../../../components/ui/form'
+import { Button } from '../../../../../components/ui/button'
+import { Checkbox } from '../../../../../components/ui/checkbox'
+import { Plus, Minus } from 'lucide-react'
+import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomInput } from '../../../../../components/Input/CustomInput'
 
 export interface ChoiceMultiFormData {
   choice_multi_question: {
-    question: string;
-    explain: string;
-  };
+    question: string
+    explain: string
+  }
   choice_multi_options: Array<{
-    option: string;
-    is_correct: boolean;
-  }>;
+    option: string
+    is_correct: boolean
+  }>
 }
 
 interface ChoiceMultiFormProps {
-  initialData?: ChoiceMultiFormData;
+  initialData?: ChoiceMultiFormData
 }
 
-export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({
-  initialData,
-}): JSX.Element => {
-  const form = useFormContext<ChoiceMultiFormData>();
-  const initialized = useRef(false);
+export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({ initialData }): JSX.Element => {
+  const form = useFormContext<ChoiceMultiFormData>()
+  const initialized = useRef(false)
 
   const { fields, append, remove } = useFieldArray<ChoiceMultiFormData>({
     control: form.control,
-    name: "choice_multi_options",
+    name: 'choice_multi_options',
     rules: {
-      required: "Vui lòng thêm ít nhất một lựa chọn",
+      required: 'Vui lòng thêm ít nhất một lựa chọn',
       validate: {
         atLeastThree: (value: Array<{ option: string; is_correct: boolean }>) =>
-          (value && value.length >= 3) || "Phải có ít nhất 3 lựa chọn",
+          (value && value.length >= 3) || 'Phải có ít nhất 3 lựa chọn',
         maxTen: (value: Array<{ option: string; is_correct: boolean }>) =>
-          (value && value.length <= 10) || "Chỉ được tối đa 10 lựa chọn",
-        hasCorrectAnswers: (
-          value: Array<{ option: string; is_correct: boolean }>
-        ) => {
-          const correctCount =
-            value?.filter((opt) => opt.is_correct).length || 0;
-          const incorrectCount =
-            value?.filter((opt) => !opt.is_correct).length || 0;
+          (value && value.length <= 10) || 'Chỉ được tối đa 10 lựa chọn',
+        hasCorrectAnswers: (value: Array<{ option: string; is_correct: boolean }>) => {
+          const correctCount = value?.filter((opt) => opt.is_correct).length || 0
+          const incorrectCount = value?.filter((opt) => !opt.is_correct).length || 0
           return (
             (correctCount >= 2 && incorrectCount >= 1) ||
-            "Phải có ít nhất 2 đáp án đúng và 1 đáp án sai"
-          );
+            'Phải có ít nhất 2 đáp án đúng và 1 đáp án sai'
+          )
         },
-        noDuplicates: (
-          value: Array<{ option: string; is_correct: boolean }>
-        ) => {
-          if (!value) return true;
-          const options = value.map((v) => v.option.trim());
-          const uniqueOptions = new Set(options);
-          return (
-            options.length === uniqueOptions.size ||
-            "Các lựa chọn không được trùng nhau"
-          );
-        },
-      },
-    },
-  });
+        noDuplicates: (value: Array<{ option: string; is_correct: boolean }>) => {
+          if (!value) return true
+          const options = value.map((v) => v.option.trim())
+          const uniqueOptions = new Set(options)
+          return options.length === uniqueOptions.size || 'Các lựa chọn không được trùng nhau'
+        }
+      }
+    }
+  })
 
   // Initialize with 3 default options if no initial data
   useEffect(() => {
     if (!initialized.current) {
-      initialized.current = true;
+      initialized.current = true
       const hasInitialOptions =
         initialData &&
         Array.isArray(initialData.choice_multi_options) &&
-        initialData.choice_multi_options.length > 0;
+        initialData.choice_multi_options.length > 0
       if (!hasInitialOptions && fields.length === 0) {
         append([
-          { option: "", is_correct: true },
-          { option: "", is_correct: true },
-          { option: "", is_correct: false },
-        ]);
+          { option: '', is_correct: true },
+          { option: '', is_correct: true },
+          { option: '', is_correct: false }
+        ])
       }
     }
-  }, [initialData, fields.length, append]);
+  }, [initialData, fields.length, append])
 
   // Trigger initial validation
   useEffect(() => {
     form.trigger([
-      "choice_multi_question.question",
-      "choice_multi_question.explain",
-      "choice_multi_options",
-    ]);
-  }, []);
+      'choice_multi_question.question',
+      'choice_multi_question.explain',
+      'choice_multi_options'
+    ])
+  }, [])
 
   // Trigger validation when option fields change
   useEffect(() => {
     if (fields.length > 0) {
-      form.trigger("choice_multi_options");
+      form.trigger('choice_multi_options')
     }
-  }, [fields.length]);
+  }, [fields.length])
 
   return (
     <Form {...form}>
@@ -116,44 +105,34 @@ export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({
               control={form.control}
               name="choice_multi_question.question"
               rules={{
-                required: "Vui lòng nhập câu hỏi",
+                required: 'Vui lòng nhập câu hỏi',
                 validate: (value) => {
-                  const plain = (value || "")
-                    .replace(/<p>|<\/p>|<br\s*\/?>/gi, "")
-                    .trim();
-                  if (!plain) return "Vui lòng nhập câu hỏi";
-                  return true;
-                },
+                  const plain = (value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
+                  if (!plain) return 'Vui lòng nhập câu hỏi'
+                  return true
+                }
               }}
               render={({ field, fieldState: { error } }) => {
-                const plain = (field.value || "")
-                  .replace(/<p>|<\/p>|<br\s*\/?>/gi, "")
-                  .trim();
+                const plain = (field.value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
                 return (
                   <FormItem>
-                    <FormLabel className="text-[#2D3748] font-medium">
-                      Câu hỏi
-                    </FormLabel>
+                    <FormLabel className="text-[#2D3748] font-medium">Câu hỏi</FormLabel>
                     <FormControl>
                       <div className="mt-2">
                         <RichtextchtEditor
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           className={
-                            !plain
-                              ? "border-red-500 text-red-500"
-                              : "hover:border-[#52aaaf]"
+                            !plain ? 'border-red-500 text-red-500' : 'hover:border-[#52aaaf]'
                           }
                         />
                       </div>
                     </FormControl>
                     {!plain && (
-                      <div className="text-sm text-red-500 mt-1">
-                        Vui lòng nhập câu hỏi
-                      </div>
+                      <div className="text-sm text-red-500 mt-1">Vui lòng nhập câu hỏi</div>
                     )}
                   </FormItem>
-                );
+                )
               }}
             />
           </div>
@@ -174,7 +153,7 @@ export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({
             {fields.length < 10 && (
               <Button
                 type="button"
-                onClick={() => append({ option: "", is_correct: false })}
+                onClick={() => append({ option: '', is_correct: false })}
                 className="flex items-center gap-2 px-4 py-1.5 text-sm bg-[#52aaa5]/10 text-[#52aaa5] hover:bg-[#52aaa5]/20 rounded-lg transition-colors"
               >
                 <Plus className="h-4 w-4" />
@@ -197,8 +176,8 @@ export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({
                             <Checkbox
                               checked={Boolean(checkboxField.value)}
                               onCheckedChange={(checked) => {
-                                checkboxField.onChange(checked || false);
-                                form.trigger("choice_multi_options");
+                                checkboxField.onChange(checked || false)
+                                form.trigger('choice_multi_options')
                               }}
                             />
                           </FormControl>
@@ -212,27 +191,22 @@ export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({
                       control={form.control}
                       name={`choice_multi_options.${index}.option`}
                       rules={{
-                        required: "Vui lòng nhập lựa chọn",
+                        required: 'Vui lòng nhập lựa chọn'
                       }}
-                      render={({
-                        field: inputField,
-                        fieldState: { error },
-                      }) => (
+                      render={({ field: inputField, fieldState: { error } }) => (
                         <FormItem>
                           <FormControl>
                             <div className="block w-full">
                               <CustomInput
-                                value={inputField.value || ""}
+                                value={inputField.value || ''}
                                 onChange={(val) => {
-                                  inputField.onChange(val);
-                                  form.trigger("choice_multi_options");
+                                  inputField.onChange(val)
+                                  form.trigger('choice_multi_options')
                                 }}
                                 className={`w-full bg-transparent text-[#2D3748] min-h-[40px] py-1.5 my-1 ${
-                                  error ||
-                                  form.formState.errors.choice_multi_options
-                                    ?.root
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20"
+                                  error || form.formState.errors.choice_multi_options?.root
+                                    ? 'border-red-500 focus:ring-red-500'
+                                    : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
                                 }`}
                               />
                             </div>
@@ -264,31 +238,25 @@ export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({
               control={form.control}
               name="choice_multi_question.explain"
               rules={{
-                required: "Vui lòng nhập giải thích",
+                required: 'Vui lòng nhập giải thích',
                 validate: (value) => {
-                  if (!value?.trim()) return "Vui lòng nhập giải thích";
-                  return true;
-                },
+                  if (!value?.trim()) return 'Vui lòng nhập giải thích'
+                  return true
+                }
               }}
               render={({ field, fieldState: { error } }) => (
                 <FormItem>
-                  <FormLabel className="text-[#2D3748] font-medium">
-                    Giải thích
-                  </FormLabel>
+                  <FormLabel className="text-[#2D3748] font-medium">Giải thích</FormLabel>
                   <FormControl>
                     <div className="mt-2">
                       <RichtextchtEditor
-                        value={field.value || ""}
+                        value={field.value || ''}
                         onChange={field.onChange}
-                        className={error ? "border-red-500" : ""}
+                        className={error ? 'border-red-500' : ''}
                       />
                     </div>
                   </FormControl>
-                  {error && (
-                    <div className="text-sm text-red-500 mt-1">
-                      {error.message}
-                    </div>
-                  )}
+                  {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
                 </FormItem>
               )}
             />
@@ -296,5 +264,5 @@ export const ChoiceMultiForm: FC<ChoiceMultiFormProps> = ({
         </div>
       </div>
     </Form>
-  );
-};
+  )
+}

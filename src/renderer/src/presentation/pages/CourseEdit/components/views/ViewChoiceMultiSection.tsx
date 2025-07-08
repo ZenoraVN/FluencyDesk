@@ -1,20 +1,18 @@
-import { FC } from "react";
-import { QuestionDetail } from "../../types/questionDetail";
-import { RichtextView } from "@/presentation/components/common/RichtextView";
+import { FC } from 'react'
+import { QuestionDetail } from '../../types/questionDetail'
+import { RichtextView } from '../../../../../components/common/RichtextView'
 
 interface Props {
-  question: QuestionDetail;
+  question: QuestionDetail
 }
 
 export const ViewChoiceMultiSection: FC<Props> = ({ question }) => {
-  if (!question.choice_multi_question) return null;
-  const { question: questionText, explain } = question.choice_multi_question;
-  const options = (question.choice_multi_options ?? []).map(
-    (o: any, idx: number) => ({
-      ...o,
-      idx,
-    })
-  );
+  if (!question.choice_multi_question) return null
+  const { question: questionText, explain } = question.choice_multi_question
+  const options = (question.choice_multi_options ?? []).map((o: any, idx: number) => ({
+    ...o,
+    idx
+  }))
 
   return (
     <div className="rounded-xl">
@@ -27,13 +25,11 @@ export const ViewChoiceMultiSection: FC<Props> = ({ question }) => {
             key={option.id || option.idx}
             className={`flex items-center gap-3 w-full p-2 rounded-lg text-left transition-colors ${
               option.is_correct
-                ? "text-[#52aaaf] border border-[#52aaaf] bg-[#e9faf9]"
-                : "border border-[#ddd] text-[#2D3748] hover:border-red-500"
+                ? 'text-[#52aaaf] border border-[#52aaaf] bg-[#e9faf9]'
+                : 'border border-[#ddd] text-[#2D3748] hover:border-red-500'
             }`}
           >
-            <span className={option.is_correct ? "font-medium" : ""}>
-              {option.option}
-            </span>
+            <span className={option.is_correct ? 'font-medium' : ''}>{option.option}</span>
           </div>
         ))}
       </div>
@@ -44,5 +40,5 @@ export const ViewChoiceMultiSection: FC<Props> = ({ question }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useState, useRef, useEffect } from 'react'
 import { Badge } from '../../../../components/ui/badge'
 import { Course } from '../type/Course'
 import { twMerge } from 'tailwind-merge'
@@ -41,9 +41,26 @@ const STATUS_LABELS: Record<string, string> = {
 
 export const CourseCard: FC<CourseCardProps> = ({ course, onView, onEdit, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isMenuOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      // If the menu is open and click target is outside cardRef, close menu
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside, true)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside, true)
+    }
+  }, [isMenuOpen])
 
   return (
     <div
+      ref={cardRef}
       className={twMerge(
         'relative rounded-2xl border border-[#b9b9b9] flex overflow-hidden transition-all group',
         'bg-transparent',

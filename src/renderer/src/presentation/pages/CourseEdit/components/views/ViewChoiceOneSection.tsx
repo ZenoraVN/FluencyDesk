@@ -1,13 +1,13 @@
-import { FC } from "react";
-import { QuestionDetail } from "../../types/questionDetail";
-import { RichtextView } from "@/presentation/components/common/RichtextView";
+import { FC } from 'react'
+import { QuestionDetail } from '../../types/questionDetail'
+import { RichtextView } from '../../../../../components/common/RichtextView'
 
 interface Props {
-  question: QuestionDetail;
+  question: QuestionDetail
 }
 
 export const ViewChoiceOneSection: FC<Props> = ({ question }) => {
-  if (!question.choice_one_question) return null;
+  if (!question.choice_one_question) return null
 
   return (
     <div className="rounded-xl">
@@ -22,13 +22,11 @@ export const ViewChoiceOneSection: FC<Props> = ({ question }) => {
             key={option.id || idx}
             className={`flex items-center gap-3 w-full p-2 rounded-lg text-left transition-colors ${
               option.is_correct
-                ? "text-[#52aaaf] border border-[#52aaaf]"
-                : "border border-[#ddd] text-[#2D3748] hover:border-red-500"
+                ? 'text-[#52aaaf] border border-[#52aaaf]'
+                : 'border border-[#ddd] text-[#2D3748] hover:border-red-500'
             }`}
           >
-            <span className={option.is_correct ? "font-medium" : ""}>
-              {option.option}
-            </span>
+            <span className={option.is_correct ? 'font-medium' : ''}>{option.option}</span>
           </div>
         ))}
       </div>
@@ -36,12 +34,9 @@ export const ViewChoiceOneSection: FC<Props> = ({ question }) => {
       {question.choice_one_question.explain && (
         <div className="mt-6">
           <h4 className="font-medium text-[#2D3748] mb-1">Giải thích</h4>
-          <RichtextView
-            content={question.choice_one_question.explain}
-            className="text-[#718096]"
-          />
+          <RichtextView content={question.choice_one_question.explain} className="text-[#718096]" />
         </div>
       )}
     </div>
-  );
-};
+  )
+}

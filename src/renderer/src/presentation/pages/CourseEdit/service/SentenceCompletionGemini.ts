@@ -1,18 +1,18 @@
-import { GeminiService } from "@/service/GeminiService";
+import { GeminiService } from '../../../../service/GeminiService'
 
 export interface SentenceCompletionAIData {
-    instruction: string;
-    topic: string[];
-    tags: string[];
-    level: string;
-    sentence_completions: Array<{
-        original_sentence: string;
-        start_phrase: string;
-        middle_phrase: string | null;
-        end_phrase: string | null;
-        true_sentences: string[];
-        explain: string;
-    }>;
+  instruction: string
+  topic: string[]
+  tags: string[]
+  level: string
+  sentence_completions: Array<{
+    original_sentence: string
+    start_phrase: string
+    middle_phrase: string | null
+    end_phrase: string | null
+    true_sentences: string[]
+    explain: string
+  }>
 }
 
 const buildPrompt = (message: string) => `
@@ -55,49 +55,49 @@ Chỉ trả về object JSON duy nhất bên trong code block, không chú thíc
 """
 ${message}
 """
-`;
+`
 
 function parseAIJson(text: string): SentenceCompletionAIData | null {
-    try {
-        const jsonBlock = text.match(/```json\s*([\s\S]+?)\s*```/);
-        let rawJson = jsonBlock?.[1]?.trim() ?? '';
-        if (!rawJson && text.trim().startsWith("{")) rawJson = text.trim();
-        else if (!rawJson) {
-            const jsonStart = text.indexOf("{");
-            if (jsonStart >= 0) rawJson = text.slice(jsonStart).trim();
-        }
-        if (!rawJson) return null;
-        return JSON.parse(rawJson);
-    } catch {
-        return null;
+  try {
+    const jsonBlock = text.match(/```json\s*([\s\S]+?)\s*```/)
+    let rawJson = jsonBlock?.[1]?.trim() ?? ''
+    if (!rawJson && text.trim().startsWith('{')) rawJson = text.trim()
+    else if (!rawJson) {
+      const jsonStart = text.indexOf('{')
+      if (jsonStart >= 0) rawJson = text.slice(jsonStart).trim()
     }
+    if (!rawJson) return null
+    return JSON.parse(rawJson)
+  } catch {
+    return null
+  }
 }
 
 export async function getSentenceCompletionAIGemini(
-    message: string
+  message: string
 ): Promise<SentenceCompletionAIData> {
-    const apiKey = await GeminiService.getNextApiKey();
-    if (!apiKey) throw new Error("Chưa cấu hình Gemini API Key");
-    const prompt = buildPrompt(message);
-    const resp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-            }),
-        }
-    );
-    if (!resp.ok) throw new Error("Gemini API lỗi: " + resp.statusText);
-    const result = await resp.json();
-    const text =
-        result.candidates?.[0]?.content?.parts?.[0]?.text ||
-        result.candidates?.[0]?.content?.parts?.[0] ||
-        result.candidates?.[0]?.content?.text ||
-        result.text ||
-        "";
-    const data = parseAIJson(text);
-    if (!data) throw new Error("Gemini trả về dữ liệu không hợp lệ!");
-    return data;
+  const apiKey = await GeminiService.getNextApiKey()
+  if (!apiKey) throw new Error('Chưa cấu hình Gemini API Key')
+  const prompt = buildPrompt(message)
+  const resp = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    }
+  )
+  if (!resp.ok) throw new Error('Gemini API lỗi: ' + resp.statusText)
+  const result = await resp.json()
+  const text =
+    result.candidates?.[0]?.content?.parts?.[0]?.text ||
+    result.candidates?.[0]?.content?.parts?.[0] ||
+    result.candidates?.[0]?.content?.text ||
+    result.text ||
+    ''
+  const data = parseAIJson(text)
+  if (!data) throw new Error('Gemini trả về dữ liệu không hợp lệ!')
+  return data
 }

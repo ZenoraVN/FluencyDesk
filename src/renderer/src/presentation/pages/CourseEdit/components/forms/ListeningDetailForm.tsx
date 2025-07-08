@@ -1,109 +1,103 @@
-import { FC, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FC, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-} from "@/presentation/components/ui/form";
-import { Button } from "@/presentation/components/ui/button";
-import { Upload, X } from "lucide-react";
-import { useDropzone } from "react-dropzone";
-import { RichtextchtEditor } from "@/presentation/components/Input/CustomRichtext";
-import { MultiImageDropzone } from "../../../../components/Image/CustomMultiImageDropzone";
+  FormLabel
+} from '../../../../../components/ui/form'
+import { Button } from '../../../../../components/ui/button'
+import { Upload, X } from 'lucide-react'
+import { useDropzone } from 'react-dropzone'
+import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { MultiImageDropzone } from '../../../../../components/Image/CustomMultiImageDropzone'
 
 export interface ListeningDetailFormData {
-  transcript?: string;
-  audio_file?: File;
-  image_files?: File[];
+  transcript?: string
+  audio_file?: File
+  image_files?: File[]
 }
 
 interface ListeningDetailFormProps {
-  onChange: (data: ListeningDetailFormData) => void;
+  onChange: (data: ListeningDetailFormData) => void
   initialData?: {
-    transcript?: string;
-    audio_file?: File;
-    image_files?: File[];
-  };
+    transcript?: string
+    audio_file?: File
+    image_files?: File[]
+  }
 }
 
-export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
-  initialData,
-  onChange,
-}) => {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [, setImageUrls] = useState<string[]>([]);
+export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({ initialData, onChange }) => {
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [, setImageUrls] = useState<string[]>([])
 
   const form = useForm<ListeningDetailFormData>({
     defaultValues: {
-      transcript: initialData?.transcript || "",
+      transcript: initialData?.transcript || '',
       audio_file: initialData?.audio_file,
-      image_files: initialData?.image_files || [],
-    },
-  });
+      image_files: initialData?.image_files || []
+    }
+  })
 
   // Force show validation on mount
   useEffect(() => {
-    form.trigger("audio_file");
-  }, []);
+    form.trigger('audio_file')
+  }, [])
 
   // Set initial files and emit changes
   useEffect(() => {
     if (initialData) {
       if (initialData.audio_file) {
-        form.setValue("audio_file", initialData.audio_file);
+        form.setValue('audio_file', initialData.audio_file)
       }
       if (initialData.image_files?.length) {
-        form.setValue("image_files", initialData.image_files);
+        form.setValue('image_files', initialData.image_files)
       }
     }
-  }, [initialData, form]);
+  }, [initialData, form])
 
   // Watch form changes and emit to parent
   useEffect(() => {
     const subscription = form.watch((value) => {
-      onChange(value as ListeningDetailFormData);
-    });
-    return () => subscription.unsubscribe();
-  }, [form, onChange]);
+      onChange(value as ListeningDetailFormData)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, onChange])
 
   // Create audio preview URLs
   useEffect(() => {
-    const audioFile = form.watch("audio_file");
+    const audioFile = form.watch('audio_file')
     if (audioFile) {
-      const url = URL.createObjectURL(audioFile);
-      setAudioUrl(url);
-      return () => URL.revokeObjectURL(url);
+      const url = URL.createObjectURL(audioFile)
+      setAudioUrl(url)
+      return () => URL.revokeObjectURL(url)
     }
-    setAudioUrl(null);
-    return () => {};
-  }, [form.watch("audio_file")]);
+    setAudioUrl(null)
+    return () => {}
+  }, [form.watch('audio_file')])
 
   // Create image preview URLs
   useEffect(() => {
-    const imageFiles = form.watch("image_files") || [];
-    const urls = imageFiles.map((file) => URL.createObjectURL(file));
-    setImageUrls(urls);
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [form.watch("image_files")]);
+    const imageFiles = form.watch('image_files') || []
+    const urls = imageFiles.map((file) => URL.createObjectURL(file))
+    setImageUrls(urls)
+    return () => urls.forEach((url) => URL.revokeObjectURL(url))
+  }, [form.watch('image_files')])
 
   // Handle image upload
   const handleImageDrop = (newFiles: File[]) => {
-    form.setValue("image_files", newFiles, {
+    form.setValue('image_files', newFiles, {
       shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
+      shouldDirty: true
+    })
+  }
 
   const ImageUploadSection = () => (
     <div className="space-y-4">
-      <MultiImageDropzone
-        files={form.watch("image_files") || []}
-        onChange={handleImageDrop}
-      />
+      <MultiImageDropzone files={form.watch('image_files') || []} onChange={handleImageDrop} />
     </div>
-  );
+  )
 
   return (
     <Form {...form}>
@@ -114,35 +108,31 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
             control={form.control}
             name="audio_file"
             rules={{
-              validate: (value) => !!value || "Vui lòng tải lên file âm thanh",
+              validate: (value) => !!value || 'Vui lòng tải lên file âm thanh'
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => {
-              const { getRootProps, getInputProps, isDragActive } = useDropzone(
-                {
-                  accept: {
-                    "audio/mpeg": [".mp3"],
-                    "audio/mp3": [".mp3"],
-                  },
-                  maxFiles: 1,
-                  onDrop: async (acceptedFiles) => {
-                    const file = acceptedFiles[0];
-                    if (file) {
-                      onChange(file);
-                      // Update form value and trigger validation
-                      await form.setValue("audio_file", file, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      });
-                    }
-                  },
+              const { getRootProps, getInputProps, isDragActive } = useDropzone({
+                accept: {
+                  'audio/mpeg': ['.mp3'],
+                  'audio/mp3': ['.mp3']
+                },
+                maxFiles: 1,
+                onDrop: async (acceptedFiles) => {
+                  const file = acceptedFiles[0]
+                  if (file) {
+                    onChange(file)
+                    // Update form value and trigger validation
+                    await form.setValue('audio_file', file, {
+                      shouldValidate: true,
+                      shouldDirty: true
+                    })
+                  }
                 }
-              );
+              })
 
               return (
                 <FormItem>
-                  <FormLabel className="text-[#2D3748] font-medium">
-                    File âm thanh (MP3)
-                  </FormLabel>
+                  <FormLabel className="text-[#2D3748] font-medium">File âm thanh (MP3)</FormLabel>
                   <FormControl>
                     <div className="space-y-4">
                       {!value && (
@@ -151,22 +141,20 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
                           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
                             ${
                               isDragActive
-                                ? "border-blue-500 bg-blue-50"
+                                ? 'border-blue-500 bg-blue-50'
                                 : error
-                                ? "border-red-500 hover:border-red-600"
-                                : "border-gray-300 hover:border-blue-400"
+                                  ? 'border-red-500 hover:border-red-600'
+                                  : 'border-gray-300 hover:border-blue-400'
                             }`}
                         >
                           <input {...getInputProps()} />
                           <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
                           <p className="text-sm text-gray-600">
                             {isDragActive
-                              ? "Thả file vào đây"
-                              : "Kéo thả file MP3 hoặc click để chọn"}
+                              ? 'Thả file vào đây'
+                              : 'Kéo thả file MP3 hoặc click để chọn'}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Chỉ chấp nhận file MP3
-                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Chỉ chấp nhận file MP3</p>
                         </div>
                       )}
 
@@ -206,7 +194,7 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
                               className="w-full"
                               src={audioUrl}
                               style={{
-                                height: "36px",
+                                height: '36px'
                               }}
                             />
                           </div>
@@ -214,8 +202,8 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
                           <Button
                             type="button"
                             onClick={() => {
-                              onChange(undefined);
-                              setAudioUrl(null);
+                              onChange(undefined)
+                              setAudioUrl(null)
                             }}
                             className="absolute top-2 right-2 w-8 h-8 p-0 bg-red-500 text-white rounded-lg hover:bg-red-600"
                           >
@@ -224,15 +212,11 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
                         </div>
                       )}
 
-                      {error && (
-                        <div className="text-sm text-red-500 mt-1">
-                          {error.message}
-                        </div>
-                      )}
+                      {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
                     </div>
                   </FormControl>
                 </FormItem>
-              );
+              )
             }}
           />
 
@@ -248,7 +232,7 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
                 <FormControl>
                   <div className="mt-2">
                     <RichtextchtEditor
-                      value={field.value || ""}
+                      value={field.value || ''}
                       onChange={field.onChange}
                       className="border-[#52aaa5]/20"
                     />
@@ -260,9 +244,7 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
 
           {/* Image Upload */}
           <FormItem>
-            <FormLabel className="text-[#2D3748] font-medium">
-              Hình ảnh (Không bắt buộc)
-            </FormLabel>
+            <FormLabel className="text-[#2D3748] font-medium">Hình ảnh (Không bắt buộc)</FormLabel>
             <FormControl>
               <ImageUploadSection />
             </FormControl>
@@ -270,5 +252,5 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({
         </div>
       </form>
     </Form>
-  );
-};
+  )
+}

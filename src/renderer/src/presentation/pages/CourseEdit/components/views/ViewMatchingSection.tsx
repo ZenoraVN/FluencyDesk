@@ -1,24 +1,22 @@
-import { FC, useState } from "react";
-import { QuestionDetail } from "../../types/questionDetail";
-import { RichtextView } from "@/presentation/components/common/RichtextView";
+import { FC, useState } from 'react'
+import { QuestionDetail } from '../../types/questionDetail'
+import { RichtextView } from '../../../../../components/common/RichtextView'
 
 interface Props {
-  question: QuestionDetail;
+  question: QuestionDetail
 }
 
 export const ViewMatchingSection: FC<Props> = ({ question }) => {
-  const pairs = question.matchings || [];
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const pairs = question.matchings || []
+  const [openIdx, setOpenIdx] = useState<number | null>(null)
   const handleToggle = (idx: number) => {
-    setOpenIdx(idx === openIdx ? null : idx);
-  };
-  if (!pairs.length) return null;
+    setOpenIdx(idx === openIdx ? null : idx)
+  }
+  if (!pairs.length) return null
 
   return (
     <div className="pt-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-5">
-        Các cặp ghép nối
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-5">Các cặp ghép nối</h3>
       <div className="space-y-6">
         {pairs.map((pair: any, idx: number) => (
           <div key={idx} className="rounded-lg">
@@ -39,9 +37,7 @@ export const ViewMatchingSection: FC<Props> = ({ question }) => {
                 onClick={() => handleToggle(idx)}
                 type="button"
               >
-                <div className="mt-1 text-gray-900 break-words">
-                  {pair.question || "--"}
-                </div>
+                <div className="mt-1 text-gray-900 break-words">{pair.question || '--'}</div>
               </button>
               {/* Answer */}
               <button
@@ -49,19 +45,15 @@ export const ViewMatchingSection: FC<Props> = ({ question }) => {
                 onClick={() => handleToggle(idx)}
                 type="button"
               >
-                <div className="mt-1 text-gray-900 break-words">
-                  {pair.answer || "--"}
-                </div>
+                <div className="mt-1 text-gray-900 break-words">{pair.answer || '--'}</div>
               </button>
             </div>
             {/* Explain (collapsed/expanded) */}
             {openIdx === idx && (
               <div className="px-4 py-3 animate-fade-in">
-                <span className="font-semibold text-gray-700 block mb-1">
-                  Giải thích:
-                </span>
+                <span className="font-semibold text-gray-700 block mb-1">Giải thích:</span>
                 <RichtextView
-                  content={pair.explain || "Không có giải thích."}
+                  content={pair.explain || 'Không có giải thích.'}
                   className="text-black"
                 />
               </div>
@@ -70,5 +62,5 @@ export const ViewMatchingSection: FC<Props> = ({ question }) => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

@@ -1,24 +1,22 @@
-import { FC } from "react";
-import { QuestionDetail } from "../../types/questionDetail";
-import { RichtextView } from "@/presentation/components/common/RichtextView";
-import ImagePreview from "@/presentation/components/Image/ImagePreview";
+import { FC } from 'react'
+import { QuestionDetail } from '../../types/questionDetail'
+import { RichtextView } from '../../../../../components/common/RichtextView'
+import ImagePreview from '../../../../../components/Image/ImagePreview'
 
 interface Props {
-  question: QuestionDetail;
+  question: QuestionDetail
 }
 
 export const ViewReadingDetailSection: FC<Props> = ({ question }) => {
-  const readingDetail = question.reading_question_detail;
+  const readingDetail = question.reading_question_detail
 
-  if (!readingDetail || !readingDetail.passage) return null;
+  if (!readingDetail || !readingDetail.passage) return null
 
-  const { title, passage, image_urls = [] } = readingDetail;
+  const { title, passage, image_urls = [] } = readingDetail
 
   return (
     <div className="rounded-xl">
-      {title && (
-        <div className="mb-2 font-medium text-xl text-[#2D3748]">{title}</div>
-      )}
+      {title && <div className="mb-2 font-medium text-xl text-[#2D3748]">{title}</div>}
       <div className="mb-6">
         <h4 className="font-medium text-[#2D3748] mb-1">Nội dung bài đọc</h4>
         <RichtextView content={passage} className="text-[#2D3748]" />
@@ -29,5 +27,5 @@ export const ViewReadingDetailSection: FC<Props> = ({ question }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

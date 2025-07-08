@@ -1,49 +1,49 @@
-import { FC, useRef, useEffect, useState } from "react";
-import { Editor } from "@tiptap/react";
-import { RichtextchtEditor } from "@/presentation/components/Input/CustomRichtext";
-import { CustomInput } from "@/presentation/components/Input/CustomInput";
-import { Plus, X, Edit2, Save, Image as ImageIcon, Upload } from "lucide-react";
-import ApiService from "@/service/ApiService";
-import { Course, CourseBook } from "../types/course";
+import { FC, useRef, useEffect, useState } from 'react'
+import { Editor } from '@tiptap/react'
+import { RichtextchtEditor } from '../../../../components/Input/CustomRichtext'
+import { CustomInput } from '../../../../components/Input/CustomInput'
+import { Plus, X, Edit2, Save, Image as ImageIcon, Upload } from 'lucide-react'
+import ApiService from '../../../../service/ApiService'
+import { Course, CourseBook } from '../types/course'
 
 interface Skill {
-  value: string;
-  label: string;
-  color: string;
+  value: string
+  label: string
+  color: string
 }
 interface Level {
-  value: string;
-  label: string;
-  color: string;
+  value: string
+  label: string
+  color: string
 }
 const SKILLS: Skill[] = [
-  { value: "listening", label: "Nghe", color: "#FF6B6B" },
-  { value: "reading", label: "Đọc", color: "#4ECDC4" },
-  { value: "writing", label: "Viết", color: "#45B7D1" },
-  { value: "speaking", label: "Nói", color: "#96CEB4" },
-  { value: "grammar", label: "Ngữ pháp", color: "#6366F1" },
-];
+  { value: 'listening', label: 'Nghe', color: '#FF6B6B' },
+  { value: 'reading', label: 'Đọc', color: '#4ECDC4' },
+  { value: 'writing', label: 'Viết', color: '#45B7D1' },
+  { value: 'speaking', label: 'Nói', color: '#96CEB4' },
+  { value: 'grammar', label: 'Ngữ pháp', color: '#6366F1' }
+]
 const LEVELS: Level[] = [
-  { value: "beginner", label: "Cơ bản", color: "#FF6B6B" },
-  { value: "intermediate", label: "Trung cấp", color: "#4ECDC4" },
-  { value: "advanced", label: "Nâng cao", color: "#45B7D1" },
-];
+  { value: 'beginner', label: 'Cơ bản', color: '#FF6B6B' },
+  { value: 'intermediate', label: 'Trung cấp', color: '#4ECDC4' },
+  { value: 'advanced', label: 'Nâng cao', color: '#45B7D1' }
+]
 
 interface CourseSectionProps {
-  course: Course;
-  editor: Editor | null;
-  editingTitle: boolean;
-  editingImage: boolean;
-  imageUrl: string;
-  newTag: string;
-  showTagInput: boolean;
-  onCourseChange: (course: Course) => void;
-  onSetEditingTitle: (editing: boolean) => void;
-  onSetEditingImage: (editing: boolean) => void;
-  onSetImageUrl: (url: string) => void;
-  onSetNewTag: (tag: string) => void;
-  onSetShowTagInput: (show: boolean) => void;
-  onUpdateCourseField: (field: string, value: any) => Promise<void>;
+  course: Course
+  editor: Editor | null
+  editingTitle: boolean
+  editingImage: boolean
+  imageUrl: string
+  newTag: string
+  showTagInput: boolean
+  onCourseChange: (course: Course) => void
+  onSetEditingTitle: (editing: boolean) => void
+  onSetEditingImage: (editing: boolean) => void
+  onSetImageUrl: (url: string) => void
+  onSetNewTag: (tag: string) => void
+  onSetShowTagInput: (show: boolean) => void
+  onUpdateCourseField: (field: string, value: any) => Promise<void>
 }
 
 export const CourseSection: FC<CourseSectionProps> = ({
@@ -57,221 +57,221 @@ export const CourseSection: FC<CourseSectionProps> = ({
   onSetImageUrl,
   onSetNewTag,
   onSetShowTagInput,
-  onUpdateCourseField,
+  onUpdateCourseField
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null)
+  const dropZoneRef = useRef<HTMLDivElement>(null)
 
   // Title
-  const [localTitle, setLocalTitle] = useState(course.title);
-  const [editingLocalTitle, setEditingLocalTitle] = useState(false);
-  const [titleError, setTitleError] = useState("");
-  const [titleChanged, setTitleChanged] = useState(false);
-  const [savingTitle, setSavingTitle] = useState(false);
+  const [localTitle, setLocalTitle] = useState(course.title)
+  const [editingLocalTitle, setEditingLocalTitle] = useState(false)
+  const [titleError, setTitleError] = useState('')
+  const [titleChanged, setTitleChanged] = useState(false)
+  const [savingTitle, setSavingTitle] = useState(false)
 
   // Overview
-  const [localOverview, setLocalOverview] = useState(course.overview || "");
-  const [overviewChanged, setOverviewChanged] = useState(false);
-  const [savingOverview, setSavingOverview] = useState(false);
+  const [localOverview, setLocalOverview] = useState(course.overview || '')
+  const [overviewChanged, setOverviewChanged] = useState(false)
+  const [savingOverview, setSavingOverview] = useState(false)
 
   // Book
-  const [bookInfo, setBookInfo] = useState<CourseBook | null>(null);
-  const [bookLoading, setBookLoading] = useState(false);
-  const [newAuthors, setNewAuthors] = useState<string[]>([]);
-  const [newPublishers, setNewPublishers] = useState<string[]>([]);
-  const [authorInput, setAuthorInput] = useState("");
-  const [publisherInput, setPublisherInput] = useState("");
+  const [bookInfo, setBookInfo] = useState<CourseBook | null>(null)
+  const [bookLoading, setBookLoading] = useState(false)
+  const [newAuthors, setNewAuthors] = useState<string[]>([])
+  const [newPublishers, setNewPublishers] = useState<string[]>([])
+  const [authorInput, setAuthorInput] = useState('')
+  const [publisherInput, setPublisherInput] = useState('')
 
   // Publication year
-  const [editingYear, setEditingYear] = useState(false);
-  const [localYear, setLocalYear] = useState<number | "">("");
-  const [yearChanged, setYearChanged] = useState(false);
-  const [savingYear, setSavingYear] = useState(false);
+  const [editingYear, setEditingYear] = useState(false)
+  const [localYear, setLocalYear] = useState<number | ''>('')
+  const [yearChanged, setYearChanged] = useState(false)
+  const [savingYear, setSavingYear] = useState(false)
 
   // Sync state với props
   useEffect(() => {
-    setLocalTitle(course.title);
-    setEditingLocalTitle(false);
-    setTitleChanged(false);
-  }, [course.title]);
+    setLocalTitle(course.title)
+    setEditingLocalTitle(false)
+    setTitleChanged(false)
+  }, [course.title])
   useEffect(() => {
-    setLocalOverview(course.overview ?? "");
-    setOverviewChanged(false);
-  }, [course.overview]);
+    setLocalOverview(course.overview ?? '')
+    setOverviewChanged(false)
+  }, [course.overview])
   useEffect(() => {
-    if (course.type === "BOOK" && course.course_book) {
-      const data = course.course_book;
-      setBookInfo(data);
-      setNewAuthors(data.authors || []);
-      setNewPublishers(data.publishers || []);
-      setLocalYear(data.publication_year ?? "");
-      setEditingYear(false);
-      setYearChanged(false);
-      setAuthorInput("");
-      setPublisherInput("");
-      setBookLoading(false);
+    if (course.type === 'BOOK' && course.course_book) {
+      const data = course.course_book
+      setBookInfo(data)
+      setNewAuthors(data.authors || [])
+      setNewPublishers(data.publishers || [])
+      setLocalYear(data.publication_year ?? '')
+      setEditingYear(false)
+      setYearChanged(false)
+      setAuthorInput('')
+      setPublisherInput('')
+      setBookLoading(false)
     } else {
-      setBookInfo(null);
-      setNewAuthors([]);
-      setNewPublishers([]);
-      setAuthorInput("");
-      setPublisherInput("");
-      setLocalYear("");
-      setEditingYear(false);
-      setYearChanged(false);
-      setBookLoading(false);
+      setBookInfo(null)
+      setNewAuthors([])
+      setNewPublishers([])
+      setAuthorInput('')
+      setPublisherInput('')
+      setLocalYear('')
+      setEditingYear(false)
+      setYearChanged(false)
+      setBookLoading(false)
     }
-  }, [course.type, course.course_book]);
+  }, [course.type, course.course_book])
 
   // Drag & drop image logic
   useEffect(() => {
     if (dropZoneRef.current && editingImage) {
-      const dropZone = dropZoneRef.current as HTMLDivElement;
+      const dropZone = dropZoneRef.current as HTMLDivElement
       const handleDragOver = (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.add("border-[#52aaa5]", "bg-[#52aaa5]/10");
-      };
+        e.preventDefault()
+        e.stopPropagation()
+        dropZone.classList.add('border-[#52aaa5]', 'bg-[#52aaa5]/10')
+      }
       const handleDragLeave = (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove("border-[#52aaa5]", "bg-[#52aaa5]/10");
-      };
+        e.preventDefault()
+        e.stopPropagation()
+        dropZone.classList.remove('border-[#52aaa5]', 'bg-[#52aaa5]/10')
+      }
       const handleDrop = (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove("border-[#52aaa5]", "bg-[#52aaa5]/10");
+        e.preventDefault()
+        e.stopPropagation()
+        dropZone.classList.remove('border-[#52aaa5]', 'bg-[#52aaa5]/10')
         if (e.dataTransfer?.files.length) {
-          const file = e.dataTransfer.files[0];
-          if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
+          const file = e.dataTransfer.files[0]
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader()
             reader.onloadend = () => {
-              onSetImageUrl(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+              onSetImageUrl(reader.result as string)
+            }
+            reader.readAsDataURL(file)
           }
         }
-      };
-      dropZone.addEventListener("dragover", handleDragOver);
-      dropZone.addEventListener("dragleave", handleDragLeave);
-      dropZone.addEventListener("drop", handleDrop);
+      }
+      dropZone.addEventListener('dragover', handleDragOver)
+      dropZone.addEventListener('dragleave', handleDragLeave)
+      dropZone.addEventListener('drop', handleDrop)
       return () => {
-        dropZone.removeEventListener("dragover", handleDragOver);
-        dropZone.removeEventListener("dragleave", handleDragLeave);
-        dropZone.removeEventListener("drop", handleDrop);
-      };
+        dropZone.removeEventListener('dragover', handleDragOver)
+        dropZone.removeEventListener('dragleave', handleDragLeave)
+        dropZone.removeEventListener('drop', handleDrop)
+      }
     }
-  }, [editingImage, onSetImageUrl]);
+  }, [editingImage, onSetImageUrl])
 
   // Handlers
 
   const handleSaveTitle = async () => {
     if (!localTitle.trim()) {
-      setTitleError("Tiêu đề không được để trống");
-      return;
+      setTitleError('Tiêu đề không được để trống')
+      return
     }
-    setSavingTitle(true);
+    setSavingTitle(true)
     try {
-      await onUpdateCourseField("title", localTitle.trim());
-      onCourseChange({ ...course, title: localTitle.trim() });
-      setEditingLocalTitle(false);
-      setTitleChanged(false);
+      await onUpdateCourseField('title', localTitle.trim())
+      onCourseChange({ ...course, title: localTitle.trim() })
+      setEditingLocalTitle(false)
+      setTitleChanged(false)
     } catch {
-      alert("Lỗi khi cập nhật tiêu đề!");
+      alert('Lỗi khi cập nhật tiêu đề!')
     }
-    setSavingTitle(false);
-  };
+    setSavingTitle(false)
+  }
 
   const handleSaveOverview = async () => {
-    setSavingOverview(true);
+    setSavingOverview(true)
     try {
-      await onUpdateCourseField("overview", localOverview);
-      onCourseChange({ ...course, overview: localOverview });
-      setOverviewChanged(false);
+      await onUpdateCourseField('overview', localOverview)
+      onCourseChange({ ...course, overview: localOverview })
+      setOverviewChanged(false)
     } catch {
-      alert("Lỗi khi cập nhật tổng quan!");
+      alert('Lỗi khi cập nhật tổng quan!')
     }
-    setSavingOverview(false);
-  };
+    setSavingOverview(false)
+  }
 
   const handleSkillToggle = async (skillValue: string) => {
     const newSkills = course.skills.includes(skillValue)
       ? course.skills.filter((s: string) => s !== skillValue)
-      : [...course.skills, skillValue];
-    onCourseChange({ ...course, skills: newSkills });
+      : [...course.skills, skillValue]
+    onCourseChange({ ...course, skills: newSkills })
     try {
-      await onUpdateCourseField("skills", newSkills);
+      await onUpdateCourseField('skills', newSkills)
     } catch {
-      alert("Lỗi khi cập nhật kỹ năng!");
+      alert('Lỗi khi cập nhật kỹ năng!')
     }
-  };
+  }
   const handleLevelChange = async (levelValue: string) => {
-    onCourseChange({ ...course, level: levelValue });
+    onCourseChange({ ...course, level: levelValue })
     try {
-      await onUpdateCourseField("level", levelValue);
+      await onUpdateCourseField('level', levelValue)
     } catch {
-      alert("Lỗi khi cập nhật cấp độ!");
+      alert('Lỗi khi cập nhật cấp độ!')
     }
-  };
+  }
   const handleTagRemove = async (tagToRemove: string) => {
-    const tags = course.tags.filter((tag: string) => tag !== tagToRemove);
-    onCourseChange({ ...course, tags });
+    const tags = course.tags.filter((tag: string) => tag !== tagToRemove)
+    onCourseChange({ ...course, tags })
     try {
-      await onUpdateCourseField("tags", tags);
+      await onUpdateCourseField('tags', tags)
     } catch {
-      alert("Lỗi khi cập nhật thẻ!");
+      alert('Lỗi khi cập nhật thẻ!')
     }
-  };
+  }
   const handleAddTag = async () => {
     if (newTag.trim() && !course.tags.includes(newTag.trim())) {
-      const tags = [...course.tags, newTag.trim()];
-      onCourseChange({ ...course, tags });
+      const tags = [...course.tags, newTag.trim()]
+      onCourseChange({ ...course, tags })
       try {
-        await onUpdateCourseField("tags", tags);
+        await onUpdateCourseField('tags', tags)
       } catch {
-        alert("Lỗi khi cập nhật thẻ!");
+        alert('Lỗi khi cập nhật thẻ!')
       }
     }
-    onSetNewTag("");
-    onSetShowTagInput(false);
-  };
+    onSetNewTag('')
+    onSetShowTagInput(false)
+  }
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddTag();
-    } else if (e.key === "Escape") {
-      onSetShowTagInput(false);
-      onSetNewTag("");
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleAddTag()
+    } else if (e.key === 'Escape') {
+      onSetShowTagInput(false)
+      onSetNewTag('')
     }
-  };
+  }
 
-  const handleTypeChange = async (typeVal: "BOOK" | "OTHER") => {
-    if (course.type === typeVal) return;
-    onCourseChange({ ...course, type: typeVal });
+  const handleTypeChange = async (typeVal: 'BOOK' | 'OTHER') => {
+    if (course.type === typeVal) return
+    onCourseChange({ ...course, type: typeVal })
     try {
-      await onUpdateCourseField("type", typeVal);
+      await onUpdateCourseField('type', typeVal)
     } catch {
-      alert("Lỗi khi cập nhật loại khoá học!");
+      alert('Lỗi khi cập nhật loại khoá học!')
     }
-  };
+  }
 
   // Lưu publication_year
   const handleSaveYear = async () => {
-    if (!bookInfo || localYear === "") return;
-    setSavingYear(true);
+    if (!bookInfo || localYear === '') return
+    setSavingYear(true)
     try {
       await ApiService.put(`/course-book/${bookInfo.id}`, {
-        field: "publication_year",
-        value: localYear,
-      });
-      setBookInfo({ ...bookInfo, publication_year: Number(localYear) });
-      setEditingYear(false);
-      setYearChanged(false);
+        field: 'publication_year',
+        value: localYear
+      })
+      setBookInfo({ ...bookInfo, publication_year: Number(localYear) })
+      setEditingYear(false)
+      setYearChanged(false)
     } catch {
-      alert("Lỗi khi cập nhật năm xuất bản!");
+      alert('Lỗi khi cập nhật năm xuất bản!')
     }
-    setSavingYear(false);
-  };
+    setSavingYear(false)
+  }
 
   // --- UI ---
   return (
@@ -296,8 +296,8 @@ export const CourseSection: FC<CourseSectionProps> = ({
                   />
                   <button
                     onClick={() => {
-                      onSetImageUrl("");
-                      onSetEditingImage(false);
+                      onSetImageUrl('')
+                      onSetEditingImage(false)
                     }}
                     className="absolute top-2 right-2 p-2 rounded-lg bg-[#52aaa5] hover:bg-[#52aaa5]/90 text-white transition-colors"
                   >
@@ -310,13 +310,13 @@ export const CourseSection: FC<CourseSectionProps> = ({
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
+                      const file = e.target.files?.[0]
                       if (file) {
-                        const reader = new FileReader();
+                        const reader = new FileReader()
                         reader.onloadend = () => {
-                          onSetImageUrl(reader.result as string);
-                        };
-                        reader.readAsDataURL(file);
+                          onSetImageUrl(reader.result as string)
+                        }
+                        reader.readAsDataURL(file)
                       }
                     }}
                     className="hidden"
@@ -329,12 +329,8 @@ export const CourseSection: FC<CourseSectionProps> = ({
                     <div className="mb-4 p-4 rounded-full bg-[#52aaa5]/10">
                       <Upload className="h-8 w-8 text-[#52aaa5]" />
                     </div>
-                    <span className="text-[#52aaa5] font-medium">
-                      Chọn hình ảnh
-                    </span>
-                    <span className="text-sm text-[#718096] mt-1">
-                      hoặc kéo thả vào đây
-                    </span>
+                    <span className="text-[#52aaa5] font-medium">Chọn hình ảnh</span>
+                    <span className="text-sm text-[#718096] mt-1">hoặc kéo thả vào đây</span>
                   </label>
                 </>
               )}
@@ -365,15 +361,13 @@ export const CourseSection: FC<CourseSectionProps> = ({
             <CustomInput
               value={localTitle}
               onChange={(v) => {
-                setLocalTitle(v);
-                setTitleError("");
-                setTitleChanged(v.trim() !== course.title.trim());
+                setLocalTitle(v)
+                setTitleError('')
+                setTitleChanged(v.trim() !== course.title.trim())
               }}
               className="w-full"
             />
-            {titleError && (
-              <div className="text-sm text-red-500">{titleError}</div>
-            )}
+            {titleError && <div className="text-sm text-red-500">{titleError}</div>}
             {titleChanged && (
               <div className="flex gap-2 mt-2">
                 <button
@@ -391,13 +385,9 @@ export const CourseSection: FC<CourseSectionProps> = ({
           <div
             className="group relative"
             tabIndex={-1}
-            onMouseLeave={() =>
-              setTimeout(() => setEditingLocalTitle(false), 200)
-            }
+            onMouseLeave={() => setTimeout(() => setEditingLocalTitle(false), 200)}
           >
-            <h1 className="text-xl font-semibold text-[#2D3748] pr-8">
-              {course.title}
-            </h1>
+            <h1 className="text-xl font-semibold text-[#2D3748] pr-8">{course.title}</h1>
             <button
               onClick={() => setEditingLocalTitle(true)}
               className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 text-[#52aaa5] opacity-0 group-hover:opacity-100 hover:bg-[#52aaa5]/10 rounded-md transition-all"
@@ -409,25 +399,23 @@ export const CourseSection: FC<CourseSectionProps> = ({
       </div>
       {/* Type (BOOK|OTHER) */}
       <div>
-        <h3 className="text-base font-medium text-[#2D3748] mb-2">
-          Loại khoá học
-        </h3>
+        <h3 className="text-base font-medium text-[#2D3748] mb-2">Loại khoá học</h3>
         <div className="flex gap-3">
-          {["OTHER", "BOOK"].map((value) => (
+          {['OTHER', 'BOOK'].map((value) => (
             <button
               key={value}
-              onClick={() => handleTypeChange(value as "BOOK" | "OTHER")}
+              onClick={() => handleTypeChange(value as 'BOOK' | 'OTHER')}
               className={`
                 px-3 py-1.5 text-sm rounded-md border
                 ${
                   course.type === value
-                    ? "bg-[#52aaa5] text-white border-[#52aaa5]"
-                    : "bg-white text-[#52aaa5] border-[#52aaa5]/20"
+                    ? 'bg-[#52aaa5] text-white border-[#52aaa5]'
+                    : 'bg-white text-[#52aaa5] border-[#52aaa5]/20'
                 }
                 transition-all
               `}
             >
-              {value === "OTHER" ? "Khác" : "Sách"}
+              {value === 'OTHER' ? 'Khác' : 'Sách'}
             </button>
           ))}
         </div>
@@ -446,9 +434,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
                   backgroundColor: course.skills.includes(skill.value)
                     ? skill.color
                     : `${skill.color}20`,
-                  color: course.skills.includes(skill.value)
-                    ? "white"
-                    : skill.color,
+                  color: course.skills.includes(skill.value) ? 'white' : skill.color
                 }}
               >
                 {skill.label}
@@ -465,11 +451,8 @@ export const CourseSection: FC<CourseSectionProps> = ({
                 onClick={() => handleLevelChange(level.value)}
                 className={`flex-1 px-2.5 py-1 text-sm rounded-lg transition-all hover:scale-105 hover:shadow-md`}
                 style={{
-                  backgroundColor:
-                    course.level === level.value
-                      ? level.color
-                      : `${level.color}20`,
-                  color: course.level === level.value ? "white" : level.color,
+                  backgroundColor: course.level === level.value ? level.color : `${level.color}20`,
+                  color: course.level === level.value ? 'white' : level.color
                 }}
               >
                 {level.label}
@@ -488,10 +471,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
               className="inline-flex items-center gap-0.5 px-2 py-0.5 text-sm rounded-md bg-[#52aaa5]/10 text-[#52aaa5]"
             >
               {tag}
-              <button
-                onClick={() => handleTagRemove(tag)}
-                className="hover:text-red-500"
-              >
+              <button onClick={() => handleTagRemove(tag)} className="hover:text-red-500">
                 <X className="h-3.5 w-3.5" />
               </button>
             </span>
@@ -515,8 +495,8 @@ export const CourseSection: FC<CourseSectionProps> = ({
               </button>
               <button
                 onClick={() => {
-                  onSetShowTagInput(false);
-                  onSetNewTag("");
+                  onSetShowTagInput(false)
+                  onSetNewTag('')
                 }}
                 className="p-1 text-red-500 hover:bg-red-50 rounded-md transition-colors"
               >
@@ -540,12 +520,12 @@ export const CourseSection: FC<CourseSectionProps> = ({
         <RichtextchtEditor
           value={localOverview}
           onChange={(value: string) => {
-            setLocalOverview(value);
+            setLocalOverview(value)
             setOverviewChanged(
-              value.trim().replace(/(<([^>]+)>)/gi, "").length !==
-                (course.overview?.trim().replace(/(<([^>]+)>)/gi, "")?.length ??
-                  0) || course.overview !== value
-            );
+              value.trim().replace(/(<([^>]+)>)/gi, '').length !==
+                (course.overview?.trim().replace(/(<([^>]+)>)/gi, '')?.length ?? 0) ||
+                course.overview !== value
+            )
           }}
           className=" border-gray-200 hover:border-[#52aaa5] rounded-lg transition-colors"
         />
@@ -563,7 +543,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
         )}
       </div>
       {/* Book info */}
-      {course.type === "BOOK" && (
+      {course.type === 'BOOK' && (
         <div className="mt-4 rounded-lg">
           {bookLoading ? (
             <div>Đang tải...</div>
@@ -581,15 +561,13 @@ export const CourseSection: FC<CourseSectionProps> = ({
                       {author}
                       <button
                         onClick={() => {
-                          const updated = newAuthors.filter(
-                            (_, i) => i !== idx
-                          );
-                          setNewAuthors(updated);
+                          const updated = newAuthors.filter((_, i) => i !== idx)
+                          setNewAuthors(updated)
                           if (bookInfo)
                             ApiService.put(`/course-book/${bookInfo.id}`, {
-                              field: "authors",
-                              value: updated,
-                            });
+                              field: 'authors',
+                              value: updated
+                            })
                         }}
                         className="hover:text-red-500"
                         tabIndex={-1}
@@ -604,35 +582,28 @@ export const CourseSection: FC<CourseSectionProps> = ({
                     value={authorInput}
                     onChange={(e) => setAuthorInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (
-                        (e.key === "Enter" || e.key === ",") &&
-                        authorInput.trim()
-                      ) {
-                        e.preventDefault();
+                      if ((e.key === 'Enter' || e.key === ',') && authorInput.trim()) {
+                        e.preventDefault()
                         if (!newAuthors.includes(authorInput.trim())) {
-                          const updated = [...newAuthors, authorInput.trim()];
-                          setNewAuthors(updated);
-                          setAuthorInput("");
+                          const updated = [...newAuthors, authorInput.trim()]
+                          setNewAuthors(updated)
+                          setAuthorInput('')
                           if (bookInfo)
                             ApiService.put(`/course-book/${bookInfo.id}`, {
-                              field: "authors",
-                              value: updated,
-                            });
+                              field: 'authors',
+                              value: updated
+                            })
                         } else {
-                          setAuthorInput("");
+                          setAuthorInput('')
                         }
-                      } else if (
-                        e.key === "Backspace" &&
-                        !authorInput &&
-                        newAuthors.length
-                      ) {
-                        const updated = newAuthors.slice(0, -1);
-                        setNewAuthors(updated);
+                      } else if (e.key === 'Backspace' && !authorInput && newAuthors.length) {
+                        const updated = newAuthors.slice(0, -1)
+                        setNewAuthors(updated)
                         if (bookInfo)
                           ApiService.put(`/course-book/${bookInfo.id}`, {
-                            field: "authors",
-                            value: updated,
-                          });
+                            field: 'authors',
+                            value: updated
+                          })
                       }
                     }}
                     placeholder="Ấn Enter để thêm"
@@ -652,15 +623,13 @@ export const CourseSection: FC<CourseSectionProps> = ({
                       {pub}
                       <button
                         onClick={() => {
-                          const updated = newPublishers.filter(
-                            (_, i) => i !== idx
-                          );
-                          setNewPublishers(updated);
+                          const updated = newPublishers.filter((_, i) => i !== idx)
+                          setNewPublishers(updated)
                           if (bookInfo)
                             ApiService.put(`/course-book/${bookInfo.id}`, {
-                              field: "publishers",
-                              value: updated,
-                            });
+                              field: 'publishers',
+                              value: updated
+                            })
                         }}
                         className="hover:text-red-500"
                         tabIndex={-1}
@@ -675,38 +644,28 @@ export const CourseSection: FC<CourseSectionProps> = ({
                     value={publisherInput}
                     onChange={(e) => setPublisherInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (
-                        (e.key === "Enter" || e.key === ",") &&
-                        publisherInput.trim()
-                      ) {
-                        e.preventDefault();
+                      if ((e.key === 'Enter' || e.key === ',') && publisherInput.trim()) {
+                        e.preventDefault()
                         if (!newPublishers.includes(publisherInput.trim())) {
-                          const updated = [
-                            ...newPublishers,
-                            publisherInput.trim(),
-                          ];
-                          setNewPublishers(updated);
-                          setPublisherInput("");
+                          const updated = [...newPublishers, publisherInput.trim()]
+                          setNewPublishers(updated)
+                          setPublisherInput('')
                           if (bookInfo)
                             ApiService.put(`/course-book/${bookInfo.id}`, {
-                              field: "publishers",
-                              value: updated,
-                            });
+                              field: 'publishers',
+                              value: updated
+                            })
                         } else {
-                          setPublisherInput("");
+                          setPublisherInput('')
                         }
-                      } else if (
-                        e.key === "Backspace" &&
-                        !publisherInput &&
-                        newPublishers.length
-                      ) {
-                        const updated = newPublishers.slice(0, -1);
-                        setNewPublishers(updated);
+                      } else if (e.key === 'Backspace' && !publisherInput && newPublishers.length) {
+                        const updated = newPublishers.slice(0, -1)
+                        setNewPublishers(updated)
                         if (bookInfo)
                           ApiService.put(`/course-book/${bookInfo.id}`, {
-                            field: "publishers",
-                            value: updated,
-                          });
+                            field: 'publishers',
+                            value: updated
+                          })
                       }
                     }}
                     placeholder="Ấn Enter để thêm"
@@ -720,14 +679,13 @@ export const CourseSection: FC<CourseSectionProps> = ({
                 {editingYear ? (
                   <>
                     <CustomInput
-                      value={localYear === "" ? "" : String(localYear)}
+                      value={localYear === '' ? '' : String(localYear)}
                       onChange={(v) => {
-                        const val = v.replace(/\D/g, "");
-                        setLocalYear(val ? parseInt(val, 10) : "");
+                        const val = v.replace(/\D/g, '')
+                        setLocalYear(val ? parseInt(val, 10) : '')
                         setYearChanged(
-                          (val ? parseInt(val, 10) : "") !==
-                            (bookInfo?.publication_year ?? "")
-                        );
+                          (val ? parseInt(val, 10) : '') !== (bookInfo?.publication_year ?? '')
+                        )
                       }}
                       className="w-full"
                     />
@@ -745,7 +703,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
                 ) : (
                   <div className="relative group">
                     <span className="text-base text-[#2D3748]">
-                      {bookInfo?.publication_year || ""}
+                      {bookInfo?.publication_year || ''}
                     </span>
                     <button
                       onClick={() => setEditingYear(true)}
@@ -761,5 +719,5 @@ export const CourseSection: FC<CourseSectionProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

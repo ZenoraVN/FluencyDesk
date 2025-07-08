@@ -1,20 +1,17 @@
-import { FC } from "react";
-import { QuestionDetail } from "../../types/questionDetail";
-import ImagePreview from "@/presentation/components/Image/ImagePreview";
-import { RichtextView } from "@/presentation/components/common/RichtextView";
+import { FC } from 'react'
+import { QuestionDetail } from '../../types/questionDetail'
+import ImagePreview from '../../../../../components/Image/ImagePreview'
+
+import { RichtextView } from '../../../../../components/common/RichtextView'
 
 interface Props {
-  question: QuestionDetail;
+  question: QuestionDetail
 }
 
 export const ViewListeningDetailSection: FC<Props> = ({ question }) => {
-  if (!question.listening_question_detail) return null;
+  if (!question.listening_question_detail) return null
 
-  const {
-    audio_url,
-    image_urls = [],
-    transcript = "",
-  } = question.listening_question_detail as any;
+  const { audio_url, image_urls = [], transcript = '' } = question.listening_question_detail as any
 
   return (
     <div className="rounded-xl my-6">
@@ -36,9 +33,7 @@ export const ViewListeningDetailSection: FC<Props> = ({ question }) => {
 
       {transcript && (
         <div className="mt-4">
-          <h5 className="font-medium text-[#2D3748] mb-1 flex items-center gap-2">
-            Transcript
-          </h5>
+          <h5 className="font-medium text-[#2D3748] mb-1 flex items-center gap-2">Transcript</h5>
           <RichtextView
             content={transcript}
             className="text-black text-base p-4 rounded-lg border border-[#ddd] hover:border-[#52aaaf]"
@@ -46,7 +41,7 @@ export const ViewListeningDetailSection: FC<Props> = ({ question }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ViewListeningDetailSection;
+export default ViewListeningDetailSection

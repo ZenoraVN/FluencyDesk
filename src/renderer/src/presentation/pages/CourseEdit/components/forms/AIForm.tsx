@@ -1,105 +1,93 @@
-import { FC, useState } from "react";
-import { Button } from "@/presentation/components/ui/button";
-import { CustomInput } from "@/presentation/components/Input/CustomInput";
-import { getFillInBlankAIGemini } from "@/presentation/pages/CourseEdit/service/FillInBlankGemini";
-import { getChoiceOneAIGemini } from "@/presentation/pages/CourseEdit/service/ChoiceOneGemini";
-import { getChoiceMultiAIGemini } from "@/presentation/pages/CourseEdit/service/ChoiceMultiGemini";
-import { getMatchingAIGemini } from "@/presentation/pages/CourseEdit/service/MatchingGemini";
-import { getTrueFalseNotGivenAIGemini } from "@/presentation/pages/CourseEdit/service/TrueFalseNotGivenGemini";
-import { getErrorIdentificationAIGemini } from "@/presentation/pages/CourseEdit/service/ErrorIdentificationGemini";
-import { getSentenceCompletionAIGemini } from "@/presentation/pages/CourseEdit/service/SentenceCompletionGemini";
-import { getConversationalRepetitionAIGemini } from "@/presentation/pages/CourseEdit/service/ConversationalRepetitionGemini";
-import { getOpenConversationAIGemini } from "@/presentation/pages/CourseEdit/service/OpenConversationGemini";
-import { getOpenParagraphAIGemini } from "@/presentation/pages/CourseEdit/service/OpenParagraphGemini";
-import { GeminiSetting } from "@/presentation/components/form/GeminiSettingForm";
+import { FC, useState } from 'react'
+import { Button } from '../../../../../components/ui/button'
+import { CustomInput } from '../../../../../components/Input/CustomInput'
+import { getFillInBlankAIGemini } from '../../../../pages/CourseEdit/service/FillInBlankGemini'
+import { getChoiceOneAIGemini } from '../../../../pages/CourseEdit/service/ChoiceOneGemini'
+import { getChoiceMultiAIGemini } from '../../../../pages/CourseEdit/service/ChoiceMultiGemini'
+import { getMatchingAIGemini } from '../../../../pages/CourseEdit/service/MatchingGemini'
+import { getTrueFalseNotGivenAIGemini } from '../../../../pages/CourseEdit/service/TrueFalseNotGivenGemini'
+import { getErrorIdentificationAIGemini } from '../../../../pages/CourseEdit/service/ErrorIdentificationGemini'
+import { getSentenceCompletionAIGemini } from '../../../../pages/CourseEdit/service/SentenceCompletionGemini'
+import { getConversationalRepetitionAIGemini } from '../../../../pages/CourseEdit/service/ConversationalRepetitionGemini'
+import { getOpenConversationAIGemini } from '../../../../pages/CourseEdit/service/OpenConversationGemini'
+import { getOpenParagraphAIGemini } from '../../../../pages/CourseEdit/service/OpenParagraphGemini'
+import { GeminiSetting } from '../../../../../components/form/GeminiSettingForm'
 
 interface AIFormProps {
-  skill: string;
-  type: string;
-  onResult: (aiData: any) => void;
-  transcript?: string;
-  passage?: string;
+  skill: string
+  type: string
+  onResult: (aiData: any) => void
+  transcript?: string
+  passage?: string
 }
 
-export const AIForm: FC<AIFormProps> = ({
-  skill,
-  type,
-  onResult,
-  transcript,
-  passage,
-}) => {
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showGemini, setShowGemini] = useState(false);
+export const AIForm: FC<AIFormProps> = ({ skill, type, onResult, transcript, passage }) => {
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showGemini, setShowGemini] = useState(false)
 
   const callAI = async (topic: string, transcriptOrPassage?: string) => {
     switch (type) {
-      case "fill_in_the_blank":
-        return await getFillInBlankAIGemini(topic, transcriptOrPassage);
-      case "choice_one":
-        return await getChoiceOneAIGemini(topic, transcriptOrPassage);
-      case "choice_multi":
-        return await getChoiceMultiAIGemini(topic, transcriptOrPassage);
-      case "matching":
-        return await getMatchingAIGemini(topic, transcriptOrPassage);
-      case "true_false_not_given":
-        return await getTrueFalseNotGivenAIGemini(topic, transcriptOrPassage);
-      case "error_identification":
-        return await getErrorIdentificationAIGemini(topic);
-      case "sentence_completion":
-        return await getSentenceCompletionAIGemini(topic);
-      case "conversational_repetition":
-        return await getConversationalRepetitionAIGemini(topic);
-      case "open_paragraph":
-        return await getOpenParagraphAIGemini(topic);
-      case "open_conversation":
-        return await getOpenConversationAIGemini(topic);
+      case 'fill_in_the_blank':
+        return await getFillInBlankAIGemini(topic, transcriptOrPassage)
+      case 'choice_one':
+        return await getChoiceOneAIGemini(topic, transcriptOrPassage)
+      case 'choice_multi':
+        return await getChoiceMultiAIGemini(topic, transcriptOrPassage)
+      case 'matching':
+        return await getMatchingAIGemini(topic, transcriptOrPassage)
+      case 'true_false_not_given':
+        return await getTrueFalseNotGivenAIGemini(topic, transcriptOrPassage)
+      case 'error_identification':
+        return await getErrorIdentificationAIGemini(topic)
+      case 'sentence_completion':
+        return await getSentenceCompletionAIGemini(topic)
+      case 'conversational_repetition':
+        return await getConversationalRepetitionAIGemini(topic)
+      case 'open_paragraph':
+        return await getOpenParagraphAIGemini(topic)
+      case 'open_conversation':
+        return await getOpenConversationAIGemini(topic)
       default:
-        throw new Error("Dạng câu hỏi chưa hỗ trợ AI");
+        throw new Error('Dạng câu hỏi chưa hỗ trợ AI')
     }
-  };
+  }
 
   const handleGenerate = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
-    if (skill === "listening" && (!transcript || !transcript.trim())) {
-      setError("Bạn cần nhập nội dung transcript trước khi dùng AI");
-      setLoading(false);
-      return;
+    if (skill === 'listening' && (!transcript || !transcript.trim())) {
+      setError('Bạn cần nhập nội dung transcript trước khi dùng AI')
+      setLoading(false)
+      return
     }
-    if (skill === "reading" && (!passage || !passage.trim())) {
-      setError("Bạn cần nhập nội dung bài đọc (passage) trước khi dùng AI");
-      setLoading(false);
-      return;
+    if (skill === 'reading' && (!passage || !passage.trim())) {
+      setError('Bạn cần nhập nội dung bài đọc (passage) trước khi dùng AI')
+      setLoading(false)
+      return
     }
 
     try {
       // Đã bỏ validate input rỗng
       const aiData = await callAI(
         input,
-        skill === "listening"
-          ? transcript
-          : skill === "reading"
-          ? passage
-          : undefined
-      );
-      onResult(aiData);
+        skill === 'listening' ? transcript : skill === 'reading' ? passage : undefined
+      )
+      onResult(aiData)
     } catch (err: any) {
-      setError(err.message || "Đã có lỗi AI.");
+      setError(err.message || 'Đã có lỗi AI.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleSettingsSaved = () => setShowGemini(false);
+  const handleSettingsSaved = () => setShowGemini(false)
 
   return (
     <div className="mt-4 rounded-lg transition-all">
-      <div className="mb-4 text-[#1A202C] text-lg font-bold">
-        Gợi ý tự động bằng AI
-      </div>
+      <div className="mb-4 text-[#1A202C] text-lg font-bold">Gợi ý tự động bằng AI</div>
       <CustomInput
         value={input}
         onChange={setInput}
@@ -115,10 +103,10 @@ export const AIForm: FC<AIFormProps> = ({
             rounded-lg px-5 py-2
             hover:bg-[#319c93]
             transition-colors duration-150
-            ${loading ? "opacity-50 cursor-not-allowed" : ""}
+            ${loading ? 'opacity-50 cursor-not-allowed' : ''}
           `}
         >
-          {loading ? "Đang lấy AI..." : "Gợi ý từ AI"}
+          {loading ? 'Đang lấy AI...' : 'Gợi ý từ AI'}
         </Button>
         <Button
           type="button"
@@ -145,7 +133,7 @@ export const AIForm: FC<AIFormProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AIForm;
+export default AIForm
