@@ -1,13 +1,14 @@
 import { FC, useState, ReactNode, useEffect } from 'react'
 import Drawer from 'react-modern-drawer'
 import 'react-modern-drawer/dist/index.css'
-import { Loader2, CheckCircle2 } from 'lucide-react'
+import { Loader2, CheckCircle2, Sparkles } from 'lucide-react'
 import ApiService from '../../../../service/ApiService'
 import { CustomSingleImageDropzone } from '../../../../components/Image/CustomSinglemageDropzone'
 import { CustomInput } from '../../../../components/Input/CustomInput'
 import { RichtextchtEditor } from '../../../../components/Input/CustomRichtext'
 import CustomCombobox from '../../../../components/Combobox/CustomCombobox'
 import { ButtonGroup } from '../../../../components/Button/ButtonGroup'
+import { suggestCourseTags } from '../service/AutoSuggestTagsGemini'
 
 type CourseType = 'BOOK' | 'OTHER'
 interface CreateCourseRequest {
@@ -85,6 +86,9 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
 }): ReactNode => {
   const [showSuccess, setShowSuccess] = useState(false)
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
+  // Auto Tag Gemini
+  const [autoTagLoading, setAutoTagLoading] = useState(false)
+  const [autoTagError, setAutoTagError] = useState<string | null>(null)
 
   // ESC - Close Drawer
   useEffect(() => {
@@ -273,6 +277,7 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
           {/* TAGS */}
           <div>
             <label className="block text-[#2D3748] font-medium mb-2">Thẻ</label>
+
             <CustomCombobox
               label=""
               value={newCourse.tags}
@@ -281,7 +286,6 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
                 label: tag
               }))}
               onChange={(tags) => {
-                // đảm bảo tags luôn là string[]
                 if (Array.isArray(tags)) {
                   onCourseChange({
                     ...newCourse,
@@ -297,10 +301,79 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
               placeholder="Tìm kiếm hoặc thêm thẻ mới"
               searchable
               multiple
-              creatable // nếu bạn muốn cho phép tạo thêm tag mới
-              className="mb-2"
+              creatable
+              className="w-full"
             />
-
+            <div className="flex flex-wrap items-center gap-2 mb-2 mt-2">
+              <button
+                type="button"
+                className={`
+                  flex items-center gap-1 px-2 py-1 border border-[#52aaa5] rounded-[8px] text-[#319795] text-xs font-medium
+                  bg-transparent transition-colors
+                  ${
+                    autoTagLoading ||
+                    !(
+                      newCourse.title.trim().length >= 15 &&
+                      newCourse.overview.trim().length >= 25 &&
+                      newCourse.skills.length > 0 &&
+                      newCourse.level &&
+                      newCourse.type
+                    )
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-[#dbf8f3]'
+                  }
+                `}
+                style={{
+                  minHeight: '28px' // less tall than badges and not too square
+                }}
+                disabled={
+                  autoTagLoading ||
+                  !(
+                    newCourse.title.trim().length >= 15 &&
+                    newCourse.overview.trim().length >= 25 &&
+                    newCourse.skills.length > 0 &&
+                    newCourse.level &&
+                    newCourse.type
+                  )
+                }
+                onClick={async () => {
+                  setAutoTagError(null)
+                  setAutoTagLoading(true)
+                  try {
+                    const tags = await suggestCourseTags({
+                      title: newCourse.title,
+                      overview: newCourse.overview,
+                      skills: newCourse.skills,
+                      level: newCourse.level,
+                      type: newCourse.type
+                    })
+                    // Add unique, non-duplicated tags
+                    const existed = new Set(newCourse.tags.map((t) => t.trim().toLowerCase()))
+                    const merged = [
+                      ...newCourse.tags,
+                      ...tags.filter((t) => t && !existed.has(t.trim().toLowerCase()))
+                    ]
+                    onCourseChange({ ...newCourse, tags: merged })
+                  } catch (e) {
+                    setAutoTagError(
+                      e instanceof Error ? e.message : 'Lỗi không xác định khi gợi ý tags'
+                    )
+                  } finally {
+                    setAutoTagLoading(false)
+                  }
+                }}
+              >
+                {autoTagLoading ? (
+                  <Loader2 className="h-4 w-4 text-[#319795] animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 text-[#319795] mr-1" />
+                    <span>Gợi ý thẻ tự động</span>
+                  </>
+                )}
+              </button>
+            </div>
+            {autoTagError && <p className="mt-1 text-sm text-red-500">{autoTagError}</p>}
             {validationErrors.tags?.map((error, i) => (
               <p key={i} className="mt-1 text-sm text-red-500">
                 {error}

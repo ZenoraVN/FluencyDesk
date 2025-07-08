@@ -1,22 +1,21 @@
-import { FC, useCallback, useMemo, useState } from "react";
-import { useDropzone } from "react-dropzone";
-import { X, Eye, Upload } from "lucide-react";
-import { Button } from "../ui/button";
-import imageCompression from "browser-image-compression";
-import ImageViewDialog from "../Dialog/ImageViewDialog";
+import { FC, useCallback, useMemo, useState } from 'react'
+import { useDropzone } from 'react-dropzone'
+import { X, Eye, Upload } from 'lucide-react'
+import { Button } from '../ui/button'
+import imageCompression from 'browser-image-compression'
+import ImageViewDialog from '../Dialog/ImageViewDialog'
 
 // Helper
 function formatSize(bytes: number): string {
-  if (typeof bytes !== "number" || isNaN(bytes)) return "";
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024)
-    return (bytes / 1024).toFixed(1).replace(/\.0$/, "") + " KB";
-  return (bytes / (1024 * 1024)).toFixed(1).replace(/\.0$/, "") + " MB";
+  if (typeof bytes !== 'number' || isNaN(bytes)) return ''
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1).replace(/\.0$/, '') + ' KB'
+  return (bytes / (1024 * 1024)).toFixed(1).replace(/\.0$/, '') + ' MB'
 }
 
 interface CustomSingleImageDropzoneProps {
-  imageFile?: File;
-  onChange?: (file: File | undefined) => void;
+  imageFile?: File
+  onChange?: (file: File | undefined) => void
 }
 
 const compressImage = async (file: File): Promise<File> => {
@@ -24,77 +23,72 @@ const compressImage = async (file: File): Promise<File> => {
     maxSizeMB: 1,
     maxWidthOrHeight: 1920,
     useWebWorker: true,
-    fileType: "image/webp",
-  };
-  let compressedFile = file;
-  if (
-    file.type !== "image/webp" ||
-    file.size > options.maxSizeMB * 1024 * 1024
-  ) {
-    compressedFile = await imageCompression(file, options);
+    fileType: 'image/webp'
+  }
+  let compressedFile = file
+  if (file.type !== 'image/webp' || file.size > options.maxSizeMB * 1024 * 1024) {
+    compressedFile = await imageCompression(file, options)
   }
   // Ensure file name ends with .webp
-  if (!compressedFile.name.toLowerCase().endsWith(".webp")) {
-    compressedFile = new File(
-      [compressedFile],
-      file.name.replace(/\.[^/.]+$/, "") + ".webp",
-      { type: "image/webp" }
-    );
+  if (!compressedFile.name.toLowerCase().endsWith('.webp')) {
+    compressedFile = new File([compressedFile], file.name.replace(/\.[^/.]+$/, '') + '.webp', {
+      type: 'image/webp'
+    })
   }
-  return compressedFile;
-};
+  return compressedFile
+}
 
 export const CustomSingleImageDropzone: FC<CustomSingleImageDropzoneProps> = ({
   imageFile,
-  onChange,
+  onChange
 }) => {
-  const [localImage, setLocalImage] = useState<File | undefined>(undefined);
-  const file = imageFile ?? localImage;
-  const [openDialog, setOpenDialog] = useState(false);
+  const [localImage, setLocalImage] = useState<File | undefined>(undefined)
+  const file = imageFile ?? localImage
+  const [openDialog, setOpenDialog] = useState(false)
 
   // Xử lý nén, đổi tên
   const handleDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      if (!acceptedFiles || acceptedFiles.length === 0) return;
+      if (!acceptedFiles || acceptedFiles.length === 0) return
       try {
-        const compressed = await compressImage(acceptedFiles[0]);
+        const compressed = await compressImage(acceptedFiles[0])
         if (imageFile && onChange) {
-          onChange(compressed);
+          onChange(compressed)
         } else {
-          setLocalImage(compressed);
-          onChange?.(compressed); // fallback fire
+          setLocalImage(compressed)
+          onChange?.(compressed) // fallback fire
         }
       } catch (err) {
-        alert("Có lỗi khi nén/chuyển đổi hình ảnh.");
+        alert('Có lỗi khi nén/chuyển đổi hình ảnh.')
       }
     },
     [imageFile, onChange]
-  );
+  )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: { "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"] },
+    accept: { 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp'] },
     onDrop: handleDrop,
     multiple: false,
     maxFiles: 1,
-    disabled: !!file,
-  });
+    disabled: !!file
+  })
 
   // info cho dialog
   const img = useMemo(() => {
-    if (!file) return null;
+    if (!file) return null
     return {
       src: URL.createObjectURL(file),
       name: file.name,
       size: formatSize(file.size),
-      type: (file.type.split("/")[1] || "").toUpperCase(),
-    };
-  }, [file]);
+      type: (file.type.split('/')[1] || '').toUpperCase()
+    }
+  }, [file])
 
   // Xử lý xoá
   const handleDelete = () => {
-    setLocalImage(undefined);
-    onChange?.(undefined);
-  };
+    setLocalImage(undefined)
+    onChange?.(undefined)
+  }
 
   return (
     <div className="space-y-2 w-full">
@@ -104,21 +98,16 @@ export const CustomSingleImageDropzone: FC<CustomSingleImageDropzoneProps> = ({
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
           ${
-            isDragActive
-              ? "border-blue-500 bg-blue-50"
-              : "border-gray-300 hover:border-[#52aaaf]"
+            isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-[#52aaaf]'
           }`}
+          style={{ borderRadius: 8 }}
         >
           <input {...getInputProps()} />
           <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
           <p className="text-sm text-gray-600">
-            {isDragActive
-              ? "Thả file vào đây"
-              : "Kéo thả hình ảnh hoặc click để chọn (chỉ 1 ảnh)"}
+            {isDragActive ? 'Thả file vào đây' : 'Kéo thả hình ảnh hoặc click để chọn (chỉ 1 ảnh)'}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
-            Ảnh sẽ được tự động nén và chuyển sang WebP!
-          </p>
+          <p className="text-xs text-gray-500 mt-1">Ảnh sẽ được tự động nén và chuyển sang WebP!</p>
         </div>
       ) : (
         // KHI ĐÃ CÓ FILE - PHẦN NÀY THEO UI MULTI IMAGE
@@ -179,7 +168,7 @@ export const CustomSingleImageDropzone: FC<CustomSingleImageDropzoneProps> = ({
         currentIndex={0}
       />
     </div>
-  );
-};
+  )
+}
 
-export default CustomSingleImageDropzone;
+export default CustomSingleImageDropzone
