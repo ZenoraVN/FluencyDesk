@@ -2,31 +2,51 @@ import { FC, useRef, useEffect, useState } from 'react'
 import { Editor } from '@tiptap/react'
 import { RichtextchtEditor } from '../../../../components/Input/CustomRichtext'
 import { CustomInput } from '../../../../components/Input/CustomInput'
-import { Plus, X, Edit2, Save, Image as ImageIcon, Upload } from 'lucide-react'
+import { X, Edit2, Save, Upload } from 'lucide-react'
 import ApiService from '../../../../service/ApiService'
+import { Eye, Upload as UploadIcon } from 'lucide-react'
+
+import { ImageViewDialog } from '../../../../components/Dialog/ImageViewDialog'
+import CustomCombobox from '../../../../components/Combobox/CustomCombobox'
+import { ButtonGroup } from '../../../../components/Button/ButtonGroup'
 import { Course, CourseBook } from '../types/course'
 
-interface Skill {
-  value: string
-  label: string
-  color: string
-}
-interface Level {
-  value: string
-  label: string
-  color: string
-}
-const SKILLS: Skill[] = [
-  { value: 'listening', label: 'Nghe', color: '#FF6B6B' },
-  { value: 'reading', label: 'Đọc', color: '#4ECDC4' },
-  { value: 'writing', label: 'Viết', color: '#45B7D1' },
-  { value: 'speaking', label: 'Nói', color: '#96CEB4' },
-  { value: 'grammar', label: 'Ngữ pháp', color: '#6366F1' }
+const SKILLS: { value: string; label: string }[] = [
+  { value: 'listening', label: 'Listening' },
+  { value: 'reading', label: 'Reading' },
+  { value: 'writing', label: 'Writing' },
+  { value: 'speaking', label: 'Speaking' },
+  { value: 'grammar', label: 'Grammar' }
 ]
-const LEVELS: Level[] = [
-  { value: 'beginner', label: 'Cơ bản', color: '#FF6B6B' },
-  { value: 'intermediate', label: 'Trung cấp', color: '#4ECDC4' },
-  { value: 'advanced', label: 'Nâng cao', color: '#45B7D1' }
+
+const LEVELS: { value: string; label: string }[] = [
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' }
+]
+
+const COURSE_TYPES = [
+  { value: 'BOOK' as const, label: 'Book' },
+  { value: 'OTHER' as const, label: 'Other' }
+]
+const SUGGESTED_TAGS: string[] = [
+  'IELTS',
+  'TOEIC',
+  'Business',
+  'Academic',
+  'General',
+  'Kids',
+  'Teens',
+  'Adults',
+  'Conversation',
+  'Exam',
+  'Grammar',
+  'Vocabulary',
+  'Pronunciation',
+  'Writing',
+  'Speaking',
+  'Listening',
+  'Reading'
 ]
 
 interface CourseSectionProps {
@@ -35,14 +55,10 @@ interface CourseSectionProps {
   editingTitle: boolean
   editingImage: boolean
   imageUrl: string
-  newTag: string
-  showTagInput: boolean
   onCourseChange: (course: Course) => void
   onSetEditingTitle: (editing: boolean) => void
   onSetEditingImage: (editing: boolean) => void
   onSetImageUrl: (url: string) => void
-  onSetNewTag: (tag: string) => void
-  onSetShowTagInput: (show: boolean) => void
   onUpdateCourseField: (field: string, value: any) => Promise<void>
 }
 
@@ -50,15 +66,14 @@ export const CourseSection: FC<CourseSectionProps> = ({
   course,
   editingImage,
   imageUrl,
-  newTag,
-  showTagInput,
   onCourseChange,
   onSetEditingImage,
   onSetImageUrl,
-  onSetNewTag,
-  onSetShowTagInput,
   onUpdateCourseField
 }) => {
+  // Custom: hover & image view dialog (correctly placed inside function body)
+  const [isImageHover, setIsImageHover] = useState(false)
+  const [showImageDialog, setShowImageDialog] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const dropZoneRef = useRef<HTMLDivElement>(null)
 
@@ -123,6 +138,35 @@ export const CourseSection: FC<CourseSectionProps> = ({
     }
   }, [course.type, course.course_book])
 
+  // Image upload logic
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      onSetImageUrl(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    // 🌟 Upload to backend
+    try {
+      const formData = new FormData()
+      formData.append('field', 'image_url')
+      formData.append('image', file)
+      const resp = await ApiService.put<{ image_url: string }>(
+        `/course/${course.id}`,
+        formData,
+        true,
+        true
+      )
+      if (resp.image_url) {
+        onSetImageUrl(resp.image_url)
+        onCourseChange({ ...course, image_url: resp.image_url })
+      }
+    } catch (e) {
+      alert('Error updating image!')
+    }
+  }
+
   // Drag & drop image logic
   useEffect(() => {
     if (dropZoneRef.current && editingImage) {
@@ -143,13 +187,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
         dropZone.classList.remove('border-[#52aaa5]', 'bg-[#52aaa5]/10')
         if (e.dataTransfer?.files.length) {
           const file = e.dataTransfer.files[0]
-          if (file.type.startsWith('image/')) {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-              onSetImageUrl(reader.result as string)
-            }
-            reader.readAsDataURL(file)
-          }
+          handleImageUpload(file)
         }
       }
       dropZone.addEventListener('dragover', handleDragOver)
@@ -167,7 +205,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
 
   const handleSaveTitle = async () => {
     if (!localTitle.trim()) {
-      setTitleError('Tiêu đề không được để trống')
+      setTitleError('Title must not be empty')
       return
     }
     setSavingTitle(true)
@@ -177,7 +215,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
       setEditingLocalTitle(false)
       setTitleChanged(false)
     } catch {
-      alert('Lỗi khi cập nhật tiêu đề!')
+      alert('Error updating title!')
     }
     setSavingTitle(false)
   }
@@ -189,70 +227,9 @@ export const CourseSection: FC<CourseSectionProps> = ({
       onCourseChange({ ...course, overview: localOverview })
       setOverviewChanged(false)
     } catch {
-      alert('Lỗi khi cập nhật tổng quan!')
+      alert('Error updating overview!')
     }
     setSavingOverview(false)
-  }
-
-  const handleSkillToggle = async (skillValue: string) => {
-    const newSkills = course.skills.includes(skillValue)
-      ? course.skills.filter((s: string) => s !== skillValue)
-      : [...course.skills, skillValue]
-    onCourseChange({ ...course, skills: newSkills })
-    try {
-      await onUpdateCourseField('skills', newSkills)
-    } catch {
-      alert('Lỗi khi cập nhật kỹ năng!')
-    }
-  }
-  const handleLevelChange = async (levelValue: string) => {
-    onCourseChange({ ...course, level: levelValue })
-    try {
-      await onUpdateCourseField('level', levelValue)
-    } catch {
-      alert('Lỗi khi cập nhật cấp độ!')
-    }
-  }
-  const handleTagRemove = async (tagToRemove: string) => {
-    const tags = course.tags.filter((tag: string) => tag !== tagToRemove)
-    onCourseChange({ ...course, tags })
-    try {
-      await onUpdateCourseField('tags', tags)
-    } catch {
-      alert('Lỗi khi cập nhật thẻ!')
-    }
-  }
-  const handleAddTag = async () => {
-    if (newTag.trim() && !course.tags.includes(newTag.trim())) {
-      const tags = [...course.tags, newTag.trim()]
-      onCourseChange({ ...course, tags })
-      try {
-        await onUpdateCourseField('tags', tags)
-      } catch {
-        alert('Lỗi khi cập nhật thẻ!')
-      }
-    }
-    onSetNewTag('')
-    onSetShowTagInput(false)
-  }
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleAddTag()
-    } else if (e.key === 'Escape') {
-      onSetShowTagInput(false)
-      onSetNewTag('')
-    }
-  }
-
-  const handleTypeChange = async (typeVal: 'BOOK' | 'OTHER') => {
-    if (course.type === typeVal) return
-    onCourseChange({ ...course, type: typeVal })
-    try {
-      await onUpdateCourseField('type', typeVal)
-    } catch {
-      alert('Lỗi khi cập nhật loại khoá học!')
-    }
   }
 
   // Lưu publication_year
@@ -268,7 +245,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
       setEditingYear(false)
       setYearChanged(false)
     } catch {
-      alert('Lỗi khi cập nhật năm xuất bản!')
+      alert('Error updating publication year!')
     }
     setSavingYear(false)
   }
@@ -279,49 +256,85 @@ export const CourseSection: FC<CourseSectionProps> = ({
       ref={containerRef}
       className="rounded-lg border-r border-gray-200 transition-colors pr-4 space-y-4 h-full overflow-y-auto"
     >
+      {/* Universal hidden file input for all modes (fixes UploadIcon not opening file picker) */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) {
+            handleImageUpload(file)
+          }
+        }}
+        className="hidden"
+        id="image-upload"
+      />
       {/* Image */}
       <div className="relative">
-        <div className="w-full aspect-[3/4] rounded-lg overflow-hidden bg-[#f6f6f0]">
+        <div className="inline-flex items-center justify-center w-full rounded-lg overflow-hidden bg-[#f6f6f0]">
           {editingImage ? (
             <div
               ref={dropZoneRef}
               className="w-full h-full border-2 border-dashed border-[#52aaa5]/20 rounded-xl p-4 bg-[#52aaa5]/5 flex flex-col items-center justify-center relative transition-colors"
             >
               {imageUrl ? (
-                <div className="relative w-full h-full">
+                <div
+                  className="relative w-full h-full group"
+                  onMouseEnter={() => setIsImageHover(true)}
+                  onMouseLeave={() => setIsImageHover(false)}
+                >
                   <img
                     src={imageUrl}
                     alt="Preview"
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-contain bg-white rounded-lg"
+                    style={{ borderRadius: 8 }}
                   />
+                  {/* Hover Overlay + Action Buttons */}
+                  <div
+                    className={`absolute inset-0 rounded-lg flex items-center justify-center transition-opacity duration-200
+                      ${isImageHover ? 'opacity-100' : 'opacity-0'}
+                      bg-black/40 z-20`}
+                    style={{
+                      borderRadius: 8
+                    }}
+                  >
+                    {/* View Button - Blue theme */}
+                    <button
+                      type="button"
+                      aria-label="Xem ảnh"
+                      className="mx-2 p-1.5 rounded-[8px] bg-[#E0ECFF] hover:bg-[#C5E1FF] transition duration-200 shadow-lg border border-[#93B6E5]"
+                      style={{ borderRadius: 8 }}
+                      onClick={() => setShowImageDialog(true)}
+                    >
+                      <Eye className="w-5 h-5 text-[#292D32]" />
+                    </button>
+                    {/* Replace Button - Teal theme */}
+                    <button
+                      type="button"
+                      aria-label="Thay ảnh"
+                      className="mx-2 p-1.5 rounded-[8px] bg-[#D4FAF6] hover:bg-[#B6F0E6] transition duration-200 shadow-lg border border-[#7EDFCB]"
+                      style={{ borderRadius: 8 }}
+                      onClick={() => {
+                        // trigger file input by id
+                        const fileInput = document.getElementById('image-upload')
+                        if (fileInput) (fileInput as HTMLInputElement).click()
+                      }}
+                    >
+                      <UploadIcon className="w-5 h-5 text-black" />
+                    </button>
+                  </div>
                   <button
                     onClick={() => {
                       onSetImageUrl('')
                       onSetEditingImage(false)
                     }}
-                    className="absolute top-2 right-2 p-2 rounded-lg bg-[#52aaa5] hover:bg-[#52aaa5]/90 text-white transition-colors"
+                    className="absolute top-2 right-2 p-2 rounded-lg bg-[#52aaa5] hover:bg-[#52aaa5]/90 text-white transition-colors z-30"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               ) : (
                 <>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        const reader = new FileReader()
-                        reader.onloadend = () => {
-                          onSetImageUrl(reader.result as string)
-                        }
-                        reader.readAsDataURL(file)
-                      }
-                    }}
-                    className="hidden"
-                    id="image-upload"
-                  />
                   <label
                     htmlFor="image-upload"
                     className="cursor-pointer flex flex-col items-center"
@@ -329,27 +342,62 @@ export const CourseSection: FC<CourseSectionProps> = ({
                     <div className="mb-4 p-4 rounded-full bg-[#52aaa5]/10">
                       <Upload className="h-8 w-8 text-[#52aaa5]" />
                     </div>
-                    <span className="text-[#52aaa5] font-medium">Chọn hình ảnh</span>
-                    <span className="text-sm text-[#718096] mt-1">hoặc kéo thả vào đây</span>
+                    <span className="text-[#52aaa5] font-medium">Choose an image</span>
+                    <span className="text-sm text-[#718096] mt-1">or drag and drop here</span>
                   </label>
                 </>
               )}
             </div>
           ) : (
-            <div className="relative w-full h-full">
+            <div
+              className="relative w-full h-full group"
+              onMouseEnter={() => setIsImageHover(true)}
+              onMouseLeave={() => setIsImageHover(false)}
+            >
               {course.image_url && (
-                <img
-                  src={course.image_url}
-                  alt={course.title}
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  <img
+                    src={course.image_url}
+                    alt={course.title}
+                    className="w-full h-full object-contain bg-white rounded-lg"
+                    style={{ borderRadius: 8 }}
+                  />
+                  {/* Hover Overlay + Action Button */}
+                  <div
+                    className={`absolute inset-0 rounded-lg flex items-center justify-center transition-opacity duration-200
+                      ${isImageHover ? 'opacity-100' : 'opacity-0'}
+                      bg-black/40 z-20`}
+                    style={{
+                      borderRadius: 8
+                    }}
+                  >
+                    {/* View Button - Blue theme */}
+                    <button
+                      type="button"
+                      aria-label="Xem ảnh"
+                      className="mx-2 p-1.5 rounded-[8px] bg-[#E0ECFF] hover:bg-[#C5E1FF] transition duration-200 shadow-lg border border-[#93B6E5]"
+                      style={{ borderRadius: 8 }}
+                      onClick={() => setShowImageDialog(true)}
+                    >
+                      <Eye className="w-5 h-5 text-[#292D32]" />
+                    </button>
+                    {/* Replace Button - Teal theme */}
+                    <button
+                      type="button"
+                      aria-label="Thay ảnh"
+                      className="mx-2 p-1.5 rounded-[8px] bg-[#D4FAF6] hover:bg-[#B6F0E6] transition duration-200 shadow-lg border border-[#7EDFCB]"
+                      style={{ borderRadius: 8 }}
+                      onClick={() => {
+                        // trigger file input by id
+                        const fileInput = document.getElementById('image-upload')
+                        if (fileInput) (fileInput as HTMLInputElement).click()
+                      }}
+                    >
+                      <UploadIcon className="w-5 h-5 text-black" />
+                    </button>
+                  </div>
+                </>
               )}
-              <button
-                onClick={() => onSetEditingImage(true)}
-                className="absolute top-4 right-4 p-2 bg-white/80 hover:bg-white text-[#52aaa5] rounded-lg transition-colors"
-              >
-                <ImageIcon className="w-5 h-5" />
-              </button>
             </div>
           )}
         </div>
@@ -376,7 +424,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
                   className="flex items-center gap-1 bg-[#52aaa5] text-white px-3 py-1.5 hover:bg-[#489c92] transition-all text-sm rounded-md"
                 >
                   <Save className="w-4 h-4" />
-                  Lưu thay đổi
+                  Save changes
                 </button>
               </div>
             )}
@@ -399,124 +447,91 @@ export const CourseSection: FC<CourseSectionProps> = ({
       </div>
       {/* Type (BOOK|OTHER) */}
       <div>
-        <h3 className="text-base font-medium text-[#2D3748] mb-2">Loại khoá học</h3>
-        <div className="flex gap-3">
-          {['OTHER', 'BOOK'].map((value) => (
-            <button
-              key={value}
-              onClick={() => handleTypeChange(value as 'BOOK' | 'OTHER')}
-              className={`
-                px-3 py-1.5 text-sm rounded-md border
-                ${
-                  course.type === value
-                    ? 'bg-[#52aaa5] text-white border-[#52aaa5]'
-                    : 'bg-white text-[#52aaa5] border-[#52aaa5]/20'
-                }
-                transition-all
-              `}
-            >
-              {value === 'OTHER' ? 'Khác' : 'Sách'}
-            </button>
-          ))}
-        </div>
+        <label className="block text-base font-medium text-[#2D3748] mb-2">Course Type</label>
+        <ButtonGroup
+          options={COURSE_TYPES}
+          selected={course.type}
+          onClick={async (value) => {
+            if (course.type === value) return
+            onCourseChange({ ...course, type: value })
+            try {
+              await onUpdateCourseField('type', value)
+            } catch {
+              alert('Error updating course type!')
+            }
+          }}
+          colorNames={['indigo', 'blueGray']}
+        />
       </div>
       {/* Skills & Level */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-4">
         <div>
-          <h3 className="text-base font-medium text-[#2D3748] mb-2">Kỹ năng</h3>
-          <div className="flex flex-wrap gap-1.5">
-            {SKILLS.map((skill) => (
-              <button
-                key={skill.value}
-                onClick={() => handleSkillToggle(skill.value)}
-                className={`px-2.5 py-1 text-sm rounded-lg transition-all hover:scale-105 hover:shadow-md`}
-                style={{
-                  backgroundColor: course.skills.includes(skill.value)
-                    ? skill.color
-                    : `${skill.color}20`,
-                  color: course.skills.includes(skill.value) ? 'white' : skill.color
-                }}
-              >
-                {skill.label}
-              </button>
-            ))}
-          </div>
+          <label className="text-base font-medium text-[#2D3748] mb-2 block">Skills</label>
+          <ButtonGroup
+            options={SKILLS}
+            selected={course.skills}
+            onClick={async (val) => {
+              const newSkills = course.skills.includes(val)
+                ? course.skills.filter((s: string) => s !== val)
+                : [...course.skills, val]
+              onCourseChange({ ...course, skills: newSkills })
+              try {
+                await onUpdateCourseField('skills', newSkills)
+              } catch {
+                alert('Error updating skills!')
+              }
+            }}
+            multiple
+            colorNames={['red', 'teal', 'blueSky', 'greenPastel', 'indigo']}
+          />
         </div>
         <div>
-          <h3 className="text-base font-medium text-[#2D3748] mb-2">Cấp độ</h3>
-          <div className="flex gap-1.5">
-            {LEVELS.map((level) => (
-              <button
-                key={level.value}
-                onClick={() => handleLevelChange(level.value)}
-                className={`flex-1 px-2.5 py-1 text-sm rounded-lg transition-all hover:scale-105 hover:shadow-md`}
-                style={{
-                  backgroundColor: course.level === level.value ? level.color : `${level.color}20`,
-                  color: course.level === level.value ? 'white' : level.color
-                }}
-              >
-                {level.label}
-              </button>
-            ))}
-          </div>
+          <label className="text-base font-medium text-[#2D3748] mb-2 block">Level</label>
+          <ButtonGroup
+            options={LEVELS}
+            selected={course.level}
+            onClick={async (val) => {
+              onCourseChange({ ...course, level: val })
+              try {
+                await onUpdateCourseField('level', val)
+              } catch {
+                alert('Error updating level!')
+              }
+            }}
+            colorNames={['yellow', 'teal', 'blueSky']}
+          />
         </div>
       </div>
       {/* Tags */}
       <div>
-        <h3 className="text-base font-medium text-[#2D3748] mb-2">Thẻ</h3>
-        <div className="flex flex-wrap gap-1.5">
-          {course.tags.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-0.5 px-2 py-0.5 text-sm rounded-md bg-[#52aaa5]/10 text-[#52aaa5]"
-            >
-              {tag}
-              <button onClick={() => handleTagRemove(tag)} className="hover:text-red-500">
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </span>
-          ))}
-          {showTagInput ? (
-            <div className="flex items-center gap-1.5">
-              <input
-                type="text"
-                value={newTag}
-                onChange={(e) => onSetNewTag(e.target.value)}
-                onKeyDown={handleTagInputKeyDown}
-                placeholder="Nhập tên thẻ"
-                className="px-2 py-0.5 text-sm rounded-md border border-[#52aaa5]/20 focus:border-[#52aaa5] focus:ring-1 focus:ring-[#52aaa5]/20 text-[#2D3748] placeholder-[#718096] outline-none"
-                autoFocus
-              />
-              <button
-                onClick={handleAddTag}
-                className="p-1 text-[#52aaa5] hover:bg-[#52aaa5]/10 rounded-md transition-colors"
-              >
-                <Save className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() => {
-                  onSetShowTagInput(false)
-                  onSetNewTag('')
-                }}
-                className="p-1 text-red-500 hover:bg-red-50 rounded-md transition-colors"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => onSetShowTagInput(true)}
-              className="inline-flex items-center gap-0.5 px-2 py-0.5 text-sm rounded-md border border-dashed border-[#52aaa5]/20 text-[#52aaa5] hover:border-[#52aaa5]/40"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Thêm thẻ
-            </button>
-          )}
-        </div>
+        <label className="block text-base font-medium text-[#2D3748] mb-2">Tags</label>
+        <CustomCombobox
+          label=""
+          value={course.tags}
+          options={SUGGESTED_TAGS.map((tag) => ({
+            value: tag,
+            label: tag
+          }))}
+          onChange={async (tags) => {
+            if (Array.isArray(tags)) {
+              onCourseChange({ ...course, tags })
+              try {
+                await onUpdateCourseField('tags', tags)
+              } catch {
+                alert('Error updating tags!')
+              }
+            }
+          }}
+          placeholder="Search or add new tag"
+          searchable
+          multiple
+          creatable
+          className="w-full"
+        />
       </div>
       {/* Overview */}
       <div>
-        <h3 className="text-base font-medium text-[#2D3748] mb-2">Tổng quan</h3>
+        <h3 className="text-base font-medium text-[#2D3748] mb-2">Overview</h3>
         <RichtextchtEditor
           value={localOverview}
           onChange={(value: string) => {
@@ -537,7 +552,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
               className="flex items-center gap-1 bg-[#52aaa5] text-white px-3 py-1.5 hover:bg-[#489c92] transition-all text-sm rounded-md"
             >
               <Save className="w-4 h-4" />
-              Lưu thay đổi
+              Save changes
             </button>
           </div>
         )}
@@ -546,12 +561,12 @@ export const CourseSection: FC<CourseSectionProps> = ({
       {course.type === 'BOOK' && (
         <div className="mt-4 rounded-lg">
           {bookLoading ? (
-            <div>Đang tải...</div>
+            <div>Loading...</div>
           ) : (
             <div className="space-y-2">
               {/* Authors */}
               <div>
-                <label className="block mb-1 text-black">Tác giả</label>
+                <label className="block mb-1 text-black">Authors</label>
                 <div className="flex flex-wrap gap-1.5">
                   {newAuthors.map((author, idx) => (
                     <span
@@ -606,14 +621,14 @@ export const CourseSection: FC<CourseSectionProps> = ({
                           })
                       }
                     }}
-                    placeholder="Ấn Enter để thêm"
+                    placeholder="Press Enter to add"
                     style={{ width: 120 }}
                   />
                 </div>
               </div>
               {/* Publishers */}
               <div>
-                <label className="block mb-1 text-black">Nhà xuất bản</label>
+                <label className="block mb-1 text-black">Publishers</label>
                 <div className="flex flex-wrap gap-1.5">
                   {newPublishers.map((pub, idx) => (
                     <span
@@ -668,14 +683,14 @@ export const CourseSection: FC<CourseSectionProps> = ({
                           })
                       }
                     }}
-                    placeholder="Ấn Enter để thêm"
+                    placeholder="Press Enter to add"
                     style={{ width: 120 }}
                   />
                 </div>
               </div>
               {/* Publication Year */}
               <div className="relative group">
-                <label className="block mb-1 text-black">Năm xuất bản</label>
+                <label className="block mb-1 text-black">Publication Year</label>
                 {editingYear ? (
                   <>
                     <CustomInput
@@ -696,7 +711,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
                         className="mt-2 flex items-center gap-1 bg-[#52aaa5] text-white px-3 py-1.5 hover:bg-[#489c92] transition-all text-sm rounded-md"
                       >
                         <Save className="w-4 h-4" />
-                        Lưu thay đổi
+                        Save changes
                       </button>
                     )}
                   </>
@@ -718,6 +733,30 @@ export const CourseSection: FC<CourseSectionProps> = ({
           )}
         </div>
       )}
+      {/* Image Viewer Dialog, always mounted for preview */}
+      <ImageViewDialog
+        open={showImageDialog}
+        onClose={() => setShowImageDialog(false)}
+        images={[
+          {
+            src: editingImage && imageUrl ? imageUrl : course.image_url || '',
+            name: editingImage && imageUrl ? 'Ảnh xem trước' : course.title || ''
+          }
+        ]}
+        currentIndex={0}
+      />
+      {/* Image Viewer Dialog, always mounted for preview */}
+      <ImageViewDialog
+        open={showImageDialog}
+        onClose={() => setShowImageDialog(false)}
+        images={[
+          {
+            src: editingImage && imageUrl ? imageUrl : course.image_url || '',
+            name: editingImage && imageUrl ? 'Ảnh xem trước' : course.title || ''
+          }
+        ]}
+        currentIndex={0}
+      />
     </div>
   )
 }
