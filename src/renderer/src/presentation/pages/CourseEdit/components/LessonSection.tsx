@@ -89,25 +89,17 @@ export const LessonSection: FC<LessonSectionProps> = ({
   newLessonOverview,
   onCourseChange,
   onSetNewLessonTitle,
-  onSetNewLessonOverview,
-  onShowCreateQuestion
+  onSetNewLessonOverview
 }) => {
   const listRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const [showNewLessonForm, setShowNewLessonForm] = useState(false)
   const [creatingLesson, setCreatingLesson] = useState(false)
-  const [showQuestionForm, setShowQuestionForm] = useState<{
-    lessonId: string
-    questionSequence: number
-  } | null>(null)
-  const [newQuestionId, setNewQuestionId] = useState('')
-  const [foundQuestion, setFoundQuestion] = useState<QuestionDetail | null>(null)
-  const [expandedLesson, setExpandedLesson] = useState<string | null>(null)
   const [reverseOrder, setReverseOrder] = useState(false)
   const [filterSequence, setFilterSequence] = useState('')
 
-  const [drawerQuestion, setDrawerQuestion] = useState<QuestionDetail | null>(null)
+  const [drawerQuestion] = useState<QuestionDetail | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   useEffect(() => {
@@ -122,17 +114,6 @@ export const LessonSection: FC<LessonSectionProps> = ({
     setShowNewLessonForm(true)
     onSetNewLessonTitle('')
     onSetNewLessonOverview('')
-  }
-
-  const handleViewQuestion = async (questionId: string) => {
-    try {
-      // Có thể set loading state nữa nếu muốn
-      const detail = await ApiService.get<QuestionDetail>(`/question/${questionId}`)
-      setDrawerQuestion(detail)
-      setDrawerOpen(true)
-    } catch (err) {
-      alert('Không lấy được chi tiết câu hỏi!')
-    }
   }
 
   const handleCreateLesson = async () => {
@@ -172,25 +153,6 @@ export const LessonSection: FC<LessonSectionProps> = ({
       setLoading(false)
     }
   }
-
-  const handleRemoveQuestion = async (
-    _lessonId: string,
-    questionId: string,
-    setLoadingId: (id: string | null) => void
-  ) => {
-    try {
-      setLoadingId(questionId)
-      await ApiService.delete(`/lesson-question/${questionId}`)
-      const updatedCourse = await ApiService.get<Course>(`/course/${course.id}`)
-      onCourseChange(updatedCourse)
-    } catch (err) {
-      alert((err as Error).message || 'Lỗi xóa câu hỏi')
-    } finally {
-      setLoadingId(null)
-    }
-  }
-
-  const handleCheckQuestion = () => setFoundQuestion(null)
 
   const filteredLessons = getLessons().filter(
     (lesson) => !filterSequence || lesson.sequence.toString() === filterSequence
@@ -249,37 +211,8 @@ export const LessonSection: FC<LessonSectionProps> = ({
           <LessonItem
             key={lesson.id}
             lesson={lesson}
-            expanded={expandedLesson === lesson.id}
-            showQuestionForm={showQuestionForm}
-            newQuestionId={newQuestionId}
-            foundQuestion={foundQuestion}
-            onSetExpanded={(id) => setExpandedLesson(id)}
+            courseId={course.id}
             onRemoveLesson={handleRemoveLesson}
-            onToggleQuestionForm={(lessonId) => {
-              if (showQuestionForm?.lessonId === lessonId) {
-                setShowQuestionForm(null)
-              } else {
-                const lesson = getLessons().find((l) => l.id === lessonId)
-                const nextSequence = (lesson?.questions?.length ?? 0) + 1
-                setShowQuestionForm({
-                  lessonId,
-                  questionSequence: nextSequence
-                })
-              }
-            }}
-            onCreateQuestion={() => {
-              const nextSequence = (lesson.questions?.length ?? 0) + 1
-              onShowCreateQuestion(lesson.id, nextSequence)
-            }}
-            onQuestionIdChange={setNewQuestionId}
-            onCheckQuestion={handleCheckQuestion}
-            onAddQuestion={() => {
-              /* giữ nguyên logic của bạn ở đây */
-            }}
-            onViewQuestion={handleViewQuestion}
-            onRemoveQuestion={(questionId, setLoadingId) =>
-              handleRemoveQuestion(lesson.id, questionId, setLoadingId)
-            }
           />
         ))}
       </div>
