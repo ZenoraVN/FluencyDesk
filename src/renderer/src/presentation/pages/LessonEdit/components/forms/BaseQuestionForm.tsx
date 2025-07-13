@@ -7,7 +7,7 @@ import {
   FormItem,
   FormLabel
 } from '../../../../../components/ui/form'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomInput } from '../../../../../components/Input/CustomInput'
 import type { SkillType, QuestionType, LevelType } from '../../types/questionDetail'
 
 export interface BaseQuestionFormData {
@@ -77,21 +77,19 @@ export const BaseQuestionForm: FC<BaseQuestionFormProps> = ({}) => {
               <FormLabel className="text-[#2D3748] font-medium">Hướng dẫn</FormLabel>
               <FormControl>
                 <div className="mt-2">
-                  <RichtextchtEditor
+                  <CustomInput
                     value={field.value || ''}
                     onChange={field.onChange}
                     className={
-                      !(field.value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
+                      !(field.value || '').trim()
                         ? 'border-red-500 text-red-500'
                         : 'hover:border-[#52aaaf]'
                     }
                     placeholder="Nhập hướng dẫn cho câu hỏi"
+                    style={{ minHeight: 40, borderRadius: 8 }}
                   />
                 </div>
               </FormControl>
-              {!(field.value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim() && (
-                <div className="text-sm text-red-500 mt-1">Vui lòng nhập tổng quan cho câu hỏi</div>
-              )}
             </FormItem>
           )}
         />
