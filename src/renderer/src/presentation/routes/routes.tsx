@@ -12,7 +12,6 @@ import NotePage from '../pages/Note'
 import AnalyticPage from '../pages/Analytic'
 import CourseEditPage from '../pages/CourseEdit'
 import LessonEditPage from '../pages/LessonEdit'
-import QuestionCreatePage from '../pages/QuestionCreate'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 import LoginPage from '../pages/Login'
 import RegisterPage from '../pages/Register'
@@ -133,14 +132,6 @@ export const routes: RouteObject[] = [
         element: (
           <RequireAuth>
             <AnalyticPage />
-          </RequireAuth>
-        )
-      },
-      {
-        path: 'lesson/:lessonId/:sequence/question/create',
-        element: (
-          <RequireAuth>
-            <QuestionCreatePage />
           </RequireAuth>
         )
       }

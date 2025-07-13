@@ -22,49 +22,49 @@ const menuItems = [
   {
     icon: LayoutDashboard,
     label: 'Dashboard',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#52aaa5]', // teal
     href: '/'
   },
   {
     icon: GraduationCap,
     label: 'My Course',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#eab308]', // yellow-500
     href: '/my-course'
   },
   {
     icon: Star,
     label: 'Favorite Course',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#f59e42]', // orange
     href: '/favorite'
   },
   {
     icon: StickyNote,
     label: 'Note',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#f43f5e]', // pink
     href: '/note'
   },
   {
     icon: BarChart2,
     label: 'Analytic',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#28b4e0]', // blue
     href: '/analytics'
   },
   {
     icon: Bell,
     label: 'Notification',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#a855f7]', // purple
     href: '/notification'
   },
   {
     icon: BookOpen,
     label: 'Notebook',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#22c55e]', // green
     href: '/notebook'
   },
   {
     icon: Settings,
     label: 'Setting',
-    iconClassName: 'text-[#52aaa5]',
+    iconClassName: 'text-[#f472b6]', // rose
     href: '/settings'
   }
 ]
@@ -130,7 +130,7 @@ export function Sidebar({ className }: SidebarProps) {
               <item.icon
                 className={cn(
                   'h-5 w-5',
-                  activeItem === item.href ? 'text-white' : 'text-[#52aaa5]'
+                  activeItem === item.href ? 'text-white' : item.iconClassName
                 )}
               />
               <span>{item.label}</span>
