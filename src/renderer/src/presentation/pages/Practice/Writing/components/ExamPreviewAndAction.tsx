@@ -12,7 +12,7 @@ const ExamPreviewAndAction: React.FC<ExamPreviewAndActionProps> = ({
   enabled,
   onStartExam
 }) => (
-  <div className="bg-card rounded-xl p-4 mb-4 border">
+  <div className="bg-card rounded-xl p-4 mb-4 border w-full min-w-0">
     <div className="mb-2 text-lg font-bold flex items-center gap-2">
       <Eye className="w-5 h-5 text-primary" />
       Exam Preview

@@ -15,9 +15,9 @@ import LessonEditPage from '../pages/LessonEdit'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 import LoginPage from '../pages/Login'
 import RegisterPage from '../pages/Register'
-import PracticePage from '../pages/Practice'
 
 import { RequireAuth } from '../providers/RequireAuth'
+import PracticeWritingPage from '../pages/Practice/Writing/PracticeWritingPage'
 
 export const routes: RouteObject[] = [
   {
@@ -136,36 +136,11 @@ export const routes: RouteObject[] = [
           </RequireAuth>
         )
       },
-      // --- PRACTICE ROUTES ---
-      {
-        path: 'practice/reading',
-        element: (
-          <RequireAuth>
-            <PracticePage />
-          </RequireAuth>
-        )
-      },
-      {
-        path: 'practice/listening',
-        element: (
-          <RequireAuth>
-            <PracticePage />
-          </RequireAuth>
-        )
-      },
       {
         path: 'practice/writing',
         element: (
           <RequireAuth>
-            <PracticePage />
-          </RequireAuth>
-        )
-      },
-      {
-        path: 'practice/speaking',
-        element: (
-          <RequireAuth>
-            <PracticePage />
+            <PracticeWritingPage />
           </RequireAuth>
         )
       }

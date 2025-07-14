@@ -33,7 +33,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
   const showCustomInput = selectedTopic === 'Other'
 
   return (
-    <div className="bg-card border rounded-xl p-4 mb-4">
+    <div className="bg-card border rounded-xl p-4 mb-4 w-full min-w-0">
       <div className="mb-6 flex items-center gap-2">
         <span className="text-xl text-green-600">&#127757;</span>
         <h3 className="text-lg font-bold">Choose Topic</h3>

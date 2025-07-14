@@ -51,7 +51,7 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
   onSelectTask,
   selectedTaskObj
 }) => (
-  <div className="bg-card rounded-xl mb-4 border p-4 border-gray-300">
+  <div className="bg-card rounded-xl mb-4 border p-4 border-gray-300 w-full min-w-0">
     {/* Header title and icon */}
     <div className="mb-8 flex items-center gap-2">
       <span className="text-xl text-primary">&#128218;</span>

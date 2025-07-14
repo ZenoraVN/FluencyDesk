@@ -16,7 +16,7 @@ const AiPromptInput: React.FC<AiPromptInputProps> = ({
   onCreateRandom,
   disableCreateByPrompt
 }) => (
-  <div className="bg-card rounded-xl p-4 mb-4 border">
+  <div className="bg-card rounded-xl p-4 mb-4 border w-full min-w-0">
     <div className="mb-4 flex items-center gap-2">
       <span className="text-xl text-purple-600">&#129302;</span>
       <h3 className="text-lg font-bold">AI Prompt</h3>
