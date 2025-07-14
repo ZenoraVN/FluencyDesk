@@ -15,6 +15,7 @@ import LessonEditPage from '../pages/LessonEdit'
 import NotFoundPage from '../pages/Other/NotFoundPage'
 import LoginPage from '../pages/Login'
 import RegisterPage from '../pages/Register'
+import PracticePage from '../pages/Practice'
 
 import { RequireAuth } from '../providers/RequireAuth'
 
@@ -132,6 +133,39 @@ export const routes: RouteObject[] = [
         element: (
           <RequireAuth>
             <AnalyticPage />
+          </RequireAuth>
+        )
+      },
+      // --- PRACTICE ROUTES ---
+      {
+        path: 'practice/reading',
+        element: (
+          <RequireAuth>
+            <PracticePage />
+          </RequireAuth>
+        )
+      },
+      {
+        path: 'practice/listening',
+        element: (
+          <RequireAuth>
+            <PracticePage />
+          </RequireAuth>
+        )
+      },
+      {
+        path: 'practice/writing',
+        element: (
+          <RequireAuth>
+            <PracticePage />
+          </RequireAuth>
+        )
+      },
+      {
+        path: 'practice/speaking',
+        element: (
+          <RequireAuth>
+            <PracticePage />
           </RequireAuth>
         )
       }
