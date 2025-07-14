@@ -25,6 +25,7 @@ interface RichtextchtEditorProps {
   placeholder?: string
   count?: boolean // thêm
   min?: boolean // thêm
+  hideToolbar?: boolean // thêm prop ẩn toolbar
 }
 
 export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
@@ -33,7 +34,8 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
   className = '',
   placeholder = 'Type here...',
   count = true,
-  min = false
+  min = false,
+  hideToolbar = false
 }) => {
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [wordCount, setWordCount] = useState(0)
@@ -114,8 +116,8 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
         isMinimal ? 'h-10 flex items-center relative' : 'space-y-2'
       } rounded-lg ${className}`}
     >
-      {/* Toolbar -- chỉ hiện nếu không phải min */}
-      {!isMinimal && (
+      {/* Toolbar -- chỉ hiện nếu không phải min và không ẩn toolbar */}
+      {!isMinimal && !hideToolbar && (
         <div
           className={`flex items-center gap-1 p-1 border border-[#52aaa5]/20 rounded-t-lg ${className}`}
         >

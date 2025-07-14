@@ -67,7 +67,7 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
             key={key}
             onClick={() => onSelectExam(key)}
             className={[
-              'w-full rounded-xl px-6 py-4 flex flex-col items-start text-left transition focus:outline-none hover:border-[#52aaad]',
+              'w-full rounded-xl px-6 py-4 flex flex-col items-start text-left transition focus:outline-none',
               isActive
                 ? 'border-t-[4px] border-x border-b border-x-gray-300 border-b-gray-300'
                 : 'border border-gray-300 text-gray-900 dark:text-gray-200'
@@ -107,32 +107,33 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
               isActive
                 ? {
                     color: '#1a202c',
-                    background: '#f8fafc',
                     borderLeftColor: examTypeBorderColor[selectedExam]
                   }
                 : {}
             }
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="grid grid-cols-[1fr_auto] items-center gap-2 w-full">
               <div>
                 <div className={'text-base font-semibold' + (isActive ? ' text-blue-800' : '')}>
                   {task.name}
                 </div>
                 <div className="text-sm text-gray-500">{task.description}</div>
               </div>
-              <div className="flex gap-4 mt-2 sm:mt-0 text-sm text-blue-500 items-center">
-                <div className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-lg" style={{ fontSize: 18 }}>
-                    timer
-                  </span>
-                  <span>{task.time}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-lg" style={{ fontSize: 18 }}>
-                    format_color_text
-                  </span>
-                  <span>{task.words}</span>
-                </div>
+              <div className="flex gap-2 mt-2 sm:mt-0 items-center justify-end min-w-fit text-right">
+                <span className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full font-medium text-xs">
+                  <span
+                    className="material-symbols-outlined text-lg"
+                    style={{ fontSize: 17 }}
+                  ></span>
+                  {task.time}
+                </span>
+                <span className="flex items-center gap-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full font-medium text-xs">
+                  <span
+                    className="material-symbols-outlined text-lg"
+                    style={{ fontSize: 17 }}
+                  ></span>
+                  {task.words}
+                </span>
               </div>
             </div>
           </button>

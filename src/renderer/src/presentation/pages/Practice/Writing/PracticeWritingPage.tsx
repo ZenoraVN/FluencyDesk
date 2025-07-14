@@ -179,7 +179,7 @@ const PracticeWritingPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-row h-screen gap-6 px-4 pt-4">
+    <div className="flex flex-row h-screen gap-6 px-4 pt-4 pb-8">
       {/* Panel trái: scroll độc lập */}
       <div className="w-1/3 flex flex-col h-full overflow-y-auto bg-background border-r pr-4">
         <WritingHistory />
@@ -202,15 +202,13 @@ const PracticeWritingPage: React.FC = () => {
         </div>
         {/* Chủ đề - chỉ hiện nếu task có topics */}
         {topics.length > 0 && (
-          <div className="bg-card border rounded-xl p-8 mb-4">
-            <TopicSelector
-              topics={topics}
-              selectedTopic={selectedTopic}
-              onSelect={setSelectedTopic}
-              customTopic={customTopic}
-              setCustomTopic={setCustomTopic}
-            />
-          </div>
+          <TopicSelector
+            topics={topics}
+            selectedTopic={selectedTopic}
+            onSelect={setSelectedTopic}
+            customTopic={customTopic}
+            setCustomTopic={setCustomTopic}
+          />
         )}
         <AiPromptInput
           value={aiPrompt}
