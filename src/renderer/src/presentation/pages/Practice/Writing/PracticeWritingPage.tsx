@@ -179,7 +179,7 @@ const PracticeWritingPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-row h-screen gap-6 px-4">
+    <div className="flex flex-row h-screen gap-6 px-4 pt-4">
       {/* Panel trái: scroll độc lập */}
       <div className="w-1/3 flex flex-col h-full overflow-y-auto bg-background border-r pr-4">
         <WritingHistory />
