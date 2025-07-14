@@ -1,8 +1,13 @@
 import { useLocation } from 'react-router-dom'
+import PracticeWritingPage from './Writing/PracticeWritingPage'
 
 export default function PracticePage() {
   const location = useLocation()
   const type = location.pathname.split('/')[2] || ''
+
+  if (type === 'writing') {
+    return <PracticeWritingPage />
+  }
 
   let title = ''
   switch (type) {
@@ -11,9 +16,6 @@ export default function PracticePage() {
       break
     case 'listening':
       title = 'Practice: Listening'
-      break
-    case 'writing':
-      title = 'Practice: Writing'
       break
     case 'speaking':
       title = 'Practice: Speaking'

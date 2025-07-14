@@ -195,7 +195,7 @@ export function Sidebar({ className }: SidebarProps) {
                   <sub.icon
                     className={cn(
                       'h-4 w-4',
-                      location.pathname === sub.href ? 'text-white' : sub.iconClassName
+                      sub.iconClassName // Always use the designated vibrant color
                     )}
                   />
                   <span>{sub.label}</span>
