@@ -15,12 +15,12 @@ const ExamPreviewAndAction: React.FC<ExamPreviewAndActionProps> = ({
   <div className="bg-card rounded-xl p-4 mb-4 border">
     <div className="mb-2 text-lg font-bold flex items-center gap-2">
       <Eye className="w-5 h-5 text-primary" />
-      Xem trước đề
+      Exam Preview
     </div>
     <div className="border rounded-md px-4 py-3 mb-4 min-h-[68px] whitespace-pre-line text-gray-700">
       {preview
         ? preview
-        : '(Chưa có đề nào được tạo. Hãy nhập yêu cầu hoặc tạo đề ngẫu nhiên nhé!)'}
+        : '(No exam has been generated. Please enter a prompt or create a random exam!)'}
     </div>
     {preview && (
       <div className="flex justify-end">
@@ -30,7 +30,7 @@ const ExamPreviewAndAction: React.FC<ExamPreviewAndActionProps> = ({
           disabled={!enabled}
           onClick={onStartExam}
         >
-          Làm bài
+          Start Exam
         </button>
       </div>
     )}

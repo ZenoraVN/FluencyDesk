@@ -24,7 +24,7 @@ const AiPromptInput: React.FC<AiPromptInputProps> = ({
     <RichtextchtEditor
       value={value}
       onChange={onChange}
-      placeholder="Nhập yêu cầu đặc biệt cho đề viết..."
+      placeholder="Enter a special writing prompt..."
       count={false}
       hideToolbar={true}
     />
@@ -35,14 +35,14 @@ const AiPromptInput: React.FC<AiPromptInputProps> = ({
         disabled={disableCreateByPrompt}
         style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
       >
-        Tạo đề theo yêu cầu
+        Create by Prompt
       </button>
       <button
         className="bg-blue-500 text-white font-bold rounded-r-xl rounded-l-none px-6 py-2 hover:bg-blue-600 transition"
         onClick={onCreateRandom}
         style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
       >
-        Tạo đề ngẫu nhiên
+        Create Random
       </button>
     </div>
   </div>

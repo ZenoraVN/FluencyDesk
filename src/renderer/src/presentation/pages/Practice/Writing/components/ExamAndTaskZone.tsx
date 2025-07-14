@@ -55,10 +55,10 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
     {/* Header title and icon */}
     <div className="mb-8 flex items-center gap-2">
       <span className="text-xl text-primary">&#128218;</span>
-      <h2 className="text-xl font-bold">Lựa chọn dạng bài</h2>
+      <h2 className="text-xl font-bold">Choose Task Type</h2>
     </div>
     {/* Exam type selector */}
-    <div className="text-gray-700 text-sm font-semibold mb-2">Loại kỳ thi</div>
+    <div className="text-gray-700 text-sm font-semibold mb-2">Exam Type</div>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
       {examTypes.map(({ key, label, info }) => {
         const isActive = selectedExam === key
@@ -91,7 +91,7 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
       })}
     </div>
     {/* Task type selector */}
-    <div className="text-gray-700 text-sm font-semibold mb-2">Dạng bài cụ thể</div>
+    <div className="text-gray-700 text-sm font-semibold mb-2">Task Detail Type</div>
     <div className="flex flex-col gap-3">
       {tasks.map((task) => {
         const isActive = selectedTask === task.key
@@ -145,7 +145,7 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
       <div className="bg-blue-50 border border-blue-200 rounded-xl px-6 py-4 mt-6">
         <div className="text-sm">
           <span className="font-bold">{selectedTaskObj.name}:</span> {selectedTaskObj.description}.
-          Thời gian: <b>{selectedTaskObj.time}</b>, từ: <b>{selectedTaskObj.words}</b>.
+          Time: <b>{selectedTaskObj.time}</b>, words: <b>{selectedTaskObj.words}</b>.
         </div>
       </div>
     )}

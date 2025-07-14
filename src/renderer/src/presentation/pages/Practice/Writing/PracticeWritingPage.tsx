@@ -27,31 +27,31 @@ const EXAM_TYPES: MyExamType[] = [
   {
     key: 'IELTS',
     label: 'IELTS',
-    info: '2 dạng bài',
+    info: '2 task types',
     tasks: [
       {
         key: 'task1',
-        name: 'Task 1 (Biểu đồ / Thư)',
-        description: 'Viết thư hoặc báo cáo biểu đồ',
-        time: '20 phút',
-        words: '~150 từ',
+        name: 'Task 1 (Chart / Letter)',
+        description: 'Write a letter or chart report',
+        time: '20 minutes',
+        words: '~150 words',
         topics: undefined
       },
       {
         key: 'task2',
         name: 'Task 2 (Essay)',
         description: 'Essay argumentative/opinion',
-        time: '40 phút',
-        words: '~250 từ',
+        time: '40 minutes',
+        words: '~250 words',
         topics: [
-          'Môi trường',
-          'Công nghệ',
-          'Giáo dục',
-          'Sức khỏe',
-          'Xã hội',
-          'Kinh doanh',
-          'Du lịch',
-          'Văn hóa'
+          'Environment',
+          'Technology',
+          'Education',
+          'Health',
+          'Society',
+          'Business',
+          'Travel',
+          'Culture'
         ]
       }
     ]
@@ -59,30 +59,30 @@ const EXAM_TYPES: MyExamType[] = [
   {
     key: 'TOEIC',
     label: 'TOEIC',
-    info: '3 dạng bài',
+    info: '3 task types',
     tasks: [
       {
         key: 'email',
-        name: 'Viết Email',
-        description: 'Viết email liên quan business/office',
-        time: '15 phút',
-        words: '~120 từ',
-        topics: ['Kinh doanh', 'Xã hội', 'Văn hóa']
+        name: 'Write Email',
+        description: 'Write an email related to business/office',
+        time: '15 minutes',
+        words: '~120 words',
+        topics: ['Business', 'Society', 'Culture']
       },
       {
         key: 'essay',
-        name: 'Viết Essay',
-        description: 'Topic đa dạng về cuộc sống & công việc',
-        time: '30 phút',
-        words: '~150 từ',
-        topics: ['Kinh doanh', 'Sức khỏe', 'Du lịch', 'Xã hội']
+        name: 'Write Essay',
+        description: 'Varied topics about life & work',
+        time: '30 minutes',
+        words: '~150 words',
+        topics: ['Business', 'Health', 'Travel', 'Society']
       },
       {
         key: 'letter',
-        name: 'Thư thương mại',
-        description: 'Soạn thư cho mục tiêu công việc',
-        time: '20 phút',
-        words: '~100 từ',
+        name: 'Business Letter',
+        description: 'Write a letter for work purposes',
+        time: '20 minutes',
+        words: '~100 words',
         topics: undefined
       }
     ]
@@ -90,22 +90,22 @@ const EXAM_TYPES: MyExamType[] = [
   {
     key: 'TOEFL',
     label: 'TOEFL',
-    info: '2 dạng bài',
+    info: '2 task types',
     tasks: [
       {
         key: 'independent',
         name: 'Independent Writing',
         description: 'Personal/Opinion Essay',
-        time: '30 phút',
-        words: '~300 từ',
-        topics: ['Môi trường', 'Giáo dục', 'Xã hội', 'Du lịch']
+        time: '30 minutes',
+        words: '~300 words',
+        topics: ['Environment', 'Education', 'Society', 'Travel']
       },
       {
         key: 'integrated',
         name: 'Integrated Writing',
-        description: 'Kết hợp listening, reading, writing',
-        time: '20 phút',
-        words: '~150-225 từ',
+        description: 'Combine listening, reading, writing skills',
+        time: '20 minutes',
+        words: '~150-225 words',
         topics: undefined
       }
     ]
@@ -113,31 +113,31 @@ const EXAM_TYPES: MyExamType[] = [
   {
     key: 'CEFR',
     label: 'CEFR',
-    info: '3 dạng bài',
+    info: '3 task types',
     tasks: [
       {
         key: 'letter',
         name: 'Letter',
-        description: 'Viết thư cá nhân/ công việc',
-        time: '15 phút',
-        words: '~80 từ',
+        description: 'Write a personal/work letter',
+        time: '15 minutes',
+        words: '~80 words',
         topics: undefined
       },
       {
         key: 'essay',
         name: 'Essay',
-        description: 'Opinion essay các chủ đề xã hội',
-        time: '25 phút',
-        words: '~150 từ',
-        topics: ['Môi trường', 'Văn hóa', 'Kinh doanh', 'Xã hội']
+        description: 'Opinion essay on social topics',
+        time: '25 minutes',
+        words: '~150 words',
+        topics: ['Environment', 'Culture', 'Business', 'Society']
       },
       {
         key: 'article',
         name: 'Article',
-        description: 'Viết bài cho báo hoặc tạp chí',
-        time: '25 phút',
-        words: '~150 từ',
-        topics: ['Công nghệ', 'Văn hóa', 'Sức khỏe']
+        description: 'Write an article for a newspaper or magazine',
+        time: '25 minutes',
+        words: '~150 words',
+        topics: ['Technology', 'Culture', 'Health']
       }
     ]
   }
@@ -168,13 +168,13 @@ const PracticeWritingPage: React.FC = () => {
   const selectedTaskObj = exam.tasks.find((t) => t.key === selectedTask)
   const topics = selectedTaskObj?.topics || []
 
-  // Tạo đề
+  // Generate prompt
   const handleCreateExam = (mode: 'prompt' | 'random') => {
     setCreated(true)
     setPreview(
       mode === 'prompt'
-        ? `Đề thi được tạo bằng AI theo yêu cầu: "${aiPrompt.trim()}".\n\n(Đây là bản xem trước đề. Nội dung sẽ tuỳ theo cấu hình thật.)`
-        : `Đề thi ngẫu nhiên được tạo cho dạng "${selectedTaskObj?.name}" và chủ đề "${selectedTopic === 'Other' ? customTopic || '...' : selectedTopic}".\n\n(Đây là bản xem trước đề. Nội dung sẽ tuỳ theo cấu hình thật.)`
+        ? `Exam generated by AI with prompt: "${aiPrompt.trim()}".\n\n(This is a preview only. The actual content will vary.)`
+        : `A random exam is generated for "${selectedTaskObj?.name}" with topic "${selectedTopic === 'Other' ? customTopic || '...' : selectedTopic}".\n\n(This is a preview only. The actual content will vary.)`
     )
   }
 

@@ -2,14 +2,14 @@ import React from 'react'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
 const TOPIC_ICON: Record<string, string> = {
-  'Môi trường': '🌍',
-  'Công nghệ': '💻',
-  'Giáo dục': '📚',
-  'Sức khỏe': '🗓️',
-  'Xã hội': '👥',
-  'Kinh doanh': '💼',
-  'Du lịch': '✈️',
-  'Văn hóa': '🎨',
+  Environment: '🌍',
+  Technology: '💻',
+  Education: '📚',
+  Health: '🗓️',
+  Society: '👥',
+  Business: '💼',
+  Travel: '✈️',
+  Culture: '🎨',
   Other: '➕',
   Random: '🎲'
 }
@@ -36,7 +36,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
     <div className="bg-card border rounded-xl p-4 mb-4">
       <div className="mb-6 flex items-center gap-2">
         <span className="text-xl text-green-600">&#127757;</span>
-        <h3 className="text-lg font-bold">Chọn chủ đề</h3>
+        <h3 className="text-lg font-bold">Choose Topic</h3>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {displayTopics.map((topic) => (
@@ -61,7 +61,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
             value={customTopic}
             onChange={setCustomTopic}
             className="w-full border border-blue-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Nhập chủ đề tùy chọn của bạn..."
+            placeholder="Enter your custom topic..."
           />
         </div>
       )}
