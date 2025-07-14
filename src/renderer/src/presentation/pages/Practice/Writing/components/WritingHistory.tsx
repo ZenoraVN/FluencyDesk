@@ -1,3 +1,6 @@
+// Using Lucide-react icon for Writing History header
+import { MdMenuBook } from 'react-icons/md'
+import { BookOpen } from 'lucide-react'
 import React from 'react'
 import { ExamTypeKey } from './ExamAndTaskZone'
 
@@ -107,7 +110,13 @@ const WritingHistory: React.FC = () => (
     "
     style={{ minHeight: 0 }}
   >
-    <h2 className="text-xl font-semibold mb-3">Writing History</h2>
+    <h2 className="text-xl font-semibold mb-3 flex items-center">
+      <MdMenuBook
+        className="mr-2 w-7 h-7 drop-shadow-[0_2px_6px_rgba(31,166,229,0.30)] text-[#1fa6e5] bg-gradient-to-br from-[#1fa6e5] via-[#9c3dff] to-[#e5a11f] rounded-full p-1 animate-float"
+        style={{ backgroundClip: 'text', color: '#1fa6e5' }}
+      />
+      Writing History
+    </h2>
     <div className="flex-1 overflow-y-auto min-h-0">
       {mockHistory.length === 0 && (
         <div className="text-gray-400 text-sm text-center">No recent history.</div>

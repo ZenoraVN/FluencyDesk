@@ -16,6 +16,7 @@ export interface TaskBrief {
   time: string
   words: string
   topics?: string[]
+  disabled?: boolean
 }
 
 interface ExamAndTaskZoneProps {
@@ -95,27 +96,39 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
     <div className="flex flex-col gap-3">
       {tasks.map((task) => {
         const isActive = selectedTask === task.key
+        const isDisabled = !!task.disabled
         return (
           <button
             key={task.key}
-            onClick={() => onSelectTask(task.key)}
+            onClick={() => !isDisabled && onSelectTask(task.key)}
             className={[
               'w-full border rounded-xl px-5 py-4 text-left transition group',
-              isActive ? 'border-l-4 border-y border-r-0' : 'border'
+              isActive ? 'border-l-4 border-y border-r-0' : 'border',
+              isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
             ].join(' ')}
             style={
               isActive
                 ? {
                     color: '#1a202c',
-                    borderLeftColor: examTypeBorderColor[selectedExam]
+                    borderLeftColor: examTypeBorderColor[selectedExam],
+                    ...(isDisabled && { backgroundColor: '#f3f4f6', color: '#bfbfbf' })
                   }
-                : {}
+                : isDisabled
+                  ? { backgroundColor: '#f3f4f6', color: '#bfbfbf' }
+                  : {}
             }
+            disabled={isDisabled}
+            aria-disabled={isDisabled}
+            tabIndex={isDisabled ? -1 : undefined}
+            title={isDisabled ? 'This task is temporarily unavailable' : undefined}
           >
             <div className="grid grid-cols-[1fr_auto] items-center gap-2 w-full">
               <div>
                 <div className={'text-base font-semibold' + (isActive ? ' text-blue-800' : '')}>
                   {task.name}
+                  {isDisabled && (
+                    <span className="ml-2 text-xs text-gray-500 font-normal">(disabled)</span>
+                  )}
                 </div>
                 <div className="text-sm text-gray-500">{task.description}</div>
               </div>

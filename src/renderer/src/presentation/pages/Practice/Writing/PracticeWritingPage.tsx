@@ -15,6 +15,7 @@ interface TaskType {
   time: string
   words: string
   topics?: string[]
+  disabled?: boolean
 }
 
 interface MyExamType {
@@ -36,7 +37,8 @@ const EXAM_TYPES: MyExamType[] = [
         description: 'Write a letter or chart report',
         time: '20 minutes',
         words: '~150 words',
-        topics: undefined
+        topics: undefined,
+        disabled: true
       },
       {
         key: 'task2',
@@ -107,7 +109,8 @@ const EXAM_TYPES: MyExamType[] = [
         description: 'Combine listening, reading, writing skills',
         time: '20 minutes',
         words: '~150-225 words',
-        topics: undefined
+        topics: undefined,
+        disabled: true
       }
     ]
   },
@@ -151,7 +154,18 @@ const PracticeWritingPage: React.FC = () => {
   const [customTopic, setCustomTopic] = useState('')
   const [selectedTopic, setSelectedTopic] = useState('Random')
   const [aiPrompt, setAiPrompt] = useState('')
-  const [preview, setPreview] = useState<string | null>(null)
+  // CHART PREVIEW TYPES
+  type ChartPreview = {
+    chartType: string
+    chartData: any
+    chartOptions?: any
+  }
+  interface WritingPreviewData {
+    text: string
+    chart?: ChartPreview | null
+  }
+  // preview now stores question and chart (if any)
+  const [preview, setPreview] = useState<WritingPreviewData | null>(null)
   const [created, setCreated] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -173,6 +187,7 @@ const PracticeWritingPage: React.FC = () => {
   const selectedTaskObj = exam.tasks.find((t) => t.key === selectedTask)
   const topics = selectedTaskObj?.topics || []
 
+  // Enhanced Gemini Prompt for IELTS Task 1 with Chart JSON
   const buildGeminiPrompt = (mode: 'prompt' | 'random') => {
     let taskText = `Exam: ${exam.label}\nTask: ${selectedTaskObj?.name}\nDescription: ${selectedTaskObj?.description}\nTime: ${selectedTaskObj?.time}\nWords: ${selectedTaskObj?.words}\n`
     let topicText = ''
@@ -186,16 +201,49 @@ const PracticeWritingPage: React.FC = () => {
           : selectedTopic)
     }
     let userPrompt = mode === 'prompt' ? aiPrompt.trim() : ''
+    const isIeltsTask1 =
+      exam.key === 'IELTS' && selectedTaskObj?.name?.toLowerCase()?.includes('task 1')
     let sysPrompt =
       `You're an expert English exam generator. Please generate a practice writing task for a student, with realistic context and clear requirements.` +
       `\n${taskText}` +
       (topicText ? `\n${topicText}` : '') +
-      (userPrompt ? `\nFocus: ${userPrompt}` : '') +
-      `\nReturn ONLY the generated writing question as you would present it to a student.`
+      (userPrompt ? `\nFocus: ${userPrompt}` : '')
+    if (isIeltsTask1) {
+      sysPrompt += `
+If the question is about CHART/GRAPH, CREATE and PROVIDE a suitable hypothetical chart for the task.
+After generating the exam question, return the chart data as a JSON object for react-chartjs-2 (for example Bar, Pie or Line chart: { "chartType": "bar"|"pie"|"line", "chartData": { "labels": [...], "datasets": [...] }, "chartOptions": {}}).
+Write ONLY the exam question for students first, then add the chart JSON in a Markdown code block (for example: \`\`\`json ... \`\`\`). If not a chart/graph, just give the question.`
+    }
+    sysPrompt += `\nReturn ONLY the generated writing question as you would present it to a student.`
     return sysPrompt
   }
 
+  // Helper: Extract preview and chart (if any) from Gemini response
+  function extractPreviewAndChart(raw: string): WritingPreviewData {
+    const codeRegex = /```json\s*([\s\S]+?)```/i
+    const match = raw.match(codeRegex)
+    if (!match) {
+      return { text: raw, chart: null }
+    }
+    let chart: ChartPreview | null = null
+    try {
+      chart = JSON.parse(match[1].trim())
+    } catch (e) {
+      chart = null
+    }
+    const text = raw.replace(codeRegex, '').trim()
+    return { text, chart }
+  }
+
   const handleCreateExam = async (mode: 'prompt' | 'random') => {
+    // Prevent creation for disabled tasks
+    if (selectedTaskObj?.disabled) {
+      setError('This task type is temporarily unavailable.')
+      setCreated(false)
+      setPreview(null)
+      setLoading(false)
+      return
+    }
     setCreated(false)
     setLoading(true)
     setPreview(null)
@@ -233,7 +281,8 @@ const PracticeWritingPage: React.FC = () => {
         data?.candidates?.[0]?.content?.parts?.map((p: { text: string }) => p.text).join('\n') ||
         data?.candidates?.[0]?.content?.text ||
         '(No response)'
-      setPreview(message)
+      // Use chart-aware extract helper
+      setPreview(extractPreviewAndChart(message))
       setCreated(true)
     } catch (err: any) {
       setError(
