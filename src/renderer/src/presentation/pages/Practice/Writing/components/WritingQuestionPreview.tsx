@@ -1,6 +1,7 @@
 import React from 'react'
 import { MyExamType, TaskType } from '../PracticeWritingPage'
 import ChartRenderer from './ChartRenderer'
+import { examTypeBorderColor } from './examTypeColors'
 
 type ChartPreview = {
   chartType: string
@@ -19,7 +20,7 @@ interface WritingQuestionPreviewProps {
 }
 
 const WritingQuestionPreview: React.FC<WritingQuestionPreviewProps> = ({ exam, task, preview }) => (
-  <>
+  <div>
     <div className="mb-3">
       <div className="text-lg font-bold mb-2 flex gap-2 items-center">
         <span role="img" aria-label="writing">
@@ -29,8 +30,15 @@ const WritingQuestionPreview: React.FC<WritingQuestionPreviewProps> = ({ exam, t
       </div>
       <div className="text-base mb-2 text-gray-600">{task.description}</div>
     </div>
-    <div className="mb-4 border rounded p-4 bg-white dark:bg-gray-800 min-h-[80px]">
-      {preview?.text || '(No exam question)'}
+    <div
+      className="mb-4 border px-4 py-3 bg-gray-50 min-h-[68px] whitespace-pre-line rounded-lg border-l-4 rounded-l-lg"
+      style={{ borderLeftColor: examTypeBorderColor[exam.key] }}
+    >
+      {preview?.text ? (
+        <div className="font-medium text-gray-800">{preview.text}</div>
+      ) : (
+        '(No exam question)'
+      )}
     </div>
     {preview?.chart && (
       <div className="mb-5 flex flex-col items-center">
@@ -40,7 +48,7 @@ const WritingQuestionPreview: React.FC<WritingQuestionPreviewProps> = ({ exam, t
         </div>
       </div>
     )}
-  </>
+  </div>
 )
 
 export default WritingQuestionPreview

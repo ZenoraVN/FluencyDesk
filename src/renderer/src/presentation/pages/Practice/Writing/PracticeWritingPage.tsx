@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import WritingCreationSection from './sections/WritingCreationSection'
 import WritingDoingSection from './sections/WritingDoingSection'
 import { GeminiService } from '../../../../service/GeminiService'
+import { getWordCount, parseMinWords } from '../../../../utils/wordCount'
 
 // Removes generic exam instructions, headings, and structure info — returns only the core question
 /**
@@ -301,8 +302,12 @@ const PracticeWritingPage: React.FC = () => {
     }
   }, [doingMode])
 
-  // Helper: can submit only in last 10 mins
-  const canSubmit = remainingTime <= 600 && doingMode && remainingTime > 0
+  // Calculate minWords and word count for answer
+  const minWords = doingMode && sessionTask ? parseMinWords(sessionTask.words) : 1
+  const wordCount = doingMode && answer ? getWordCount(answer) : 0
+
+  // Helper: can submit if minimum word count met and time > 0
+  const canSubmit = doingMode && remainingTime > 0 && wordCount >= minWords
 
   const handleSubmit = () => {
     if (!canSubmit) return
@@ -442,6 +447,8 @@ Write ONLY the main exam question for students first, then add the chart JSON in
       onChangeAnswer={setAnswer}
       canSubmit={canSubmit}
       suggestions={suggestions}
+      wordCount={wordCount}
+      minWords={minWords}
     />
   ) : (
     <WritingCreationSection
