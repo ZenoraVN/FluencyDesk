@@ -1,5 +1,5 @@
 import React from 'react'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { RichtextchtEditor } from '../../../../../../components/Input/CustomRichtext'
 
 interface AiPromptInputProps {
   value: string

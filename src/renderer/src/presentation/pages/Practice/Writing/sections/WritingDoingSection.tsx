@@ -1,9 +1,9 @@
 import React from 'react'
 import { MyExamType, TaskType } from '../PracticeWritingPage'
-import WritingQuestionPreview from '../components/WritingQuestionPreview'
-import WritingAnswerArea from '../components/WritingAnswerArea'
-import TimerAndSubmit from '../components/TimerAndSubmit'
-import WritingSuggestion from '../components/WritingSuggestion'
+import WritingQuestionPreview from '../components/Doing/WritingQuestionPreview'
+import WritingAnswerArea from '../components/Doing/WritingAnswerArea'
+import TimerAndSubmit from '../components/Doing/TimerAndSubmit'
+import WritingSuggestion from '../components/Doing/WritingSuggestion'
 
 interface WritingPreviewData {
   text: string

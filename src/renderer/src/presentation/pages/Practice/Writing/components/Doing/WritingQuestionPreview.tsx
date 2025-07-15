@@ -1,7 +1,6 @@
 import React from 'react'
-import { MyExamType, TaskType } from '../PracticeWritingPage'
-import ChartRenderer from './ChartRenderer'
-import { examTypeBorderColor } from './examTypeColors'
+import { MyExamType, TaskType } from '../../PracticeWritingPage'
+import { examTypeBorderColor } from '../../data/examTypeColors'
 
 type ChartPreview = {
   chartType: string
@@ -40,14 +39,6 @@ const WritingQuestionPreview: React.FC<WritingQuestionPreviewProps> = ({ exam, t
         '(No exam question)'
       )}
     </div>
-    {preview?.chart && (
-      <div className="mb-5 flex flex-col items-center">
-        <div className="text-sm font-medium mb-2 text-gray-500">Chart Data</div>
-        <div className="w-full max-w-[480px] border rounded-lg p-2 bg-white dark:bg-gray-900">
-          <ChartRenderer chart={preview.chart} />
-        </div>
-      </div>
-    )}
   </div>
 )
 

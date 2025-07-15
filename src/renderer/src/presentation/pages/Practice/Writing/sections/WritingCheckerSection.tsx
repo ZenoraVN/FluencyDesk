@@ -1,6 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { MyExamType, TaskType, WritingPreviewData, EvaluationResult } from '../PracticeWritingPage'
-import { examTypeBorderColor } from '../components/examTypeColors'
+import { BandScoreBox } from '../components/Checker/BandScoreBox'
+import { ParagraphOptimizationBox } from '../components/Checker/ParagraphOptimizationBox'
+import { VocabularyHighlightsBox } from '../components/Checker/VocabularyHighlightsBox'
+import { SentenceDiversificationBox } from '../components/Checker/SentenceDiversificationBox'
+import { SampleEssaysBox } from '../components/Checker/SampleEssaysBox'
+import { AnnotatedAnswerBox } from '../components/Checker/AnnotatedAnswerBox'
 
 interface WritingCheckerSectionProps {
   exam: MyExamType
@@ -11,66 +16,55 @@ interface WritingCheckerSectionProps {
   onRetry: () => void
 }
 
-function WritingCheckerSection({
+const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
   exam,
   task,
   preview,
   answer,
   evaluation,
   onRetry
-}: WritingCheckerSectionProps) {
+}) => {
+  const [activeError, setActiveError] = useState<number | null>(null)
+
   return (
-    <div className="flex flex-col h-full p-6 bg-white rounded-xl shadow-lg">
-      <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col h-full p-6 bg-white rounded-xl shadow-lg overflow-y-auto">
+      <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 py-4">
         <h2 className="text-2xl font-bold text-gray-800">
-          Kết quả đánh giá - {exam.label} {task.name}
+          Evaluation Result - {exam.label} {task.name}
         </h2>
-        <div
-          className="px-4 py-2 rounded-full text-white font-bold"
-          style={{ backgroundColor: examTypeBorderColor[exam.key] }}
-        >
-          Điểm: {evaluation.score}/10
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 flex-grow">
-        {/* Cột trái: Đề bài và bài làm */}
-        <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left Panel (Prompt + Answer annotation) */}
+        <div className="w-full lg:w-7/12 space-y-6">
           <div className="bg-gray-50 p-4 rounded-lg border">
-            <h3 className="font-semibold text-lg mb-2">Đề bài:</h3>
+            <h3 className="font-semibold text-lg mb-2 flex items-center">
+              <span className="text-gray-600 mr-2">&#128196;</span>
+              Prompt
+            </h3>
             <p className="whitespace-pre-line">{preview?.text}</p>
           </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 className="font-semibold text-lg mb-2">Bài làm của bạn:</h3>
-            <p className="whitespace-pre-line">{answer}</p>
-          </div>
+          <AnnotatedAnswerBox annotatedText={evaluation.annotatedText || answer} />
         </div>
-
-        {/* Cột phải: Đánh giá chi tiết */}
-        <div className="bg-gray-50 p-4 rounded-lg border h-full overflow-y-auto">
-          <h3 className="font-semibold text-lg mb-4">Nhận xét tổng quan:</h3>
-          <p className="mb-6 p-3 bg-yellow-50 rounded">{evaluation.feedback}</p>
-
-          <h3 className="font-semibold text-lg mb-4">Phân tích chi tiết:</h3>
-          <div className="space-y-4">
-            {Object.entries(evaluation.detailedAnalysis).map(([criteria, feedback]) => (
-              <div key={criteria} className="p-3 border-b">
-                <h4 className="font-medium text-blue-700">{criteria}:</h4>
-                <p>{feedback}</p>
-              </div>
-            ))}
-          </div>
+        {/* Right Panel (Band Score and checker features) */}
+        <div className="w-full lg:w-5/12 space-y-6">
+          <BandScoreBox bandScores={evaluation.bandScores} />
+          <ParagraphOptimizationBox optimizations={evaluation.paragraphOptimizations} />
+          <VocabularyHighlightsBox vocabulary={evaluation.vocabularyHighlights} />
+          <SentenceDiversificationBox diversifications={evaluation.sentenceDiversifications} />
+          <SampleEssaysBox samples={evaluation.sampleEssays} />
         </div>
       </div>
 
-      <div className="flex justify-center mt-4">
+      {/* Retry Button */}
+      <div className="flex justify-center mt-8 sticky bottom-0 bg-white py-4">
         <button
           type="button"
-          className="px-6 py-3 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white rounded transition"
+          className="px-6 py-3 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center"
           onClick={onRetry}
         >
-          Làm lại bài
+          <span className="mr-2">&#10227;</span>
+          Retry
         </button>
       </div>
     </div>
