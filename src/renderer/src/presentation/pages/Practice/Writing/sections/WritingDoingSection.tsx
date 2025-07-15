@@ -28,6 +28,7 @@ interface WritingDoingSectionProps {
   suggestions: string[]
   wordCount: number
   minWords: number
+  evaluating?: boolean
 }
 
 const WritingDoingSection: React.FC<WritingDoingSectionProps> = ({
@@ -43,7 +44,8 @@ const WritingDoingSection: React.FC<WritingDoingSectionProps> = ({
   canSubmit,
   suggestions,
   wordCount,
-  minWords
+  minWords,
+  evaluating
 }) => {
   // Dummy handlers for demo - replace with props or state in parent as needed
   const handleSaveDraft =
@@ -71,6 +73,7 @@ const WritingDoingSection: React.FC<WritingDoingSectionProps> = ({
           onSubmit={onSubmit}
           onSaveDraft={handleSaveDraft}
           canSubmit={canSubmit}
+          evaluating={evaluating}
         />
         <WritingSuggestion suggestions={suggestions} onLoadSuggestion={handleLoadSuggestion} />
         {/* You can add more right panel widgets here */}
