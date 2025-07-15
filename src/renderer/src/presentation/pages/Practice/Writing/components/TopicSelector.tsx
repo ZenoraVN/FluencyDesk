@@ -11,7 +11,17 @@ const TOPIC_ICON: Record<string, string> = {
   Travel: '✈️',
   Culture: '🎨',
   Other: '➕',
-  Random: '🎲'
+  Random: '🎲',
+  // VSTEP topics
+  Complaint: '📝',
+  'Job Application': '💼',
+  'Information Request': '❓',
+  'Thank You': '🙏',
+  Apology: '😔',
+  Opinion: '💬',
+  Argumentative: '⚖️',
+  'Problem-Solution': '🔧',
+  'Advantage-Disadvantage': '📊'
 }
 
 interface TopicSelectorProps {

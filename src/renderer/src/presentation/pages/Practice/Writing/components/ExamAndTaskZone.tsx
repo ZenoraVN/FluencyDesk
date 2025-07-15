@@ -1,11 +1,12 @@
 import React from 'react'
 
-export type ExamTypeKey = 'IELTS' | 'TOEIC' | 'TOEFL' | 'CEFR'
+export type ExamTypeKey = 'IELTS' | 'TOEIC' | 'TOEFL' | 'PTE' | 'VSTEP'
 
 export interface ExamType {
   key: ExamTypeKey
   label: string
   info: string
+  purpose: string
   tasks: TaskBrief[]
 }
 
@@ -33,14 +34,16 @@ const examTypeBorderColor: Record<ExamTypeKey, string> = {
   IELTS: '#1fa6e5', // blue
   TOEIC: '#e5a11f', // yellow/orange
   TOEFL: '#34b271', // green
-  CEFR: '#9c3dff' // purple
+  PTE: '#ff6b6b', // red
+  VSTEP: '#9c3dff' // purple
 }
 
 const examTypeIcon: Record<ExamTypeKey, string> = {
   IELTS: '🎓',
   TOEIC: '📊',
   TOEFL: '🎤',
-  CEFR: '🏅'
+  PTE: '💻',
+  VSTEP: '🇻🇳'
 }
 
 const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
@@ -61,7 +64,7 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
     {/* Exam type selector */}
     <div className="text-gray-700 text-sm font-semibold mb-2">Exam Type</div>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-      {examTypes.map(({ key, label, info }) => {
+      {examTypes.map(({ key, label, info, purpose }) => {
         const isActive = selectedExam === key
         return (
           <button
@@ -87,6 +90,7 @@ const ExamAndTaskZone: React.FC<ExamAndTaskZoneProps> = ({
               <span>{label}</span>
             </span>
             <span className="text-sm text-gray-500 mt-1">{info}</span>
+            <span className="text-xs text-gray-400 mt-1">{purpose}</span>
           </button>
         )
       })}

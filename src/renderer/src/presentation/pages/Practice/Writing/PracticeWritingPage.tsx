@@ -52,7 +52,12 @@ function stripWritingPromptInstructions(input: string): string {
     /^toefl (integrated|independent) writing$/i,
     /^cefr writing$/i,
     /^toeic writing$/i,
-    /^#\s+/ // Markdown headings
+    /^#\s+/, // Markdown headings
+    // VSTEP-specific patterns
+    /You should write at least \d+ words/i,
+    /You do not need to include your name or addresses/i,
+    /Your response will be evaluated in terms of/i,
+    /Task fulfillment, Organization, Vocabulary, and Grammar/i
   ]
 
   // Remove ALL instruction lines
@@ -68,7 +73,7 @@ function stripWritingPromptInstructions(input: string): string {
 }
 
 // Type exports needed by sections
-export type ExamTypeKey = 'IELTS' | 'TOEIC' | 'TOEFL' | 'CEFR'
+export type ExamTypeKey = 'IELTS' | 'TOEIC' | 'TOEFL' | 'PTE' | 'VSTEP'
 
 export interface TaskType {
   key: string
@@ -84,6 +89,7 @@ export interface MyExamType {
   key: ExamTypeKey
   label: string
   info: string
+  purpose: string
   tasks: TaskType[]
 }
 
@@ -92,6 +98,7 @@ const EXAM_TYPES: MyExamType[] = [
     key: 'IELTS',
     label: 'IELTS',
     info: '2 task types',
+    purpose: 'For studying or working in English-speaking countries',
     tasks: [
       {
         key: 'task1',
@@ -125,6 +132,7 @@ const EXAM_TYPES: MyExamType[] = [
     key: 'TOEIC',
     label: 'TOEIC',
     info: '3 task types',
+    purpose: 'For workplace English proficiency assessment',
     tasks: [
       {
         key: 'email',
@@ -156,6 +164,7 @@ const EXAM_TYPES: MyExamType[] = [
     key: 'TOEFL',
     label: 'TOEFL',
     info: '2 task types',
+    purpose: 'For academic studies in English-speaking universities',
     tasks: [
       {
         key: 'independent',
@@ -177,33 +186,59 @@ const EXAM_TYPES: MyExamType[] = [
     ]
   },
   {
-    key: 'CEFR',
-    label: 'CEFR',
+    key: 'PTE',
+    label: 'PTE',
     info: '3 task types',
+    purpose: 'Computer-based test for study abroad and immigration',
+    tasks: [
+      {
+        key: 'essay',
+        name: 'Write Essay',
+        description: 'Academic essay on given topic',
+        time: '20 minutes',
+        words: '200-300 words',
+        topics: ['Education', 'Technology', 'Environment', 'Society']
+      },
+      {
+        key: 'summarize',
+        name: 'Summarize Text',
+        description: 'Summarize academic text in one sentence',
+        time: '10 minutes',
+        words: '5-75 words',
+        topics: undefined
+      },
+      {
+        key: 'describe',
+        name: 'Describe Image',
+        description: 'Describe visual information',
+        time: '25 minutes',
+        words: '~150 words',
+        topics: undefined,
+        disabled: true
+      }
+    ]
+  },
+  {
+    key: 'VSTEP',
+    label: 'VSTEP',
+    info: '2 task types',
+    purpose: 'Vietnamese standardized test for English proficiency',
     tasks: [
       {
         key: 'letter',
-        name: 'Letter',
-        description: 'Write a personal/work letter',
-        time: '15 minutes',
-        words: '~80 words',
-        topics: undefined
+        name: 'Formal Letter/Email',
+        description: 'Write a formal letter or email for specific purposes',
+        time: '20 minutes',
+        words: '~120 words',
+        topics: ['Complaint', 'Job Application', 'Information Request', 'Thank You', 'Apology']
       },
       {
         key: 'essay',
         name: 'Essay',
-        description: 'Opinion essay on social topics',
-        time: '25 minutes',
-        words: '~150 words',
-        topics: ['Environment', 'Culture', 'Business', 'Society']
-      },
-      {
-        key: 'article',
-        name: 'Article',
-        description: 'Write an article for a newspaper or magazine',
-        time: '25 minutes',
-        words: '~150 words',
-        topics: ['Technology', 'Culture', 'Health']
+        description: 'Argumentative essay on social issues',
+        time: '40 minutes',
+        words: '~250 words',
+        topics: ['Opinion', 'Argumentative', 'Problem-Solution', 'Advantage-Disadvantage']
       }
     ]
   }

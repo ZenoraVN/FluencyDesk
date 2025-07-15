@@ -8,14 +8,16 @@ const examTypeBorderColor: Record<ExamTypeKey, string> = {
   IELTS: '#1fa6e5',
   TOEIC: '#e5a11f',
   TOEFL: '#34b271',
-  CEFR: '#9c3dff'
+  PTE: '#ff6b6b',
+  VSTEP: '#9c3dff'
 }
 
 const examTypeIcon: Record<ExamTypeKey, string> = {
   IELTS: '🎓',
   TOEIC: '📊',
   TOEFL: '🎤',
-  CEFR: '🏅'
+  PTE: '💻',
+  VSTEP: '🇻🇳'
 }
 
 type WritingHistoryItem = {
@@ -54,14 +56,14 @@ const mockHistory: WritingHistoryItem[] = [
   },
   {
     id: '3',
-    examType: 'CEFR',
+    examType: 'PTE',
     taskKey: 'essay',
-    taskName: 'Essay',
+    taskName: 'Write Essay',
     question:
-      "Write an essay about the importance of learning a second language in today's globalized world.",
-    date: '2025-07-05',
-    time: '16:02',
-    score: 'B2'
+      'Should students be required to learn a second language in university? Discuss your views.',
+    date: '2025-07-06',
+    time: '11:30',
+    score: '70'
   },
   {
     id: '4',
@@ -73,6 +75,16 @@ const mockHistory: WritingHistoryItem[] = [
     date: '2025-07-03',
     time: '10:18',
     score: '140'
+  },
+  {
+    id: '5',
+    examType: 'VSTEP',
+    taskKey: 'letter',
+    taskName: 'Formal Letter',
+    question: 'Write a formal letter of complaint about noise to your local community office.',
+    date: '2025-07-02',
+    time: '14:55',
+    score: 'B1'
   }
 ]
 
@@ -86,8 +98,7 @@ const formatScore = (examType: ExamTypeKey, score?: string) => {
       return `${score} / 200`
     case 'TOEFL':
       return `${score} / 30`
-    case 'CEFR':
-      return score
+    // PTE, VSTEP, or any new types: just return the score raw
     default:
       return score
   }
