@@ -21,14 +21,13 @@ const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
   task,
   preview,
   answer,
-  evaluation,
-  onRetry
+  evaluation
 }) => {
   const [activeError, setActiveError] = useState<number | null>(null)
 
   return (
-    <div className="flex flex-col h-full p-6 bg-white rounded-xl shadow-lg overflow-y-auto">
-      <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 py-4">
+    <div className="flex flex-col h-full p-4 rounded-xl shadow-lg overflow-y-auto">
+      <div className="flex justify-between items-center py-4">
         <h2 className="text-2xl font-bold text-gray-800">
           Evaluation Result - {exam.label} {task.name}
         </h2>
@@ -54,18 +53,6 @@ const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
           <SentenceDiversificationBox diversifications={evaluation.sentenceDiversifications} />
           <SampleEssaysBox samples={evaluation.sampleEssays} />
         </div>
-      </div>
-
-      {/* Retry Button */}
-      <div className="flex justify-center mt-8 sticky bottom-0 bg-white py-4">
-        <button
-          type="button"
-          className="px-6 py-3 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center"
-          onClick={onRetry}
-        >
-          <span className="mr-2">&#10227;</span>
-          Retry
-        </button>
       </div>
     </div>
   )

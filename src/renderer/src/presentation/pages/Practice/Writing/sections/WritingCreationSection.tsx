@@ -1,9 +1,9 @@
 import React from 'react'
-import WritingHistory from '../components/WritingHistory'
-import ExamAndTaskZone from '../components/ExamAndTaskZone'
-import TopicSelector from '../components/TopicSelector'
-import AiPromptInput from '../components/AiPromptInput'
-import ExamPreviewAndAction from '../components/ExamPreviewAndAction'
+import WritingHistory from '../components/Create/WritingHistory'
+import ExamAndTaskZone from '../components/Create/ExamAndTaskZone'
+import TopicSelector from '../components/Create/TopicSelector'
+import AiPromptInput from '../components/Create/AiPromptInput'
+import ExamPreviewAndAction from '../components/Create/ExamPreviewAndAction'
 
 import type { MyExamType, TaskType } from '../PracticeWritingPage'
 

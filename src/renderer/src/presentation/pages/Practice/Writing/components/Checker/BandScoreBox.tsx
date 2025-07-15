@@ -18,19 +18,21 @@ export const BandScoreBox: React.FC<BandScoreBoxProps> = ({ bandScores }) => (
       </div>
       <div className="flex justify-between">
         <span className="font-medium">Task Response (TR):</span>
-        <span>{bandScores.TR}</span>
+        <span>{bandScores.TR !== null && bandScores.TR !== undefined ? bandScores.TR : 'N/A'}</span>
       </div>
       <div className="flex justify-between">
         <span className="font-medium">Coherence & Cohesion (CC):</span>
-        <span>{bandScores.CC}</span>
+        <span>{bandScores.CC !== null && bandScores.CC !== undefined ? bandScores.CC : 'N/A'}</span>
       </div>
       <div className="flex justify-between">
         <span className="font-medium">Grammatical Range & Accuracy (GRA):</span>
-        <span>{bandScores.GRA}</span>
+        <span>
+          {bandScores.GRA !== null && bandScores.GRA !== undefined ? bandScores.GRA : 'N/A'}
+        </span>
       </div>
       <div className="flex justify-between">
         <span className="font-medium">Lexical Resource (LR):</span>
-        <span>{bandScores.LR}</span>
+        <span>{bandScores.LR !== null && bandScores.LR !== undefined ? bandScores.LR : 'N/A'}</span>
       </div>
     </div>
   </div>

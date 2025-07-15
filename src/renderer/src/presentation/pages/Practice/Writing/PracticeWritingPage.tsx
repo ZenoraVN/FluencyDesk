@@ -144,10 +144,10 @@ export interface SampleEssay {
 
 export interface BandScores {
   overall: number
-  TR: number // Task Response
-  CC: number // Coherence & Cohesion
-  GRA: number // Grammatical Range & Accuracy
-  LR: number // Lexical Resource
+  TR: number | null // Task Response
+  CC: number | null // Coherence & Cohesion
+  GRA: number | null // Grammatical Range & Accuracy
+  LR: number | null // Lexical Resource
 }
 
 export interface EvaluationResult {
@@ -248,26 +248,38 @@ ${question}
 ${answer}
 
 **Evaluation Instructions:**
-1. Assign an overall score (0-10)
-2. Give an overall comment
-3. Provide detailed feedback for each criterion:
+1. Assign an overall band score (0-9), AND 4 separate band scores (0-9, using .0 or .5 steps) for:
+   - Task Response (TR): (how well the answer meets requirements)
+   - Coherence & Cohesion (CC): (organization and flow)
+   - Lexical Resource (LR): (vocabulary range and accuracy)
+   - Grammatical Range & Accuracy (GRA): (grammar and structures)
+2. Return these scores as a JSON object under the key "bandScores" with keys: overall, TR, CC, GRA, LR (all must be numbers).
+3. Give an overall comment.
+4. Provide detailed feedback for each criterion:
    - Task Achievement (How well the answer meets requirements)
    - Coherence & Cohesion (Organization and flow)
    - Lexical Resource (Vocabulary range and accuracy)
    - Grammatical Range & Accuracy (Grammar and structures)
-4. List any spelling errors (with corrections/suggestions)
-5. List any grammar errors (with explanation and correction)
-6. Provide vocabulary suggestions for improvement (synonyms, more academic/formal words)
-7. Statistics:
+5. List any spelling errors (with corrections/suggestions)
+6. List any grammar errors (with explanation and correction)
+7. Provide vocabulary suggestions for improvement (synonyms, more academic/formal words)
+8. Statistics:
    - Word count
    - Sentence count
    - Lexical diversity (unique words/total words)
    - Grammar complexity (simple, intermediate, advanced)
-8. Suggest 3-5 specific tips for overall improvement
+9. Suggest 3-5 specific tips for overall improvement
 
 **Output format (JSON):**
 {
   "score": 8.5,
+  "bandScores": {
+    "overall": 8.5,
+    "TR": 8.0,
+    "CC": 8.5,
+    "GRA": 8.0,
+    "LR": 8.5
+  },
   "overallFeedback": "Overall, the essay is clear and well-organized but could use more advanced vocabulary and grammar structures.",
   "criteria": {
     "Task Achievement": "The response fully addresses all parts of the prompt.",
@@ -314,21 +326,65 @@ ${answer}
 `
   }
 
+  function getBandScoreValue(bandObj: any, keys: string[], defaultValue = 0): number {
+    for (const key of keys) {
+      if (bandObj && bandObj[key] != null) {
+        const val = bandObj[key]
+        return typeof val === 'string' ? parseFloat(val) : Number(val)
+      }
+      // Support case-insensitive match for robustness
+      const foundKey = bandObj
+        ? Object.keys(bandObj).find((k) => k.toLowerCase() === key.toLowerCase())
+        : undefined
+      if (foundKey && bandObj[foundKey] != null) {
+        const val = bandObj[foundKey]
+        return typeof val === 'string' ? parseFloat(val) : Number(val)
+      }
+    }
+    return defaultValue
+  }
+
   function parseEvaluationResult(text: string): EvaluationResult {
     try {
       const jsonStart = text.indexOf('{')
       const jsonEnd = text.lastIndexOf('}') + 1
       const jsonString = text.substring(jsonStart, jsonEnd)
       const result = JSON.parse(jsonString)
+      // DEBUG: Log raw Gemini output for score bug analysis
+      console.log('[Gemini DEBUG] RAW result:', result)
+      // Flexible parse band scores (handle Gemini output quirks)
+      const bandObj = result.bandScores || result.bandScore || result.band_scores || {}
 
       return {
         score: result.score ?? 0,
         bandScores: {
-          overall: result.bandScores?.overall ?? 0,
-          TR: result.bandScores?.TR ?? 0,
-          CC: result.bandScores?.CC ?? 0,
-          GRA: result.bandScores?.GRA ?? 0,
-          LR: result.bandScores?.LR ?? 0
+          // Gemini only provides overall score as "score"
+          overall:
+            typeof result.score === 'number'
+              ? result.score
+              : getBandScoreValue(bandObj, ['overall', 'total', 'band']),
+          TR:
+            bandObj && (typeof bandObj.TR === 'number' || typeof bandObj.TR === 'string')
+              ? getBandScoreValue(bandObj, ['TR', 'tr', 'taskResponse', 'task_response'])
+              : null,
+          CC:
+            bandObj && (typeof bandObj.CC === 'number' || typeof bandObj.CC === 'string')
+              ? getBandScoreValue(bandObj, ['CC', 'cc', 'coherenceCohesion', 'coherence_cohesion'])
+              : null,
+          GRA:
+            bandObj && (typeof bandObj.GRA === 'number' || typeof bandObj.GRA === 'string')
+              ? getBandScoreValue(bandObj, [
+                  'GRA',
+                  'gra',
+                  'grammaticalRangeAccuracy',
+                  'grammar',
+                  'grammatical'
+                ])
+              : null,
+          LR:
+            bandObj && (typeof bandObj.LR === 'number' || typeof bandObj.LR === 'string')
+              ? getBandScoreValue(bandObj, ['LR', 'lr', 'lexicalResource', 'lexical_resource'])
+              : null
         },
         overallFeedback: result.overallFeedback ?? '',
         errors: result.errors ?? [],
