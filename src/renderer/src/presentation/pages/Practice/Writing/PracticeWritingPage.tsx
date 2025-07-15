@@ -1,14 +1,75 @@
-import React, { useState } from 'react'
-import WritingHistory from './components/WritingHistory'
-import ExamAndTaskZone from './components/ExamAndTaskZone'
-import TopicSelector from './components/TopicSelector'
-import AiPromptInput from './components/AiPromptInput'
-import ExamPreviewAndAction from './components/ExamPreviewAndAction'
+import React, { useState, useEffect, useRef } from 'react'
+import WritingCreationSection from './sections/WritingCreationSection'
+import WritingDoingSection from './sections/WritingDoingSection'
 import { GeminiService } from '../../../../service/GeminiService'
 
-type ExamTypeKey = 'IELTS' | 'TOEIC' | 'TOEFL' | 'CEFR'
+// Removes generic exam instructions, headings, and structure info — returns only the core question
+/**
+ * Removes ALL generic exam instructions, headings, and structure info — returns ONLY the core question
+ */
+function stripWritingPromptInstructions(input: string): string {
+  // Normalize line breaks and remove empty lines
+  const lines = input
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
 
-interface TaskType {
+  // Patterns considered instruction/boilerplate (expanded list)
+  const instructionPatterns = [
+    /^(\*\*[^*]+\*\*)$/, // fully bold heading line
+    /you should spend about/i,
+    /write at least/i,
+    /write about the following topic/i,
+    /write about the following chart/i,
+    /give reasons for your answer/i,
+    /include any relevant examples/i,
+    /discuss both sides/i,
+    /discuss both views/i,
+    /give your own opinion/i,
+    /write no more than/i,
+    /write your answer in/i,
+    /your answer should be/i,
+    /please write your response/i,
+    /use specific reasons and examples/i,
+    /make sure to/i,
+    /be sure to/i,
+    /this is a/i,
+    /remember to/i,
+    /you are required to/i,
+    /your essay should/i,
+    /support your arguments/i,
+    /provide examples/i,
+    /at least \d+ words/i,
+    /between \d+ and \d+ words/i,
+    /around \d+ words/i,
+    /approximately \d+ words/i,
+    /you have \d+ minutes/i,
+    /spend no more than \d+ minutes/i,
+    /spend about \d+ minutes/i,
+    /^task \d+:$/i,
+    /^ielts writing task \d+$/i,
+    /^toefl (integrated|independent) writing$/i,
+    /^cefr writing$/i,
+    /^toeic writing$/i,
+    /^#\s+/ // Markdown headings
+  ]
+
+  // Remove ALL instruction lines
+  const filtered = lines.filter(
+    (line) => !instructionPatterns.some((pattern) => pattern.test(line))
+  )
+
+  // Remove markdown bold formatting from any remaining lines
+  const cleanedLines = filtered.map((line) => line.replace(/^\*\*|\*\*$/g, '').trim())
+
+  // Return only the core question content
+  return cleanedLines.join('\n').trim()
+}
+
+// Type exports needed by sections
+export type ExamTypeKey = 'IELTS' | 'TOEIC' | 'TOEFL' | 'CEFR'
+
+export interface TaskType {
   key: string
   name: string
   description: string
@@ -18,7 +79,7 @@ interface TaskType {
   disabled?: boolean
 }
 
-interface MyExamType {
+export interface MyExamType {
   key: ExamTypeKey
   label: string
   info: string
@@ -147,34 +208,35 @@ const EXAM_TYPES: MyExamType[] = [
   }
 ]
 
+type ChartPreview = {
+  chartType: string
+  chartData: any
+  chartOptions?: any
+}
+interface WritingPreviewData {
+  text: string
+  chart?: ChartPreview | null
+}
+
+// Main component
 const PracticeWritingPage: React.FC = () => {
+  // --- Writing Creation State ---
   const [selectedExam, setSelectedExam] = useState<ExamTypeKey>('IELTS')
   const exam = EXAM_TYPES.find((e) => e.key === selectedExam)!
   const [selectedTask, setSelectedTask] = useState(exam.tasks[0].key)
   const [customTopic, setCustomTopic] = useState('')
   const [selectedTopic, setSelectedTopic] = useState('Random')
   const [aiPrompt, setAiPrompt] = useState('')
-  // CHART PREVIEW TYPES
-  type ChartPreview = {
-    chartType: string
-    chartData: any
-    chartOptions?: any
-  }
-  interface WritingPreviewData {
-    text: string
-    chart?: ChartPreview | null
-  }
-  // preview now stores question and chart (if any)
   const [preview, setPreview] = useState<WritingPreviewData | null>(null)
   const [created, setCreated] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedTask(EXAM_TYPES.find((e) => e.key === selectedExam)!.tasks[0].key)
   }, [selectedExam])
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedTopic('Random')
     setCustomTopic('')
     setAiPrompt('')
@@ -187,7 +249,76 @@ const PracticeWritingPage: React.FC = () => {
   const selectedTaskObj = exam.tasks.find((t) => t.key === selectedTask)
   const topics = selectedTaskObj?.topics || []
 
-  // Enhanced Gemini Prompt for IELTS Task 1 with Chart JSON
+  // --- Section Switching State ---
+  const [doingMode, setDoingMode] = useState(false)
+  // Data frozen at the start of the exam
+  const [sessionExam, setSessionExam] = useState<MyExamType | null>(null)
+  const [sessionTask, setSessionTask] = useState<TaskType | null>(null)
+  const [sessionPreview, setSessionPreview] = useState<WritingPreviewData | null>(null)
+
+  // --- Writing Doing State ---
+  const [answer, setAnswer] = useState('')
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [remainingTime, setRemainingTime] = useState(0)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Calculate exam time (parse from sessionTask.time, e.g. "20 minutes")
+  const getInitialSeconds = (timeStr?: string) => {
+    if (!timeStr) return 20 * 60 // default 20min
+    const match = timeStr.match(/(\d+)\s*min/)
+    if (match) return parseInt(match[1], 10) * 60
+    return 20 * 60
+  }
+
+  // Transition: creation -> doing
+  const handleStartExam = () => {
+    if (!preview || !selectedTaskObj) return
+    setDoingMode(true)
+    setSessionExam(exam)
+    setSessionTask(selectedTaskObj)
+    setSessionPreview(preview)
+    setAnswer('')
+    setSuggestions([]) // Could load hints/guidance here
+    const sec = getInitialSeconds(selectedTaskObj.time)
+    setRemainingTime(sec)
+  }
+
+  // Timer setup/cleanup
+  useEffect(() => {
+    if (!doingMode) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
+      return
+    }
+    timerRef.current = setInterval(() => {
+      setRemainingTime((r) => (r > 0 ? r - 1 : 0))
+    }, 1000)
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+  }, [doingMode])
+
+  // Helper: can submit only in last 10 mins
+  const canSubmit = remainingTime <= 600 && doingMode && remainingTime > 0
+
+  const handleSubmit = () => {
+    if (!canSubmit) return
+    // Save/submit logic here (API, or just mark complete for demo)
+    alert('Submitted! Thank you. (Implement actual saving logic here)')
+    // Reset state to allow a new attempt:
+    setDoingMode(false)
+    setSessionExam(null)
+    setSessionTask(null)
+    setSessionPreview(null)
+    setAnswer('')
+    setSuggestions([])
+    setRemainingTime(0)
+  }
+
+  // --- Current Creation: Generate Exam logic (in creation mode only) ---
   const buildGeminiPrompt = (mode: 'prompt' | 'random') => {
     let taskText = `Exam: ${exam.label}\nTask: ${selectedTaskObj?.name}\nDescription: ${selectedTaskObj?.description}\nTime: ${selectedTaskObj?.time}\nWords: ${selectedTaskObj?.words}\n`
     let topicText = ''
@@ -204,21 +335,27 @@ const PracticeWritingPage: React.FC = () => {
     const isIeltsTask1 =
       exam.key === 'IELTS' && selectedTaskObj?.name?.toLowerCase()?.includes('task 1')
     let sysPrompt =
-      `You're an expert English exam generator. Please generate a practice writing task for a student, with realistic context and clear requirements.` +
+      `You're an expert English exam generator. Please generate ONLY the core writing question for a student, without any instructions, headings, or formatting.` +
       `\n${taskText}` +
       (topicText ? `\n${topicText}` : '') +
-      (userPrompt ? `\nFocus: ${userPrompt}` : '')
+      (userPrompt ? `\nFocus: ${userPrompt}` : '') +
+      // Critical new instruction:
+      `\n\nIMPORTANT:
+      - DO NOT include any exam instructions (time, word count, etc.)
+      - DO NOT include headings like "Task 2" or "Writing Topic"
+      - DO NOT include phrases like "Write about the following topic"
+      - ONLY provide the core question content
+      - For charts: include JSON data but keep question text minimal`
+
     if (isIeltsTask1) {
       sysPrompt += `
 If the question is about CHART/GRAPH, CREATE and PROVIDE a suitable hypothetical chart for the task.
-After generating the exam question, return the chart data as a JSON object for react-chartjs-2 (for example Bar, Pie or Line chart: { "chartType": "bar"|"pie"|"line", "chartData": { "labels": [...], "datasets": [...] }, "chartOptions": {}}).
-Write ONLY the exam question for students first, then add the chart JSON in a Markdown code block (for example: \`\`\`json ... \`\`\`). If not a chart/graph, just give the question.`
+After generating the exam question, return the chart data as a JSON object for react-chartjs-2 (for example: {"chartType": "bar"|"pie"|"line", "chartData": {...}, "chartOptions": {...}}).
+Write ONLY the main exam question for students first, then add the chart JSON in a Markdown code block (for example: \`\`\`json ... \`\`\`). If not a chart/graph, just give the question.`
     }
-    sysPrompt += `\nReturn ONLY the generated writing question as you would present it to a student.`
     return sysPrompt
   }
 
-  // Helper: Extract preview and chart (if any) from Gemini response
   function extractPreviewAndChart(raw: string): WritingPreviewData {
     const codeRegex = /```json\s*([\s\S]+?)```/i
     const match = raw.match(codeRegex)
@@ -231,12 +368,12 @@ Write ONLY the exam question for students first, then add the chart JSON in a Ma
     } catch (e) {
       chart = null
     }
-    const text = raw.replace(codeRegex, '').trim()
+    let text = raw.replace(codeRegex, '').trim()
+    text = stripWritingPromptInstructions(text)
     return { text, chart }
   }
 
   const handleCreateExam = async (mode: 'prompt' | 'random') => {
-    // Prevent creation for disabled tasks
     if (selectedTaskObj?.disabled) {
       setError('This task type is temporarily unavailable.')
       setCreated(false)
@@ -281,7 +418,6 @@ Write ONLY the exam question for students first, then add the chart JSON in a Ma
         data?.candidates?.[0]?.content?.parts?.map((p: { text: string }) => p.text).join('\n') ||
         data?.candidates?.[0]?.content?.text ||
         '(No response)'
-      // Use chart-aware extract helper
       setPreview(extractPreviewAndChart(message))
       setCreated(true)
     } catch (err: any) {
@@ -294,61 +430,44 @@ Write ONLY the exam question for students first, then add the chart JSON in a Ma
     }
   }
 
-  return (
-    <div className="flex flex-row h-screen gap-6 px-4 pt-4 pb-8 w-full max-w-full min-w-0 overflow-x-hidden">
-      {/* Panel trái: scroll độc lập */}
-      <div className="w-1/4 flex flex-col h-full overflow-y-auto overflow-x-hidden bg-background border-r pr-4 min-w-0 max-w-full">
-        <WritingHistory />
-        <div className="flex-1 mt-8 bg-background border rounded-xl flex items-center justify-center text-gray-400 text-md">
-          (Statistics coming soon)
-        </div>
-      </div>
-      {/* Panel phải: scroll độc lập */}
-      <div className="flex-1 flex flex-col h-full overflow-y-auto w-20">
-        <div className="min-w-0 max-w-full">
-          <ExamAndTaskZone
-            examTypes={EXAM_TYPES}
-            selectedExam={selectedExam}
-            onSelectExam={setSelectedExam}
-            tasks={exam.tasks}
-            selectedTask={selectedTask}
-            onSelectTask={setSelectedTask}
-            selectedTaskObj={selectedTaskObj}
-          />
-        </div>
-        {/* Chủ đề - chỉ hiện nếu task có topics */}
-        {topics.length > 0 && (
-          <TopicSelector
-            topics={topics}
-            selectedTopic={selectedTopic}
-            onSelect={setSelectedTopic}
-            customTopic={customTopic}
-            setCustomTopic={setCustomTopic}
-          />
-        )}
-        <AiPromptInput
-          value={aiPrompt}
-          onChange={setAiPrompt}
-          onCreateByPrompt={() => handleCreateExam('prompt')}
-          onCreateRandom={() => handleCreateExam('random')}
-          disableCreateByPrompt={!aiPrompt.trim() || loading}
-        />
-        <div className="min-w-0 max-w-full">
-          {loading && (
-            <div className="flex items-center gap-2 mb-2 text-yellow-700 animate-pulse">
-              <span className="animate-spin text-2xl">⏳</span>
-              Generating exam with Gemini...
-            </div>
-          )}
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-6 py-3 mb-4">
-              {error}
-            </div>
-          )}
-        </div>
-        <ExamPreviewAndAction preview={preview} enabled={created && !loading && !error} />
-      </div>
-    </div>
+  // --- Render ---
+  return doingMode && sessionExam && sessionTask && sessionPreview ? (
+    <WritingDoingSection
+      exam={sessionExam}
+      task={sessionTask}
+      preview={sessionPreview}
+      onSubmit={handleSubmit}
+      remaining={remainingTime}
+      answer={answer}
+      onChangeAnswer={setAnswer}
+      canSubmit={canSubmit}
+      suggestions={suggestions}
+    />
+  ) : (
+    <WritingCreationSection
+      examTypes={EXAM_TYPES}
+      selectedExam={selectedExam}
+      setSelectedExam={setSelectedExam}
+      exam={exam}
+      selectedTask={selectedTask}
+      setSelectedTask={setSelectedTask}
+      customTopic={customTopic}
+      setCustomTopic={setCustomTopic}
+      selectedTopic={selectedTopic}
+      setSelectedTopic={setSelectedTopic}
+      aiPrompt={aiPrompt}
+      setAiPrompt={setAiPrompt}
+      preview={preview}
+      created={created}
+      loading={loading}
+      error={error}
+      onCreateByPrompt={() => handleCreateExam('prompt')}
+      onCreateRandom={() => handleCreateExam('random')}
+      disableCreateByPrompt={!aiPrompt.trim() || loading}
+      selectedTaskObj={selectedTaskObj}
+      topics={topics}
+      onClickStartExam={handleStartExam}
+    />
   )
 }
 

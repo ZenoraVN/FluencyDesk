@@ -1,6 +1,5 @@
 // Using Lucide-react icon for Writing History header
 import { MdMenuBook } from 'react-icons/md'
-import { BookOpen } from 'lucide-react'
 import React from 'react'
 import { ExamTypeKey } from './ExamAndTaskZone'
 

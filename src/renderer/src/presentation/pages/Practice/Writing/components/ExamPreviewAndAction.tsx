@@ -68,10 +68,12 @@ const ExamPreviewAndAction: React.FC<ExamPreviewAndActionProps> = ({
         <Eye className="w-5 h-5 text-primary" />
         Exam Preview
       </div>
-      <div className="border rounded-md px-4 py-3 mb-4 min-h-[68px] whitespace-pre-line text-gray-700">
-        {preview?.text
-          ? preview.text
-          : '(No exam has been generated. Please enter a prompt or create a random exam!)'}
+      <div className="border rounded-md px-4 py-3 mb-4 min-h-[68px] whitespace-pre-line text-gray-700 bg-gray-50">
+        {preview?.text ? (
+          <div className="font-medium text-gray-800">{preview.text}</div>
+        ) : (
+          '(No exam has been generated. Please enter a prompt or create a random exam!)'
+        )}
       </div>
       {chartContent && (
         <div className="mb-4 flex flex-col items-center">
