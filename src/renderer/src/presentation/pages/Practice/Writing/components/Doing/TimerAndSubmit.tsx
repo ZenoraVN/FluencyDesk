@@ -1,11 +1,12 @@
 import React from 'react'
-
 interface TimerAndSubmitProps {
   remaining: number
   onSubmit: () => void
   onSaveDraft?: () => void
   canSubmit: boolean
   evaluating?: boolean
+  paragraphCount?: number
+  minParagraphs?: number
 }
 
 const TimerAndSubmit: React.FC<TimerAndSubmitProps> = ({
@@ -13,7 +14,9 @@ const TimerAndSubmit: React.FC<TimerAndSubmitProps> = ({
   onSubmit,
   onSaveDraft,
   canSubmit,
-  evaluating
+  evaluating,
+  paragraphCount,
+  minParagraphs
 }) => {
   const mins = Math.floor(remaining / 60)
   const secs = remaining % 60
@@ -88,11 +91,12 @@ const TimerAndSubmit: React.FC<TimerAndSubmitProps> = ({
           )}
         </button>
       </div>
-      {!canSubmit && (
-        <div className="text-xs mt-2 text-gray-400 font-medium text-center">
-          You can only submit in the last 10 minutes.
-        </div>
-      )}
+      {/* Optional: Info about timing restriction when not allowed to submit */}
+      {/*
+      {!canSubmit && ( <div className="text-xs mt-2 text-gray-400 font-medium text-center">
+        You can only submit in the last 10 minutes.
+      </div>)}
+      */}
     </div>
   )
 }

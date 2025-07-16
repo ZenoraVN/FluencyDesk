@@ -33,7 +33,9 @@ const fakeExam = {
         'Business',
         'Travel',
         'Culture'
-      ]
+      ],
+      // ADD minParagraphs = 3 for essay
+      minParagraphs: 3
     }
   ]
 }
@@ -46,7 +48,7 @@ const fakePreview = {
 }
 
 const fakeAnswer =
-  "Personally, I strongly agree that unpaid community service should be a compulsory part of high school programmes because it provides students with valuable experiences. Firstly, community service helps young people develop practical skills and understand the importance of helping others. For example, volunteering at a food bank can teach responsibility and empathy. Secondly, it encourages teamwork and communication, which are crucial in both education and future careers. Although some may argue that unpaid work distracts from academic study, I believe it enhances students' social awareness and personal growth. In conclusion, making community service compulsory benefits students and society alike."
+  'In recent years, there has been growing debate about whether unpaid community service—such as volunteering, helping the elderly, or cleaning public areas—should be a mandatory part of high school education. While some argue that it should remain optional, I strongly agree that integrating community service into school programmes offers significant educational and social benefits for students and society as a whole.\n\nTo begin with, mandatory community service equips students with essential life skills that traditional academic subjects often overlook. Participating in volunteer work fosters empathy, teamwork, communication, and a sense of responsibility. For instance, helping at a shelter or organizing local clean-up campaigns exposes students to real-world problems and encourages them to take initiative. These experiences not only make students more well-rounded individuals but also prepare them better for the challenges of adult life.\n\nFurthermore, making community service compulsory can strengthen the connection between schools and their local communities. When young people engage directly with their neighborhoods, they become more aware of social issues and are more likely to become active, responsible citizens in the future. It also helps reduce social inequality, as students from all backgrounds, regardless of their family income, participate equally and contribute meaningfully.\n\nOpponents might argue that forcing students to volunteer could lead to resentment and superficial engagement. However, with proper planning and guidance, schools can design programs that match students’ interests and strengths. For example, a student passionate about animals could volunteer at a rescue center, while another interested in education could help tutor younger children. When students see the value in what they are doing, motivation naturally follows.\n\nIn conclusion, I firmly believe that incorporating unpaid community service into high school programmes brings numerous long-term benefits. It helps develop essential life skills, fosters civic responsibility, and promotes a stronger connection between youth and society. Rather than viewing it as a burden, we should see it as an investment in building a more compassionate and engaged generation.'
 
 function stripWritingPromptInstructions(input: string): string {
   const lines = input
@@ -120,9 +122,15 @@ export interface WritingError {
 
 export interface ParagraphOptimization {
   paragraphIndex: number
+  paragraphType: 'introduction' | 'body' | 'conclusion'
   original: string
   optimized: string
   explanation: string
+  errors: {
+    original: string
+    suggestion: string
+    explanation: string
+  }[]
 }
 
 export interface VocabularyHighlight {
@@ -170,7 +178,12 @@ export interface TaskType {
   words: string
   topics?: string[]
   disabled?: boolean
+  // Minimum number of paragraphs required (optional)
+  minParagraphs?: number
 }
+
+// Patch for mock/fakeTask to allow minParagraphs property
+type AnyKeyObj = { [key: string]: any }
 
 export interface MyExamType {
   key: ExamTypeKey
@@ -189,7 +202,8 @@ export interface WritingPreviewData {
 const PracticeWritingPage: React.FC = () => {
   // STATE: Main persistent configuration (in real app this comes from props/router/context)
   const exam = fakeExam
-  const task = fakeTask
+  // Support for either proper TaskType or fallback to any for demo/mock objects
+  const task: TaskType | AnyKeyObj = fakeTask
   const preview = fakePreview
   const minWords = 250 // Hardcoded or parse from task.words
 
@@ -205,14 +219,42 @@ const PracticeWritingPage: React.FC = () => {
 
   // Word and paragraph count
   const wordCount = getWordCount(answer)
-  const isMultiParagraph = answer.trim().split(/\n\s*\n+/).length >= 2
+  // Get minimum paragraphs for this task; default 1 if not defined, or 3 for some tasks
+  // Lấy minParagraphs từ task, nếu không có thì mặc định là 0 (không cảnh báo)
+  const minParagraphs =
+    typeof task.minParagraphs === 'number' && task.minParagraphs > 0 ? task.minParagraphs : 0
+
+  // Robust paragraph count: count as a new paragraph each time:
+  // 1. There is a non-empty line, and it is the first line or the previous line is empty.
+  // This way, user can use either a single empty line or always write in blocks.
+  function countParagraphs(text: string): number {
+    const lines = text.split('\n').map((line) => line.trim())
+    let count = 0
+    let inParagraph = false
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].length > 0) {
+        if (!inParagraph) {
+          count++
+          inParagraph = true
+        }
+      } else {
+        inParagraph = false
+      }
+    }
+    return count
+  }
+
+  const paragraphCount = countParagraphs(answer)
+
+  // Old: const isMultiParagraph = answer.trim().split(/\n\s*\n+/).length >= 2
+  const hasEnoughParagraphs = paragraphCount >= minParagraphs
 
   // Button enabled only if valid
   const canSubmit =
     !loading &&
     !showChecker &&
     wordCount >= minWords &&
-    isMultiParagraph &&
+    hasEnoughParagraphs &&
     answer.trim().length > 0
 
   // Handler for submitting the writing
@@ -222,8 +264,14 @@ const PracticeWritingPage: React.FC = () => {
       setClientError(`Bài làm cần tối thiểu ${minWords} từ (hiện tại: ${wordCount}).`)
       return
     }
-    if (!isMultiParagraph) {
-      setClientError('Bài làm cần có ít nhất mở bài và thân bài (phân tách đoạn bằng xuống dòng).')
+    if (!hasEnoughParagraphs) {
+      if (minParagraphs > 1) {
+        setClientError(
+          `Bài làm cần có ít nhất ${minParagraphs} đoạn văn (được phân tách rõ ràng qua xuống dòng trống).`
+        )
+      } else {
+        setClientError('Bài làm cần có ít nhất một đoạn văn.')
+      }
       return
     }
     setClientError(null)
@@ -253,6 +301,44 @@ const PracticeWritingPage: React.FC = () => {
       const data = await response.json()
       const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
       const parsedResult = parseEvaluationResult(resultText)
+      // ---- DEMO MOCK DATA INJECTION FOR UI PREVIEW ----
+      if (TEST_WRITING_CHECKER_SECTION && parsedResult) {
+        parsedResult.sampleEssays = [
+          {
+            level: 'intermediate',
+            content:
+              'Community service offers valuable experience for students. It develops life skills and empathy. Making it compulsory can be beneficial for both the individual and society. However, attention must be paid to avoid turning it into a mere obligation.'
+          },
+          {
+            level: 'advanced',
+            content:
+              'Mandatory community service in high school curricula has the potential to cultivate not only practical skills but also a heightened awareness of social responsibility. When implemented thoughtfully, such initiatives foster civic engagement and help bridge social divides among youth from diverse backgrounds.'
+          }
+        ]
+        parsedResult.sentenceDiversifications = [
+          {
+            original:
+              'Helping at a shelter or organizing local clean-up campaigns exposes students to real-world problems and encourages them to take initiative.',
+            improved:
+              'Engaging in activities like volunteering at shelters or leading community clean-ups immerses students in real-world challenges and fosters their proactive spirit.',
+            explanation:
+              'Varied sentence structure and introduced more vivid verbs to improve engagement.'
+          }
+        ]
+        parsedResult.vocabularyHighlights = [
+          {
+            word: 'empathy',
+            meaning: 'the ability to understand and share the feelings of another',
+            example: 'Participating in volunteer work fosters empathy among students.'
+          },
+          {
+            word: 'civic engagement',
+            meaning: 'involvement in activities intended to improve one’s community',
+            example: 'Mandatory service can foster civic engagement in youth.'
+          }
+        ]
+      }
+      // ---------------------------------------------------
       setEvaluation(parsedResult)
       setShowChecker(true)
     } catch (err: any) {
@@ -304,6 +390,18 @@ ${answer}
    - Grammar complexity (simple, intermediate, advanced)
 9. Suggest 3-5 specific tips for overall improvement
 
+10. **PARAGRAPH OPTIMIZATION (Important for this evaluation!):**
+   - For each paragraph, return an object with:
+     - paragraphIndex (number, e.g. 1 for first paragraph)
+     - paragraphType: string, either "introduction", "body", or "conclusion" (identify what kind of paragraph this is)
+     - original: the original paragraph text
+     - optimized: rewrite the paragraph in improved/optimized English (focus on fluency, structure, and conciseness)
+     - explanation: (brief, high-level summary of improvements in this paragraph)
+     - errors: a list/array, where for each relevant sentence in the paragraph with issues, include:
+         - original: the original sentence (as in the user's writing)
+         - suggestion: an improved version of the sentence (if needed)
+         - explanation: explain why it needs improvement or what was corrected
+
 **Output format (JSON):**
 {
   "score": 8.5,
@@ -350,6 +448,23 @@ ${answer}
     "Use more advanced and varied vocabulary.",
     "Check verb tenses for accuracy.",
     "Add more complex sentence structures."
+  ],
+  "paragraphOptimizations": [
+    {
+      "paragraphIndex": 1,
+      "paragraphType": "introduction",
+      "original": "In recent years, there has been growing debate ...",
+      "optimized": "Recently, debate has intensified about whether ...",
+      "explanation": "Clarified main idea and improved flow.",
+      "errors": [
+        {
+          "original": "In recent years, there has been growing debate about whether unpaid community service...",
+          "suggestion": "Recently, debate has intensified about whether unpaid community service...",
+          "explanation": "Use of passive and wordiness can be improved; made wording more direct."
+        }
+      ]
+    }
+    // ... other paragraph objects
   ]
 }
 
@@ -453,7 +568,7 @@ ${answer}
     return (
       <WritingCheckerSection
         exam={exam}
-        task={task}
+        task={task as TaskType}
         preview={preview}
         answer={answer}
         evaluation={evaluation}
@@ -467,7 +582,7 @@ ${answer}
     <div className="w-full h-full min-h-[70vh] flex flex-col items-center">
       <WritingDoingSection
         exam={exam}
-        task={task}
+        task={task as TaskType}
         preview={preview}
         answer={answer}
         onChangeAnswer={setAnswer}
@@ -485,6 +600,14 @@ ${answer}
       {clientError && (
         <div className="mt-4 text-red-500 text-base font-semibold">{clientError}</div>
       )}
+
+      {/* Paragraph warning if not enough */}
+      {!hasEnoughParagraphs && (
+        <div className="mt-2 text-yellow-600 text-[15px] font-medium">
+          Bài viết của bạn phải có tối thiểu {minParagraphs} đoạn. (Mở bài - Thân bài - Kết bài)
+        </div>
+      )}
+
       {error && <div className="mt-2 text-red-600 text-base">{error}</div>}
       {loading && (
         <div className="mt-4 text-blue-700 font-medium">Evaluating with Gemini, please wait...</div>

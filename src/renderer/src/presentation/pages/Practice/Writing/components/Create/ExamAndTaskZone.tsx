@@ -18,6 +18,8 @@ export interface TaskBrief {
   words: string
   topics?: string[]
   disabled?: boolean
+  // Minimum number of paragraphs required to submit (optional, e.g. 3 for argumentative tasks)
+  minParagraphs?: number
 }
 
 interface ExamAndTaskZoneProps {
