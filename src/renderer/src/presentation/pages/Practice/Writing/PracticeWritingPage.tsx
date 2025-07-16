@@ -187,55 +187,89 @@ export interface WritingPreviewData {
 
 // --------- DEV/DEBUG ONLY main component ---------
 const PracticeWritingPage: React.FC = () => {
-  // In debug: send fakePreview.text & fakeAnswer to Gemini and show result!
+  // STATE: Main persistent configuration (in real app this comes from props/router/context)
+  const exam = fakeExam
+  const task = fakeTask
+  const preview = fakePreview
+  const minWords = 250 // Hardcoded or parse from task.words
 
+  // Dev: prefill answer or blank by env flag
+  const [answer, setAnswer] = useState(TEST_WRITING_CHECKER_SECTION ? fakeAnswer : '')
+  const [suggestions] = useState<string[]>([]) // Could fetch more for real app
+  const [remaining] = useState(40 * 60) // 40 min, static for demo
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showChecker, setShowChecker] = useState(false)
+  const [clientError, setClientError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!TEST_WRITING_CHECKER_SECTION) return
-    // Only query Gemini if not done
-    if (evaluation || loading) return
+  // Word and paragraph count
+  const wordCount = getWordCount(answer)
+  const isMultiParagraph = answer.trim().split(/\n\s*\n+/).length >= 2
 
-    const fetchEvaluation = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const apiKey = await GeminiService.getNextApiKey()
-        if (!apiKey) {
-          setError('No Gemini API key configured')
-          setLoading(false)
-          return
-        }
-        const prompt = buildEvaluationPrompt(fakePreview.text, fakeAnswer)
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }]
-            })
-          }
-        )
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData?.error?.message || 'Evaluation failed')
-        }
-        const data = await response.json()
-        const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-        const parsedResult = parseEvaluationResult(resultText)
-        setEvaluation(parsedResult)
-      } catch (err: any) {
-        setError('Evaluation error: ' + (err?.message || 'Unknown error'))
-      } finally {
-        setLoading(false)
-      }
+  // Button enabled only if valid
+  const canSubmit =
+    !loading &&
+    !showChecker &&
+    wordCount >= minWords &&
+    isMultiParagraph &&
+    answer.trim().length > 0
+
+  // Handler for submitting the writing
+  const handleSubmit = async () => {
+    // Client-side validation
+    if (wordCount < minWords) {
+      setClientError(`Bài làm cần tối thiểu ${minWords} từ (hiện tại: ${wordCount}).`)
+      return
     }
-    fetchEvaluation()
-    // eslint-disable-next-line
-  }, [evaluation, loading])
+    if (!isMultiParagraph) {
+      setClientError('Bài làm cần có ít nhất mở bài và thân bài (phân tách đoạn bằng xuống dòng).')
+      return
+    }
+    setClientError(null)
+    setLoading(true)
+    setError(null)
+    try {
+      const apiKey = await GeminiService.getNextApiKey()
+      if (!apiKey) {
+        setError('No Gemini API key configured')
+        return
+      }
+      const prompt = buildEvaluationPrompt(preview.text, answer)
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        }
+      )
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData?.error?.message || 'Evaluation failed')
+      }
+      const data = await response.json()
+      const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      const parsedResult = parseEvaluationResult(resultText)
+      setEvaluation(parsedResult)
+      setShowChecker(true)
+    } catch (err: any) {
+      setError('Evaluation error: ' + (err?.message || 'Unknown error'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Retry handler
+  const handleRetry = () => {
+    setShowChecker(false)
+    setEvaluation(null)
+    setError(null)
+    setClientError(null)
+    setLoading(false)
+  }
 
   function buildEvaluationPrompt(question: string, answer: string): string {
     return `
@@ -414,35 +448,49 @@ ${answer}
     }
   }
 
-  if (TEST_WRITING_CHECKER_SECTION) {
-    if (loading)
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-lg text-blue-700">
-          Evaluating with Gemini, please wait...
-        </div>
-      )
-    if (error)
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-lg text-red-600">
-          {error}
-        </div>
-      )
-    if (evaluation)
-      return (
-        <WritingCheckerSection
-          exam={fakeExam}
-          task={fakeTask}
-          preview={fakePreview}
-          answer={fakeAnswer}
-          evaluation={evaluation}
-          onRetry={() => window.location.reload()}
-        />
-      )
-    return null
+  // CHECKER: Show result if ready
+  if (showChecker && evaluation) {
+    return (
+      <WritingCheckerSection
+        exam={exam}
+        task={task}
+        preview={preview}
+        answer={answer}
+        evaluation={evaluation}
+        onRetry={handleRetry}
+      />
+    )
   }
 
-  // Production mode: could render something else or null here.
-  return null
+  // DOING: Input mode (default)
+  return (
+    <div className="w-full h-full min-h-[70vh] flex flex-col items-center">
+      <WritingDoingSection
+        exam={exam}
+        task={task}
+        preview={preview}
+        answer={answer}
+        onChangeAnswer={setAnswer}
+        minWords={minWords}
+        wordCount={wordCount}
+        suggestions={suggestions}
+        onSubmit={handleSubmit}
+        onSaveDraft={undefined}
+        onLoadSuggestion={undefined}
+        canSubmit={canSubmit}
+        remaining={remaining}
+        evaluating={loading}
+      />
+      {/* Errors: client validate or backend */}
+      {clientError && (
+        <div className="mt-4 text-red-500 text-base font-semibold">{clientError}</div>
+      )}
+      {error && <div className="mt-2 text-red-600 text-base">{error}</div>}
+      {loading && (
+        <div className="mt-4 text-blue-700 font-medium">Evaluating with Gemini, please wait...</div>
+      )}
+    </div>
+  )
 }
 
 export default PracticeWritingPage
