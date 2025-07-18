@@ -1,5 +1,15 @@
 import React from 'react'
+import type { QuestionDefinition } from '../../QuestionCreate/types/questionDetail'
+import { QuestionChoiceCard } from './QuestionChoiceCard'
+import QuestionCreateCard from './QuestionCreateCard'
 import QuestionEditorCard from './QuestionEditorCard'
+
+interface QuestionEditorSectionProps {
+  isQuestionChoiceCardOpen: boolean
+  createdQuestion: QuestionDefinition | null
+  onQuestionTypeChosen: (q: QuestionDefinition) => void
+  onCancelCreate: () => void
+}
 
 const fakeEditorCards = [
   {
@@ -16,23 +26,27 @@ const fakeEditorCards = [
   }
 ]
 
-import { QuestionChoiceCard } from './QuestionChoiceCard'
-
-interface QuestionEditorSectionProps {
-  showQuestionCreator: boolean
-}
-
-const QuestionEditorSection: React.FC<QuestionEditorSectionProps> = ({ showQuestionCreator }) => {
+const QuestionEditorSection: React.FC<QuestionEditorSectionProps> = ({
+  isQuestionChoiceCardOpen,
+  createdQuestion,
+  onQuestionTypeChosen,
+  onCancelCreate
+}) => {
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      {showQuestionCreator && (
+      {createdQuestion ? (
         <div className="mb-5">
-          <QuestionChoiceCard />
+          <QuestionCreateCard question={createdQuestion} onDelete={onCancelCreate} />
         </div>
+      ) : isQuestionChoiceCardOpen ? (
+        <div className="mb-5">
+          <QuestionChoiceCard onCreate={onQuestionTypeChosen} />
+        </div>
+      ) : (
+        fakeEditorCards.map((card, idx) => (
+          <QuestionEditorCard key={idx} title={card.title} description={card.description} />
+        ))
       )}
-      {fakeEditorCards.map((card, idx) => (
-        <QuestionEditorCard key={idx} title={card.title} description={card.description} />
-      ))}
     </div>
   )
 }

@@ -1,57 +1,67 @@
-import { FC } from "react";
+import { FC } from 'react'
 
 interface RichtextFillInBlankViewProps {
-  content: string;
-  onBlankClick?: (number: number) => void;
-  selectedBlankNumber?: number | null;
-  className?: string;
+  content: string
+  onBlankClick?: (hex: string) => void
+  onBlankRemove?: (hex: string) => void
+  selectedBlankId?: string | null
+  className?: string
 }
 
 export const RichtextFillInBlankView: FC<RichtextFillInBlankViewProps> = ({
   content,
   onBlankClick,
-  selectedBlankNumber,
-  className = "",
+  onBlankRemove,
+  selectedBlankId,
+  className = ''
 }) => {
-  // Render content with highlighted blanks
   const renderContent = () => {
-    if (!content) return null;
+    if (!content) return null
 
-    const parts = content.split(/(\*\*\*\d+\*\*\*)/g);
+    const parts = content.split(/(\*\*\*[a-f0-9]{6}\*\*\*)/g)
     return parts.map((part: string, index: number) => {
-      const match = part.match(/\*\*\*(\d+)\*\*\*/);
+      const match = part.match(/\*\*\*([a-f0-9]{6})\*\*\*/)
       if (match) {
-        const number = parseInt(match[1]);
+        const hex = match[1]
+        const bgColor = `#${hex}33`
+        const borderColor = selectedBlankId === hex ? '#3b82f6' : `#${hex}`
         return (
-          <button
-            key={index}
-            type="button"
-            onClick={() => onBlankClick?.(number)}
-            className={`inline-block mx-1 cursor-pointer ${
-              selectedBlankNumber === number
-                ? "text-blue-600"
-                : "text-gray-400 hover:text-blue-500"
-            }`}
-          >
-            ___({number})___
-          </button>
-        );
+          <span key={index} className="blank-wrapper inline-flex items-center mx-1">
+            <button
+              type="button"
+              onClick={() => onBlankClick?.(hex)}
+              className="blank-button flex items-center px-2 py-1 rounded transition-all"
+              style={{
+                backgroundColor: bgColor,
+                border: `1px solid ${borderColor}`
+              }}
+            >
+              <span style={{ color: `#${hex}` }}>___</span>
+            </button>
+            <button
+              type="button"
+              className="delete-blank ml-1 text-red-500 hover:text-red-700"
+              onClick={(e) => {
+                e.stopPropagation()
+                onBlankRemove?.(hex)
+              }}
+            >
+              ✕
+            </button>
+          </span>
+        )
       }
       return (
         <span
           key={index}
-          className="prose prose-sm max-w-none break-words break-all whitespace-pre-wrap leading-relaxed
-            prose-p:my-1 prose-headings:my-2 prose-headings:text-[#2D3748]
-            prose-p:break-words prose-p:break-all prose-p:whitespace-pre-wrap"
+          className="prose prose-sm max-w-none break-words break-all whitespace-pre-wrap leading-relaxed"
           dangerouslySetInnerHTML={{ __html: part }}
         />
-      );
-    });
-  };
+      )
+    })
+  }
 
   return (
-    <div className={`text-[#2D3748] leading-relaxed text-base ${className}`}>
-      {renderContent()}
-    </div>
-  );
-};
+    <div className={`text-[#2D3748] leading-relaxed text-base ${className}`}>{renderContent()}</div>
+  )
+}

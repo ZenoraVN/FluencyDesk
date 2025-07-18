@@ -9,9 +9,12 @@ import { QuestionCreateCard } from './QuestionCreateCard'
 /**
  * This card allows the user to pick a skill area and then a question type to create.
  */
-export const QuestionChoiceCard: React.FC = () => {
+interface QuestionChoiceCardProps {
+  onCreate: (q: QuestionDefinition) => void
+}
+
+export const QuestionChoiceCard: React.FC<QuestionChoiceCardProps> = ({ onCreate }) => {
   const [selectedSkill, setSelectedSkill] = useState<SkillType>(SKILLS[0]?.value as SkillType)
-  const [creatingQuestion, setCreatingQuestion] = useState<QuestionDefinition | null>(null)
   const allQuestions: QuestionDefinition[] = QUESTION_DEFINITIONS ?? []
   const filteredQuestions = allQuestions.filter((q) => q.skills.includes(selectedSkill))
 
@@ -19,11 +22,7 @@ export const QuestionChoiceCard: React.FC = () => {
     // No-op, for now
   }
   function handleCreateQuestion(q: QuestionDefinition) {
-    setCreatingQuestion(q)
-  }
-
-  if (creatingQuestion) {
-    return <QuestionCreateCard question={creatingQuestion} />
+    onCreate(q)
   }
 
   return (

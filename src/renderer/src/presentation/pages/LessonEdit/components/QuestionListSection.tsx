@@ -24,9 +24,13 @@ const fakeQuestions: { question: string; type: QuestionType }[] = [
 
 interface QuestionListSectionProps {
   onAddQuestion: () => void
+  showAddButton?: boolean
 }
 
-const QuestionListSection: React.FC<QuestionListSectionProps> = ({ onAddQuestion }) => {
+const QuestionListSection: React.FC<QuestionListSectionProps> = ({
+  onAddQuestion,
+  showAddButton = true
+}) => {
   return (
     <div className="flex flex-col h-full w-full">
       {/* Header */}
@@ -34,14 +38,16 @@ const QuestionListSection: React.FC<QuestionListSectionProps> = ({ onAddQuestion
         <span className="text-base">
           Question <span className="text-black">({fakeQuestions.length})</span>
         </span>
-        <button
-          className="rounded-md p-1 transition"
-          aria-label="Add Question"
-          type="button"
-          onClick={onAddQuestion}
-        >
-          <Plus size={18} />
-        </button>
+        {showAddButton && (
+          <button
+            className="rounded-md p-1 transition"
+            aria-label="Add Question"
+            type="button"
+            onClick={onAddQuestion}
+          >
+            <Plus size={18} />
+          </button>
+        )}
       </div>
       {/* Question List Items */}
       <div className="overflow-y-auto pr-0.5 flex-1 w-full">

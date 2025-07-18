@@ -1,5 +1,5 @@
 import React from 'react'
-import { CustomInput } from '../../../../../components/Input/CustomInput'
+import { CustomInput } from '../../../../../../components/Input/CustomInput'
 
 const TOPIC_ICON: Record<string, string> = {
   Environment: '🌍',

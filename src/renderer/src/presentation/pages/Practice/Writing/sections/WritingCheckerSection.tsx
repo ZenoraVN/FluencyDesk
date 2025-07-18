@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { MyExamType, TaskType, WritingPreviewData, EvaluationResult } from '../PracticeWritingPage'
 import { BandScoreBox } from '../components/Checker/BandScoreBox'
 import { ParagraphOptimizationBox } from '../components/Checker/ParagraphOptimizationBox'
 import { VocabularyHighlightsBox } from '../components/Checker/VocabularyHighlightsBox'
 import { SentenceDiversificationBox } from '../components/Checker/SentenceDiversificationBox'
 import { SampleEssaysBox } from '../components/Checker/SampleEssaysBox'
+import { SuggestionsBox } from '../components/Checker/SuggestionsBox'
 import { AnnotatedAnswerBox } from '../components/Checker/AnnotatedAnswerBox'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../../../components/ui/tabs'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface WritingCheckerSectionProps {
   exam: MyExamType
@@ -21,9 +24,18 @@ const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
   task,
   preview,
   answer,
-  evaluation
+  evaluation,
+  onRetry
 }) => {
+  const tabsListRef = useRef<HTMLDivElement>(null)
   const [activeError, setActiveError] = useState<number | null>(null)
+
+  const scrollLeft = () => {
+    tabsListRef.current?.scrollBy({ left: -200, behavior: 'smooth' })
+  }
+  const scrollRight = () => {
+    tabsListRef.current?.scrollBy({ left: 200, behavior: 'smooth' })
+  }
 
   return (
     <div className="flex flex-col h-full p-4 rounded-xl shadow-lg overflow-y-auto">
@@ -35,24 +47,75 @@ const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Panel (Prompt + Answer annotation) */}
-        <div className="w-full lg:w-7/12 space-y-6">
-          <div className="bg-gray-50 p-4 rounded-lg border">
+        <div className="w-full lg:w-8/12 space-y-6">
+          <div>
             <h3 className="font-semibold text-lg mb-2 flex items-center">
               <span className="text-gray-600 mr-2">&#128196;</span>
               Prompt
             </h3>
             <p className="whitespace-pre-line">{preview?.text}</p>
           </div>
-          <AnnotatedAnswerBox annotatedText={evaluation.annotatedText || answer} />
+          <AnnotatedAnswerBox
+            answer={answer}
+            errors={evaluation.errors}
+            activeErrorId={activeError}
+            onErrorClick={setActiveError}
+          />
         </div>
         {/* Right Panel (Band Score and checker features) */}
-        <div className="w-full lg:w-5/12 space-y-6">
-          <BandScoreBox bandScores={evaluation.bandScores} />
-          <ParagraphOptimizationBox optimizations={evaluation.paragraphOptimizations} />
-          <VocabularyHighlightsBox vocabulary={evaluation.vocabularyHighlights} />
-          <SentenceDiversificationBox diversifications={evaluation.sentenceDiversifications} />
-          <SampleEssaysBox samples={evaluation.sampleEssays} />
-        </div>
+        <Tabs defaultValue="bandScore" className="w-full lg:w-4/12 space-y-6 h-full">
+          <div className="flex items-center space-x-1 min-w-0">
+            <button
+              type="button"
+              onClick={scrollLeft}
+              className="flex-none p-1 bg-white/70 dark:bg-gray-800/70"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div
+              ref={tabsListRef}
+              className="flex-auto min-w-0 overflow-x-auto scroll-smooth border-b mb-2 px-2 scroll-pl-2 scroll-pr-2"
+            >
+              <TabsList className="flex space-x-2 whitespace-nowrap min-w-max">
+                <TabsTrigger value="bandScore">Band Score</TabsTrigger>
+                <TabsTrigger value="paragraphOptimization">Paragraph Optimization</TabsTrigger>
+                <TabsTrigger value="vocabularyHighlights">Vocabulary Highlights</TabsTrigger>
+                <TabsTrigger value="sentenceDiversification">Sentence Diversification</TabsTrigger>
+                <TabsTrigger value="sampleEssays">Sample Essays</TabsTrigger>
+                <TabsTrigger value="suggestion">Suggestion</TabsTrigger>
+              </TabsList>
+            </div>
+            <button
+              type="button"
+              onClick={scrollRight}
+              className="flex-none p-1 bg-white/70 dark:bg-gray-800/70"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+          <TabsContent value="bandScore">
+            <BandScoreBox bandScores={evaluation.bandScores} />
+          </TabsContent>
+          <TabsContent value="paragraphOptimization">
+            <ParagraphOptimizationBox optimizations={evaluation.paragraphOptimizations} />
+          </TabsContent>
+          <TabsContent value="vocabularyHighlights">
+            <VocabularyHighlightsBox vocabulary={evaluation.vocabularyHighlights} />
+          </TabsContent>
+          <TabsContent value="sentenceDiversification">
+            <SentenceDiversificationBox diversifications={evaluation.sentenceDiversifications} />
+          </TabsContent>
+          <TabsContent value="sampleEssays">
+            <SampleEssaysBox samples={evaluation.sampleEssays} />
+          </TabsContent>
+          <TabsContent value="suggestion">
+            <SuggestionsBox
+              errors={evaluation.errors}
+              activeErrorId={activeError}
+              onSuggestionClick={setActiveError}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

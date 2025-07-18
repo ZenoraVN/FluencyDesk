@@ -23,9 +23,10 @@ interface RichtextchtEditorProps {
   onChange: (value: string) => void
   className?: string
   placeholder?: string
-  count?: boolean // thêm
-  min?: boolean // thêm
-  hideToolbar?: boolean // thêm prop ẩn toolbar
+  count?: boolean
+  min?: boolean
+  hideToolbar?: boolean
+  hideColor?: boolean // NEW: hide color picker button if true
 }
 
 export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
@@ -35,7 +36,8 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
   placeholder = 'Type here...',
   count = true,
   min = false,
-  hideToolbar = false
+  hideToolbar = false,
+  hideColor = false
 }) => {
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [wordCount, setWordCount] = useState(0)
@@ -43,7 +45,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
   const [isFocused, setIsFocused] = useState(false)
   const colorPickerRef = useRef<HTMLDivElement>(null)
 
-  // Đếm số từ, ký tự
+  // Count words and characters
   const updateCounts = (text: string) => {
     const cleanText = text
       .replace(/<[^>]*>/g, ' ')
@@ -54,7 +56,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
     setWordCount(words.length)
   }
 
-  // Đóng color picker nếu click ra ngoài
+  // Close color picker on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (colorPickerRef.current && !colorPickerRef.current.contains(event.target as Node)) {
@@ -67,7 +69,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
     }
   }, [])
 
-  // Khởi tạo tiptap editor
+  // Initialize tiptap editor
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -97,26 +99,24 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
     }
   })
 
-  // Sync value từ ngoài vào editor nếu value prop thay đổi
+  // Sync prop value to editor
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value || '', false)
     }
   }, [value, editor])
 
-  // Kiểm tra editor có rỗng hay không
+  // Is the editor empty?
   const isEmpty = !value || value.trim() === '' || value === '<p></p>' || value === '<p><br></p>'
 
-  // Dạng đơn giản (min)
+  // Minimal mode (no toolbar, no count)
   const isMinimal = min && !count
 
   return (
     <div
-      className={`${
-        isMinimal ? 'h-10 flex items-center relative' : 'space-y-2'
-      } rounded-lg ${className}`}
+      className={`${isMinimal ? 'h-10 relative' : 'space-y-2'} rounded-lg bg-gray-50 ${className}`}
     >
-      {/* Toolbar -- chỉ hiện nếu không phải min và không ẩn toolbar */}
+      {/* Toolbar (shown unless min or hideToolbar) */}
       {!isMinimal && !hideToolbar && (
         <div
           className={`flex items-center gap-1 p-1 border border-[#52aaa5]/20 rounded-t-lg ${className}`}
@@ -174,44 +174,49 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
               <UnderlineIcon size={18} className="text-[#2D3748]" />
             </button>
           </div>
-          <div className="relative flex items-center gap-1 px-2 border-r border-[#52aaa5]/20">
-            <button
-              type="button"
-              onClick={() => setShowColorPicker(!showColorPicker)}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                showColorPicker ? 'bg-[#52aaa5]/20' : ''
-              }`}
-            >
-              <Palette size={18} className="text-[#2D3748]" />
-            </button>
-            {showColorPicker && (
-              <div
-                ref={colorPickerRef}
-                className="absolute top-full left-0 mt-1 p-2 bg-white border border-[#52aaa5]/20 rounded-lg shadow-lg z-10"
+          {/* Color picker block, conditionally hidden */}
+          {!hideColor && (
+            <div className="relative flex items-center gap-1 px-2 border-r border-[#52aaa5]/20">
+              <button
+                type="button"
+                onClick={() => setShowColorPicker(!showColorPicker)}
+                className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
+                  showColorPicker ? 'bg-[#52aaa5]/20' : ''
+                }`}
               >
-                {/* Quick access row for 4 most used colors (not black/white) */}
-                <div className="flex items-center gap-2 mb-2">
-                  {[
-                    { value: '#FF0000' }, // Red
-                    { value: '#008000' }, // Green
-                    { value: '#0000FF' }, // Blue
-                    { value: '#FFD700' } // Yellow
-                  ].map((color, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        editor?.chain().focus().setColor(color.value).run()
-                        setShowColorPicker(false)
-                      }}
-                      className="w-6 h-6 border border-[#e5e7eb] rounded-lg shadow-sm transition-transform hover:scale-110 hover:shadow-md"
-                      style={{ backgroundColor: color.value, borderRadius: 8 }}
-                      title={color.value}
-                    />
-                  ))}
+                <Palette size={18} className="text-[#2D3748]" />
+              </button>
+              {showColorPicker && (
+                <div
+                  ref={colorPickerRef}
+                  className="absolute top-full left-0 mt-1 p-2 bg-white border border-[#52aaa5]/20 rounded-lg shadow-lg z-10"
+                >
+                  {/* All quick access colors: black, white, red, green, blue, yellow */}
+                  <div className="flex items-center gap-2 mb-2">
+                    {[
+                      { value: '#000000' }, // Black
+                      { value: '#FFFFFF', border: true }, // White
+                      { value: '#FF0000' }, // Red
+                      { value: '#008000' }, // Green
+                      { value: '#0000FF' }, // Blue
+                      { value: '#FFD700' } // Yellow
+                    ].map((color, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          editor?.chain().focus().setColor(color.value).run()
+                          setShowColorPicker(false)
+                        }}
+                        className={`w-6 h-6 border ${color.border ? 'border-gray-300' : 'border-[#e5e7eb]'} rounded-lg shadow-sm transition-transform hover:scale-110 hover:shadow-md`}
+                        style={{ backgroundColor: color.value, borderRadius: 8 }}
+                        title={color.value}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-1 px-2">
             <button
               type="button"
@@ -252,7 +257,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
 
       {/* Content */}
       <div className="relative w-full">
-        {/* Placeholder: có min thì style thấp, không thì normal */}
+        {/* Placeholder */}
         {isEmpty && !isFocused && (
           <div
             className={`
@@ -265,35 +270,32 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
             {placeholder}
           </div>
         )}
-        {/* @ts-ignore: Tiptap EditorContent không có type onFocus/onBlur nhưng vẫn nhận DOM event */}
+        {/* @ts-ignore: Tiptap EditorContent doesn't have onFocus/onBlur DOM events but they work */}
         <EditorContent
           editor={editor}
           className={
-            (isMinimal
-              ? 'px-3 py-0 text-base h-full min-h-0 flex items-center'
-              : 'min-h-[100px] p-3 pb-8') +
+            (isMinimal ? 'px-3 py-0 text-base h-full min-h-0' : 'min-h-[100px] p-3 pb-8') +
             ' border border-[#52aaa5]/20 rounded-lg text-[#2D3748] w-full outline-none bg-transparent ' +
             className
           }
           style={{
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
             ...(isMinimal
               ? {
-                  minHeight: '2.5rem', // = h-10 (40px) and matches TextEditor
+                  minHeight: '2.5rem',
                   maxHeight: '2.5rem',
                   height: '2.5rem',
                   overflow: 'hidden',
                   lineHeight: '2.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
                   boxSizing: 'border-box',
                   paddingTop: 0,
                   paddingBottom: 0,
                   marginTop: 0,
                   marginBottom: 0
                 }
-              : {
-                  whiteSpace: 'pre-wrap'
-                }),
+              : {}),
             borderRadius: 8
           }}
           onFocus={() => setIsFocused(true)}
@@ -305,8 +307,8 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
               isMinimal ? 'bottom-1 right-2 text-xs' : 'bottom-2 right-3'
             } flex gap-4 text-sm text-[#52aaa5]/70`}
           >
-            <span className={` ${className}`}>{wordCount} từ</span>
-            <span className={` ${className}`}>{charCount} ký tự</span>
+            <span className={className}>{wordCount} words</span>
+            <span className={className}>{charCount} characters</span>
           </div>
         )}
       </div>
@@ -315,6 +317,9 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
           min-height: 100px;
           outline: none;
           color: #2D3748;
+          white-space: pre-wrap !important;
+          word-break: break-word !important;
+          overflow-wrap: anywhere !important;
         }
         .ProseMirror p {
           margin: 0.5em 0;
