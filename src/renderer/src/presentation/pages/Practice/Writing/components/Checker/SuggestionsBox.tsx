@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { WritingError } from '../../PracticeWritingPage'
+import type { WritingError } from '../../types'
 
 // Helper to get color for error type
 const getErrorColor = (type: string): string => {

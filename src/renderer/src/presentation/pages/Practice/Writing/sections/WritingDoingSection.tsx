@@ -1,5 +1,5 @@
 import React from 'react'
-import { MyExamType, TaskType } from '../PracticeWritingPage'
+import { MyExamType, TaskType } from '../types'
 import WritingQuestionPreview from '../components/Doing/WritingQuestionPreview'
 import WritingAnswerArea from '../components/Doing/WritingAnswerArea'
 import TimerAndSubmit from '../components/Doing/TimerAndSubmit'

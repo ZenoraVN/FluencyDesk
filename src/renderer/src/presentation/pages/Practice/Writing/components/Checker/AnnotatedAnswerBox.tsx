@@ -1,5 +1,5 @@
 import React from 'react'
-import { WritingError } from '../../PracticeWritingPage'
+import type { WritingError } from '../../types'
 
 /**
  * ERR wrapper component to represent an error marker with id and type.

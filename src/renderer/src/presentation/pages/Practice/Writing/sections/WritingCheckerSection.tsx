@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { MyExamType, TaskType, WritingPreviewData, EvaluationResult } from '../PracticeWritingPage'
+import type { MyExamType, TaskType, WritingPreviewData, EvaluationResult } from '../types'
 import { BandScoreBox } from '../components/Checker/BandScoreBox'
 import { ParagraphOptimizationBox } from '../components/Checker/ParagraphOptimizationBox'
 import { VocabularyHighlightsBox } from '../components/Checker/VocabularyHighlightsBox'
