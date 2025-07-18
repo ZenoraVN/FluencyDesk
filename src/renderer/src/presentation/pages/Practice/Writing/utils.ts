@@ -156,6 +156,9 @@ export function parseEvaluationResult(text: string): EvaluationResult {
     const jsonEnd = text.lastIndexOf('}') + 1
     const jsonString = text.substring(jsonStart, jsonEnd)
     const result = JSON.parse(jsonString)
+    console.log('Parsed errors:', result.errors)
+    console.log('Parsed paragraphOptimizations:', result.paragraphOptimizations)
+    console.log('Parsed vocabularyHighlights:', result.vocabularyHighlights)
 
     // Flexible band score parsing
     const bandObj = result.bandScores || result.bandScore || result.band_scores || {}
@@ -180,6 +183,7 @@ export function parseEvaluationResult(text: string): EvaluationResult {
       sampleEssays: result.sampleEssays ?? []
     }
   } catch (e) {
+    console.error('Raw text that caused parsing error:', text)
     console.error('Error parsing evaluation result:', e)
     return {
       score: 0,

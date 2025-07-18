@@ -81,7 +81,9 @@ const PracticeWritingPage: React.FC = () => {
       }
       const data = await response.json()
       const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      console.log('Raw Gemini response:', resultText)
       const parsedResult = parseEvaluationResult(resultText)
+      console.log('Parsed evaluation result:', parsedResult)
 
       // Inject demo suggestions when in TEST mode
       if (TEST_WRITING_CHECKER_SECTION && parsedResult) {

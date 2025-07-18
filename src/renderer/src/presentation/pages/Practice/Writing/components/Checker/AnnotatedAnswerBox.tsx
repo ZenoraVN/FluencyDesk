@@ -37,6 +37,7 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
   activeErrorId,
   onErrorClick
 }) => {
+  console.log('Errors in AnnotatedAnswerBox:', errors)
   const renderAnnotatedText = (): React.ReactNode[] => {
     if (!answer) {
       return [
