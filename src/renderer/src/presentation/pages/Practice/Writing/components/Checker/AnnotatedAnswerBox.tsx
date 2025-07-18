@@ -47,7 +47,13 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
       ]
     }
 
-    const sortedErrors = [...errors].sort((a, b) => a.startPos - b.startPos)
+    if (!Array.isArray(errors)) {
+      console.error('Errors prop is not an array:', errors)
+      return [<span key="error">{answer}</span>]
+    }
+    const sortedErrors = Array.isArray(errors)
+      ? [...errors].sort((a, b) => a.startPos - b.startPos)
+      : []
     const parts: React.ReactNode[] = []
     let lastIndex = 0
 

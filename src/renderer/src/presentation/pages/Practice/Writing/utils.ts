@@ -1,4 +1,5 @@
 import { EvaluationResult, BandScores } from './types'
+import type { WritingError } from './types'
 
 /**
  * Remove instructional lines from a writing prompt.
@@ -126,7 +127,8 @@ ${answer}
          - explanation: explain why it needs improvement or what was corrected
 
 **Output format (JSON):**
-{ ... }  // Only valid JSON, no extra formatting
+      { ... }  // Only valid JSON, no extra formatting
+      **Important:** Output only the JSON object, with no additional text before or after. Ensure the JSON is complete.
 `
 }
 
@@ -154,8 +156,43 @@ export function parseEvaluationResult(text: string): EvaluationResult {
   try {
     const jsonStart = text.indexOf('{')
     const jsonEnd = text.lastIndexOf('}') + 1
-    const jsonString = text.substring(jsonStart, jsonEnd)
+    let jsonString = text.substring(jsonStart, jsonEnd)
+    // Remove trailing commas that break JSON parsing
+    jsonString = jsonString.replace(/,\s*([}\]])/g, '$1')
     const result = JSON.parse(jsonString)
+
+    // Merge spellingErrors and grammarErrors into a single array of WritingError
+    const spellingErrorsRaw: any[] = result.spellingErrors ?? []
+    const grammarErrorsRaw: any[] = result.grammarErrors ?? []
+    const combinedErrors: WritingError[] = []
+    let idCounter = 1
+
+    spellingErrorsRaw.forEach((e) => {
+      combinedErrors.push({
+        id: idCounter++,
+        type: 'spelling',
+        original: e.original,
+        corrected: e.suggestion,
+        explanation: e.explanation ?? '',
+        startPos: 0,
+        endPos: e.original.length
+      })
+    })
+    grammarErrorsRaw.forEach((e) => {
+      combinedErrors.push({
+        id: idCounter++,
+        type: 'grammar',
+        original: e.original,
+        corrected: e.suggestion,
+        explanation: e.explanation ?? '',
+        startPos: 0,
+        endPos: e.original.length
+      })
+    })
+    // Include any other errors array entries
+    if (Array.isArray(result.errors)) {
+      result.errors.forEach((e: WritingError) => combinedErrors.push(e))
+    }
     console.log('Parsed errors:', result.errors)
     console.log('Parsed paragraphOptimizations:', result.paragraphOptimizations)
     console.log('Parsed vocabularyHighlights:', result.vocabularyHighlights)
@@ -176,7 +213,7 @@ export function parseEvaluationResult(text: string): EvaluationResult {
         LR: extract(['LR', 'lr', 'lexicalResource', 'lexical_resource'])
       },
       overallFeedback: result.overallFeedback ?? '',
-      errors: result.errors ?? [],
+      errors: combinedErrors,
       paragraphOptimizations: result.paragraphOptimizations ?? [],
       vocabularyHighlights: result.vocabularyHighlights ?? [],
       sentenceDiversifications: result.sentenceDiversifications ?? [],

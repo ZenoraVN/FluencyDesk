@@ -122,8 +122,12 @@ const PracticeWritingPage: React.FC = () => {
         ]
       }
 
-      setEvaluation(parsedResult)
-      setShowChecker(true)
+      if (parsedResult && Array.isArray(parsedResult.errors)) {
+        setEvaluation(parsedResult)
+        setShowChecker(true)
+      } else {
+        setError('Invalid evaluation format received')
+      }
     } catch (err: any) {
       setError('Evaluation error: ' + (err?.message || 'Unknown error'))
     } finally {

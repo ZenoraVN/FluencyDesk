@@ -53,7 +53,7 @@ export const SuggestionsBox: React.FC<SuggestionsBoxProps> = ({
       </div>
       {isOpen && (
         <div className="space-y-4 mt-2 max-h-[400px] overflow-y-auto">
-          {errors.length > 0 ? (
+          {Array.isArray(errors) && errors.length > 0 ? (
             errors.map((e) => (
               <div
                 id={`suggestion-${e.id}`}
