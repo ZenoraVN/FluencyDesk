@@ -127,6 +127,8 @@ ${answer}
 4. Include an "annotatedText" field with:
    - <ERR id="{id}" type="{type}">error text</ERR> tags around errors
    - For paragraph-level issues: [Placeholder] tags
+- Ensure <ERR> IDs start from 1 and follow the annotatedText sequence, so the first <ERR> tag in the text has id 1.
+- Do not nest &lt;ERR&gt; tags; ensure tags do not overlap—use adjacent tags (&lt;ERR&gt;…&lt;/ERR&gt;&lt;ERR&gt;…&lt;/ERR&gt;) instead of nesting.
 
 5. Error prioritization:
    - Prefer word-level marking when possible
@@ -147,6 +149,10 @@ ${answer}
 - For word-level errors, mark ONLY the affected word(s)
 - For sentence/paragraph errors, ENTIRE unit must be marked
 - Use exact text matching from student's answer
+**Important:**
+  - For overlapping errors, report ONLY the most significant error
+  - Avoid reporting multiple errors on the same text span
+  - Prioritize sentence-level errors over word-level errors when appropriate
 `
 }
 
@@ -170,7 +176,7 @@ function getBandScoreValue(bandObj: any, keys: string[], defaultValue = 0): numb
 /**
  * Parse the JSON result from Gemini evaluation.
  */
-export function parseEvaluationResult(text: string): EvaluationResult {
+export function parseEvaluationResult(text: string, answer: string): EvaluationResult {
   try {
     // Extract JSON from optional ```json``` fences or raw text
     const fenceMatch = text.match(/```json\s*([\s\S]*?)\s*```/i)
@@ -222,6 +228,24 @@ export function parseEvaluationResult(text: string): EvaluationResult {
     console.log('Parsed paragraphOptimizations:', result.paragraphOptimizations)
     console.log('Parsed vocabularyHighlights:', result.vocabularyHighlights)
 
+    // Keep all errors as provided without merging by span/type
+    const processedErrors: WritingError[] = combinedErrors.slice()
+
+    // Compute actual start/end positions based on the original answer string
+    processedErrors.forEach((error) => {
+      const pos = answer.indexOf(error.original)
+      if (pos >= 0) {
+        error.startPos = pos
+        error.endPos = pos + error.original.length
+      }
+    })
+
+    // Debug: log each error's computed position
+    console.log('parseEvaluationResult — total errors:', processedErrors.length)
+    processedErrors.forEach((e) =>
+      console.log(`Error id=${e.id} original="${e.original}" start=${e.startPos} end=${e.endPos}`)
+    )
+
     // Flexible band score parsing
     const bandObj = result.bandScores || result.bandScore || result.band_scores || {}
 
@@ -238,7 +262,7 @@ export function parseEvaluationResult(text: string): EvaluationResult {
         LR: extract(['LR', 'lr', 'lexicalResource', 'lexical_resource'])
       },
       overallFeedback: result.overallFeedback ?? '',
-      errors: combinedErrors,
+      errors: processedErrors,
       paragraphOptimizations: result.paragraphOptimizations ?? [],
       vocabularyHighlights: result.vocabularyHighlights ?? [],
       sentenceDiversifications: result.sentenceDiversifications ?? [],

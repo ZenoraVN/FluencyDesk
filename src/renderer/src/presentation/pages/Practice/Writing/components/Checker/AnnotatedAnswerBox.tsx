@@ -26,9 +26,16 @@ const getErrorColor = (type: string): string => {
 export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
   answer,
   errors,
+  activeErrorId,
   onErrorClick
 }) => {
+  // DEBUG: Log incoming errors and spans
+  console.log(`DEBUG AnnotatedAnswerBox – total errors prop: ${errors.length}`)
+  errors.forEach((e) =>
+    console.log(`  id=${e.id} original="${e.original}" startPos=${e.startPos} endPos=${e.endPos}"`)
+  )
   const renderAnnotatedText = (): React.ReactNode[] => {
+    console.log('AnnotatedAnswerBox props:', { answer, errors })
     if (!answer) {
       return [
         <span key="no-answer" className="text-gray-500 italic">
@@ -37,37 +44,81 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
       ]
     }
 
-    // Dynamically compute error positions in the answer text
-    const displayErrors: WritingError[] = errors
+    // Use start/end positions provided by the evaluation result
+    const displayErrors = errors.filter(
+      (e) => e.startPos != null && e.endPos != null && e.startPos >= 0
+    )
+    console.log('AnnotatedAnswerBox displayErrors:', displayErrors)
+
+    // Group errors by position to prevent overlapping highlights
+    const errorGroups: Map<string, WritingError[]> = new Map()
+    displayErrors.forEach((error) => {
+      const key = `${error.startPos}-${error.endPos}`
+      if (!errorGroups.has(key)) {
+        errorGroups.set(key, [])
+      }
+      errorGroups.get(key)!.push(error)
+      console.log('AnnotatedAnswerBox errorGroups:', errorGroups)
+    })
 
     const parts: React.ReactNode[] = []
     let lastIndex = 0
-    displayErrors.forEach((error) => {
-      const { id, type, original } = error
-      // find the next occurrence of this error text
-      const startPos = answer.indexOf(original, lastIndex)
-      if (startPos === -1) return
-      const endPos = startPos + original.length
-      const fragment = original
+
+    // Convert to array and sort by start position
+    const sortedGroups = Array.from(errorGroups.entries())
+      .map(([key, errors]) => ({
+        startPos: parseInt(key.split('-')[0], 10),
+        endPos: parseInt(key.split('-')[1], 10),
+        errors
+      }))
+      .sort((a, b) => a.startPos - b.startPos)
+    console.log('AnnotatedAnswerBox sortedGroups:', sortedGroups)
+
+    sortedGroups.forEach((group) => {
+      const { startPos, endPos, errors } = group
 
       if (startPos > lastIndex) {
-        parts.push(<span key={`pre-${id}`}>{answer.slice(lastIndex, startPos)}</span>)
+        parts.push(<span key={`pre-${startPos}`}>{answer.slice(lastIndex, startPos)}</span>)
       }
+
+      // Determine the most severe error type for styling
+      const primaryError = errors.reduce((prev, current) =>
+        ['sentence', 'vocabulary', 'grammar', 'spelling'].indexOf(current.type) <
+        ['sentence', 'vocabulary', 'grammar', 'spelling'].indexOf(prev.type)
+          ? current
+          : prev
+      )
+
+      const isActive = errors.some((e) => e.id === activeErrorId)
 
       parts.push(
         <span
-          key={`err-${id}`}
+          key={`err-${startPos}`}
           className="inline-block cursor-pointer border-b-2 border-solid"
           style={{
-            borderColor: getErrorColor(type),
-            borderBottomStyle: 'solid'
+            borderColor: getErrorColor(primaryError.type),
+            borderBottomStyle: 'solid',
+            backgroundColor: isActive ? `${getErrorColor(primaryError.type)}33` : 'transparent',
+            textDecoration: isActive ? 'line-through' : 'none'
           }}
-          onClick={() => onErrorClick(id)}
-          title={`${type} error - Click for details`}
+          onClick={() => onErrorClick(primaryError.id)}
+          title={`${
+            errors.length > 1 ? 'Multiple errors' : primaryError.type
+          } error - Click for details`}
         >
-          {fragment}
+          {answer.slice(startPos, endPos)}
+          {isActive &&
+            errors.map((error) => (
+              <span
+                key={`corr-${error.id}`}
+                className="bg-green-100 text-green-800 px-1 ml-1 rounded"
+              >
+                {error.corrected}
+              </span>
+            ))}
         </span>
       )
+
       lastIndex = endPos
     })
 
