@@ -127,7 +127,6 @@ ${answer}
 4. Include an "annotatedText" field with:
    - <ERR id="{id}" type="{type}">error text</ERR> tags around errors
    - For paragraph-level issues: [Placeholder] tags
-- Ensure <ERR> IDs start from 1 and follow the annotatedText sequence, so the first <ERR> tag in the text has id 1.
 - Do not nest &lt;ERR&gt; tags; ensure tags do not overlap—use adjacent tags (&lt;ERR&gt;…&lt;/ERR&gt;&lt;ERR&gt;…&lt;/ERR&gt;) instead of nesting.
 
 5. Error prioritization:

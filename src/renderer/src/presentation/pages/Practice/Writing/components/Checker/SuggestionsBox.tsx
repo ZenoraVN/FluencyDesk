@@ -2,6 +2,10 @@ import React, { useState } from 'react'
 import type { WritingError } from '../../types'
 import { SpellCheck, AlertCircle, BookOpen, FileText } from 'lucide-react'
 
+// Normalize types like "word-level spelling" to "spelling"
+const normalizeType = (type: string): string =>
+  type.startsWith('word-level ') ? type.replace('word-level ', '') : type
+
 // Helper to get color for error type
 const getErrorColor = (type: string): string => {
   switch (type) {
@@ -57,6 +61,7 @@ export const SuggestionsBox: React.FC<SuggestionsBoxProps> = ({
           {Array.isArray(errors) && errors.length > 0 ? (
             errors.map((e) => {
               const isActive = activeErrorId === e.id
+              const cleanType = normalizeType(e.type)
               return (
                 <div
                   id={`suggestion-${e.id}`}
@@ -72,17 +77,17 @@ export const SuggestionsBox: React.FC<SuggestionsBoxProps> = ({
                     <div className="flex items-start space-x-3">
                       <div
                         className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded bg-opacity-20"
-                        style={{ backgroundColor: `${getErrorColor(e.type)}33` }}
+                        style={{ backgroundColor: `${getErrorColor(cleanType)}33` }}
                       >
                         {{
-                          spelling: <SpellCheck color={getErrorColor(e.type)} />,
-                          grammar: <AlertCircle color={getErrorColor(e.type)} />,
-                          vocabulary: <BookOpen color={getErrorColor(e.type)} />,
-                          sentence: <FileText color={getErrorColor(e.type)} />
-                        }[e.type] || <AlertCircle color={getErrorColor(e.type)} />}
+                          spelling: <SpellCheck color={getErrorColor(cleanType)} />,
+                          grammar: <AlertCircle color={getErrorColor(cleanType)} />,
+                          vocabulary: <BookOpen color={getErrorColor(cleanType)} />,
+                          sentence: <FileText color={getErrorColor(cleanType)} />
+                        }[cleanType] || <AlertCircle color={getErrorColor(cleanType)} />}
                       </div>
                       <div className="flex-1">
-                        <p className="text-gray-500 text-sm capitalize">{e.type} error</p>
+                        <p className="text-gray-500 text-sm capitalize">{cleanType} error</p>
                         <p className="font-medium italic">{e.original}</p>
                         {e.original !== e.corrected && (
                           <p className="mt-1 text-green-800 italic">{e.corrected}</p>
@@ -90,17 +95,20 @@ export const SuggestionsBox: React.FC<SuggestionsBoxProps> = ({
                         {isActive &&
                           errors
                             .filter((err) => err.original === e.original)
-                            .map((err) => (
-                              <div key={`detail-${err.id}`} className="mt-1">
-                                <div className="font-medium text-sm capitalize">
-                                  {err.type} error
+                            .map((err) => {
+                              const detailType = normalizeType(err.type)
+                              return (
+                                <div key={`detail-${err.id}`} className="mt-1">
+                                  <div className="font-medium text-sm capitalize">
+                                    {detailType} error
+                                  </div>
+                                  <div className="mt-1 p-2 bg-blue-100 rounded-md">
+                                    <span className="font-medium">Reason:</span>{' '}
+                                    <span className="text-gray-700">{err.explanation}</span>
+                                  </div>
                                 </div>
-                                <div className="mt-1 p-2 bg-blue-100 rounded-md">
-                                  <span className="font-medium">Reason:</span>{' '}
-                                  <span className="text-gray-700">{err.explanation}</span>
-                                </div>
-                              </div>
-                            ))}
+                              )
+                            })}
                       </div>
                     </div>
                   </div>

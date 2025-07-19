@@ -22,6 +22,9 @@ const getErrorColor = (type: string): string => {
       return '#64748b'
   }
 }
+// Normalize types like "word-level spelling" to "spelling"
+const normalizeType = (type: string): string =>
+  type.startsWith('word-level ') ? type.replace('word-level ', '') : type
 
 export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
   answer,
@@ -91,15 +94,16 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
 
       const isActive = errors.some((e) => e.id === activeErrorId)
 
+      // Normalize error type string for coloring/mapping
+      const cleanType = normalizeType(primaryError.type)
+
       parts.push(
         <span
           key={`err-${startPos}`}
           className="inline-block cursor-pointer border-b-2 border-solid"
           style={{
-            borderColor: getErrorColor(primaryError.type),
-            borderBottomStyle: 'solid',
-            backgroundColor: isActive ? `${getErrorColor(primaryError.type)}33` : 'transparent',
-            textDecoration: isActive ? 'line-through' : 'none'
+            borderColor: getErrorColor(cleanType),
+            backgroundColor: isActive ? `${getErrorColor(cleanType)}33` : 'transparent'
           }}
           onClick={() => onErrorClick(primaryError.id)}
           title={`${
