@@ -1,17 +1,12 @@
 import React, { useState } from 'react'
-import WritingCreationSection from './sections/WritingCreationSection'
+// import WritingCreationSection from './sections/WritingCreationSection'
 import WritingDoingSection from './sections/WritingDoingSection'
 import { WritingCheckerSection } from './sections/WritingCheckerSection'
 import { GeminiService } from '../../../../service/GeminiService'
 import { getWordCount, parseMinWords } from '../../../../utils/wordCount'
 import type { MyExamType, TaskType, WritingPreviewData, EvaluationResult } from './types'
 import { TEST_WRITING_CHECKER_SECTION, fakeExam, fakeTask, fakePreview, fakeAnswer } from './mocks'
-import {
-  stripWritingPromptInstructions,
-  countParagraphs,
-  buildEvaluationPrompt,
-  parseEvaluationResult
-} from './utils'
+import { countParagraphs, buildEvaluationPrompt, parseEvaluationResult } from './utils'
 
 const PracticeWritingPage: React.FC = () => {
   // Configuration from mocks

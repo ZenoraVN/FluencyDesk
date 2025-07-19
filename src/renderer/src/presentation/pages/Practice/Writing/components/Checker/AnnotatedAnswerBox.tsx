@@ -1,14 +1,6 @@
 import React from 'react'
 import type { WritingError } from '../../types'
 
-/**
- * ERR wrapper component to represent an error marker with id and type.
- * This component simply renders its children and allows JSX intrinsic typing.
- */
-const ERR: React.FC<{ id: number; type: string; children: React.ReactNode }> = ({ children }) => (
-  <>{children}</>
-)
-
 interface AnnotatedAnswerBoxProps {
   answer: string
   errors: WritingError[]
@@ -34,10 +26,8 @@ const getErrorColor = (type: string): string => {
 export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
   answer,
   errors,
-  activeErrorId,
   onErrorClick
 }) => {
-  console.log('Errors in AnnotatedAnswerBox:', errors)
   const renderAnnotatedText = (): React.ReactNode[] => {
     if (!answer) {
       return [
@@ -47,52 +37,42 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
       ]
     }
 
-    if (!Array.isArray(errors)) {
-      console.error('Errors prop is not an array:', errors)
-      return [<span key="error">{answer}</span>]
-    }
-    const sortedErrors = Array.isArray(errors)
-      ? [...errors].sort((a, b) => a.startPos - b.startPos)
-      : []
+    // Dynamically compute error positions in the answer text
+    const displayErrors: WritingError[] = errors
+
     const parts: React.ReactNode[] = []
     let lastIndex = 0
+    displayErrors.forEach((error) => {
+      const { id, type, original } = error
+      // find the next occurrence of this error text
+      const startPos = answer.indexOf(original, lastIndex)
+      if (startPos === -1) return
+      const endPos = startPos + original.length
+      const fragment = original
 
-    sortedErrors.forEach((error) => {
-      if (error.startPos > lastIndex) {
-        parts.push(
-          <span key={`pre-${error.id}`}>{answer.substring(lastIndex, error.startPos)}</span>
-        )
+      if (startPos > lastIndex) {
+        parts.push(<span key={`pre-${id}`}>{answer.slice(lastIndex, startPos)}</span>)
       }
 
       parts.push(
-        <ERR id={error.id} type={error.type} key={`err-${error.id}`}>
-          <span
-            className={`inline-block relative cursor-pointer border-b-2 hover:border-b-4 ${
-              activeErrorId === error.id ? 'ring-2 ring-offset-1' : ''
-            }`}
-            style={{
-              borderColor: getErrorColor(error.type),
-              borderBottomStyle: 'dashed'
-            }}
-            onClick={() => onErrorClick(error.id)}
-            title={`${error.type} error - Click for details`}
-          >
-            {answer.substring(error.startPos, error.endPos)}
-            <span
-              className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-xs flex items-center justify-center text-white"
-              style={{ backgroundColor: getErrorColor(error.type) }}
-            >
-              {error.type.charAt(0).toUpperCase()}
-            </span>
-          </span>
-        </ERR>
+        <span
+          key={`err-${id}`}
+          className="inline-block cursor-pointer border-b-2 border-solid"
+          style={{
+            borderColor: getErrorColor(type),
+            borderBottomStyle: 'solid'
+          }}
+          onClick={() => onErrorClick(id)}
+          title={`${type} error - Click for details`}
+        >
+          {fragment}
+        </span>
       )
-
-      lastIndex = error.endPos
+      lastIndex = endPos
     })
 
     if (lastIndex < answer.length) {
-      parts.push(<span key="last-part">{answer.substring(lastIndex)}</span>)
+      parts.push(<span key="last-part">{answer.slice(lastIndex)}</span>)
     }
 
     return parts

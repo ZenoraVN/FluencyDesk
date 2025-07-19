@@ -1,10 +1,6 @@
 import React, { useState, useRef } from 'react'
 import type { MyExamType, TaskType, WritingPreviewData, EvaluationResult } from '../types'
 import { BandScoreBox } from '../components/Checker/BandScoreBox'
-import { ParagraphOptimizationBox } from '../components/Checker/ParagraphOptimizationBox'
-import { VocabularyHighlightsBox } from '../components/Checker/VocabularyHighlightsBox'
-import { SentenceDiversificationBox } from '../components/Checker/SentenceDiversificationBox'
-import { SampleEssaysBox } from '../components/Checker/SampleEssaysBox'
 import { SuggestionsBox } from '../components/Checker/SuggestionsBox'
 import { AnnotatedAnswerBox } from '../components/Checker/AnnotatedAnswerBox'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../../../components/ui/tabs'
@@ -24,8 +20,7 @@ const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
   task,
   preview,
   answer,
-  evaluation,
-  onRetry
+  evaluation
 }) => {
   const tabsListRef = useRef<HTMLDivElement>(null)
   const [activeError, setActiveError] = useState<number | null>(null)
@@ -78,10 +73,6 @@ const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
             >
               <TabsList className="flex space-x-2 whitespace-nowrap min-w-max">
                 <TabsTrigger value="bandScore">Band Score</TabsTrigger>
-                <TabsTrigger value="paragraphOptimization">Paragraph Optimization</TabsTrigger>
-                <TabsTrigger value="vocabularyHighlights">Vocabulary Highlights</TabsTrigger>
-                <TabsTrigger value="sentenceDiversification">Sentence Diversification</TabsTrigger>
-                <TabsTrigger value="sampleEssays">Sample Essays</TabsTrigger>
                 <TabsTrigger value="suggestion">Suggestion</TabsTrigger>
               </TabsList>
             </div>
@@ -95,18 +86,6 @@ const WritingCheckerSection: React.FC<WritingCheckerSectionProps> = ({
           </div>
           <TabsContent value="bandScore">
             <BandScoreBox bandScores={evaluation.bandScores} />
-          </TabsContent>
-          <TabsContent value="paragraphOptimization">
-            <ParagraphOptimizationBox optimizations={evaluation.paragraphOptimizations} />
-          </TabsContent>
-          <TabsContent value="vocabularyHighlights">
-            <VocabularyHighlightsBox vocabulary={evaluation.vocabularyHighlights} />
-          </TabsContent>
-          <TabsContent value="sentenceDiversification">
-            <SentenceDiversificationBox diversifications={evaluation.sentenceDiversifications} />
-          </TabsContent>
-          <TabsContent value="sampleEssays">
-            <SampleEssaysBox samples={evaluation.sampleEssays} />
           </TabsContent>
           <TabsContent value="suggestion">
             <SuggestionsBox

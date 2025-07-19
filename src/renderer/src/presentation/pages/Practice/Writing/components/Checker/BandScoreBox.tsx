@@ -1,5 +1,5 @@
 import React from 'react'
-import { BandScores } from '../../PracticeWritingPage'
+import { BandScores } from '../../types'
 
 interface BandScoreBoxProps {
   bandScores: BandScores

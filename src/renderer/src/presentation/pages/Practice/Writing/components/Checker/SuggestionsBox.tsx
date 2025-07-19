@@ -54,43 +54,49 @@ export const SuggestionsBox: React.FC<SuggestionsBoxProps> = ({
       {isOpen && (
         <div className="space-y-4 mt-2 max-h-[400px] overflow-y-auto">
           {Array.isArray(errors) && errors.length > 0 ? (
-            errors.map((e) => (
-              <div
-                id={`suggestion-${e.id}`}
-                key={e.id}
-                className={`border-t pt-2 cursor-pointer transition-all ${
-                  activeErrorId === e.id
-                    ? 'bg-blue-50 border-l-4 border-blue-500 pl-3'
-                    : 'hover:bg-gray-50'
-                }`}
-                onClick={() => onSuggestionClick(e.id)}
-              >
-                <div className="flex items-start">
-                  <span
-                    className="w-6 h-6 rounded-full text-xs flex items-center justify-center text-white mr-2 mt-1"
-                    style={{ backgroundColor: getErrorColor(e.type) }}
-                  >
-                    {e.type.charAt(0).toUpperCase()}
-                  </span>
-                  <div>
-                    <div>
-                      <span className="font-medium">Original:</span>{' '}
-                      <span className="italic">{e.original}</span>
-                    </div>
-                    {e.original !== e.corrected && (
+            errors.map((e) => {
+              const isActive = activeErrorId === e.id
+              return (
+                <div
+                  id={`suggestion-${e.id}`}
+                  key={e.id}
+                  className={`border-t pt-2 cursor-pointer transition-all ${
+                    activeErrorId === e.id
+                      ? 'bg-blue-50 border-l-4 border-blue-500 pl-3'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  onClick={() => onSuggestionClick(e.id)}
+                >
+                  <div className="flex items-start">
+                    <span
+                      className="w-6 h-6 rounded-full text-xs flex items-center justify-center text-white mr-2 mt-1"
+                      style={{ backgroundColor: getErrorColor(e.type) }}
+                    >
+                      {e.type.charAt(0).toUpperCase()}
+                    </span>
+                    <div className="w-full">
                       <div>
-                        <span className="font-medium text-green-800">Suggestion:</span>{' '}
-                        <span className="italic">{e.corrected}</span>
+                        <span className="font-medium">Original:</span>{' '}
+                        <span className="italic">{e.original}</span>
                       </div>
-                    )}
-                    <div>
-                      <span className="font-medium">Explanation:</span>{' '}
-                      <span className="text-gray-600">{e.explanation}</span>
+                      {e.original !== e.corrected && (
+                        <div>
+                          <span className="font-medium text-green-800">Suggestion:</span>{' '}
+                          <span className="italic">{e.corrected}</span>
+                        </div>
+                      )}
+                      {/* Detailed explanation when active */}
+                      {isActive && (
+                        <div className="mt-2 p-2 bg-blue-100 rounded-md">
+                          <span className="font-medium">Reason:</span>{' '}
+                          <span className="text-gray-700">{e.explanation}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
+              )
+            })
           ) : (
             <div className="text-gray-500">No suggestions available.</div>
           )}

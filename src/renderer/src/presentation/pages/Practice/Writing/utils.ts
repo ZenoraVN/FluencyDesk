@@ -1,4 +1,4 @@
-import { EvaluationResult, BandScores } from './types'
+import { EvaluationResult } from './types'
 import type { WritingError } from './types'
 
 /**
@@ -83,7 +83,7 @@ export function countParagraphs(text: string): number {
  */
 export function buildEvaluationPrompt(question: string, answer: string): string {
   return `
-You are an expert English writing examiner. Please evaluate the following essay according to the main criteria of IELTS, TOEFL, and VSTEP academic English writing tasks and return the result as a JSON object.
+You are an expert English writing examiner. Please evaluate the following essay and return the result as a JSON object.
 
 **Prompt:**
 ${question}
@@ -93,42 +93,60 @@ ${answer}
 
 **Evaluation Instructions:**
 1. Assign an overall band score (0-9), AND 4 separate band scores (0-9, using .0 or .5 steps) for:
-   - Task Response (TR): (how well the answer meets requirements)
-   - Coherence & Cohesion (CC): (organization and flow)
-   - Lexical Resource (LR): (vocabulary range and accuracy)
-   - Grammatical Range & Accuracy (GRA): (grammar and structures)
-2. Return these scores as a JSON object under the key "bandScores" with keys: overall, TR, CC, GRA, LR (all must be numbers).
-3. Give an overall comment.
-4. Provide detailed feedback for each criterion:
-   - Task Achievement (How well the answer meets requirements)
-   - Coherence & Cohesion (Organization and flow)
-   - Lexical Resource (Vocabulary range and accuracy)
-   - Grammatical Range & Accuracy (Grammar and structures)
-5. List any spelling errors (with corrections/suggestions)
-6. List any grammar errors (with explanation and correction)
-7. Provide vocabulary suggestions for improvement (synonyms, more academic/formal words)
-8. Statistics:
-   - Word count
-   - Sentence count
-   - Lexical diversity (unique words/total words)
-   - Grammar complexity (simple, intermediate, advanced)
-9. Suggest 3-5 specific tips for overall improvement
+   - Task Response (TR)
+   - Coherence & Cohesion (CC)
+   - Lexical Resource (LR)
+   - Grammatical Range & Accuracy (GRA)
+   Return these scores under "bandScores" with keys: overall, TR, CC, GRA, LR (all numbers).
 
-10. **PARAGRAPH OPTIMIZATION (Important for this evaluation!):**
-   - For each paragraph, return an object with:
-     - paragraphIndex (number, e.g. 1 for first paragraph)
-     - paragraphType: string, either "introduction", "body", or "conclusion" (identify what kind of paragraph this is)
-     - original: the original paragraph text
-     - optimized: rewrite the paragraph in improved/optimized English (focus on fluency, structure, and conciseness)
-     - explanation: (brief, high-level summary of improvements in this paragraph)
-     - errors: a list/array, where for each relevant sentence in the paragraph with issues, include:
-         - original: the original sentence (as in the user's writing)
-         - suggestion: an improved version of the sentence (if needed)
-         - explanation: explain why it needs improvement or what was corrected
+2. Analyze errors at different levels:
+   A. WORD-LEVEL ERRORS (mark minimal spans):
+      - Spelling: Incorrectly spelled words
+      - Vocabulary: Wrong word choice, incorrect collocations
+      - Punctuation: Missing/extra commas, periods, etc.
+      - Grammar: Verb tense, subject-verb agreement, articles, etc.
+   
+   B. SENTENCE-LEVEL ERRORS (mark entire sentences only when):
+      - Multiple word errors in one sentence
+      - Structural issues requiring complete rewrite
+      - Missing/extra sentences in paragraphs
+
+   C. PARAGRAPH-LEVEL ISSUES (mark entire paragraphs only when):
+      - Multiple problematic sentences
+      - Missing paragraphs
+      - Completely off-topic paragraphs
+
+3. For each error, create an object with:
+   - "id": Unique integer
+   - "type": Error category
+   - "original": Original text span
+   - "corrected": Suggested correction
+   - "explanation": Brief reason
+   - "level": 'word', 'sentence', or 'paragraph'
+
+4. Include an "annotatedText" field with:
+   - <ERR id="{id}" type="{type}">error text</ERR> tags around errors
+   - For paragraph-level issues: [Placeholder] tags
+
+5. Error prioritization:
+   - Prefer word-level marking when possible
+   - Only mark sentence/paragraph when absolutely necessary
+   - For overlapping errors, mark the largest meaningful unit
 
 **Output format (JSON):**
-      { ... }  // Only valid JSON, no extra formatting
-      **Important:** Output only the JSON object, with no additional text before or after. Ensure the JSON is complete.
+{
+  "bandScores": { ... },
+  "errors": [ ... ],
+  "annotatedText": "...",
+  "overallFeedback": "...",
+  ... // other fields
+}
+
+**Important:**
+- Output ONLY valid JSON, no additional text
+- For word-level errors, mark ONLY the affected word(s)
+- For sentence/paragraph errors, ENTIRE unit must be marked
+- Use exact text matching from student's answer
 `
 }
 
@@ -154,11 +172,14 @@ function getBandScoreValue(bandObj: any, keys: string[], defaultValue = 0): numb
  */
 export function parseEvaluationResult(text: string): EvaluationResult {
   try {
-    const jsonStart = text.indexOf('{')
-    const jsonEnd = text.lastIndexOf('}') + 1
-    let jsonString = text.substring(jsonStart, jsonEnd)
-    // Remove trailing commas that break JSON parsing
-    jsonString = jsonString.replace(/,\s*([}\]])/g, '$1')
+    // Extract JSON from optional ```json``` fences or raw text
+    const fenceMatch = text.match(/```json\s*([\s\S]*?)\s*```/i)
+    let jsonString = fenceMatch ? fenceMatch[1] : text
+    // Strip backticks and control characters, then fix trailing commas
+    jsonString = jsonString
+      .replace(/`/g, '')
+      .replace(/[\u0000-\u001F]+/g, ' ')
+      .replace(/,\s*([}\]])/g, '$1')
     const result = JSON.parse(jsonString)
 
     // Merge spellingErrors and grammarErrors into a single array of WritingError
@@ -168,25 +189,29 @@ export function parseEvaluationResult(text: string): EvaluationResult {
     let idCounter = 1
 
     spellingErrorsRaw.forEach((e) => {
+      const originalText = e.original ?? e.error ?? ''
+      const correctedText = e.suggestion ?? e.correction ?? ''
       combinedErrors.push({
         id: idCounter++,
         type: 'spelling',
-        original: e.original,
-        corrected: e.suggestion,
-        explanation: e.explanation ?? '',
+        original: originalText,
+        corrected: correctedText,
+        explanation: e.explanation || 'Spelling error',
         startPos: 0,
-        endPos: e.original.length
+        endPos: originalText.length
       })
     })
     grammarErrorsRaw.forEach((e) => {
+      const originalText = e.original ?? e.error ?? ''
+      const correctedText = e.suggestion ?? e.correction ?? ''
       combinedErrors.push({
         id: idCounter++,
         type: 'grammar',
-        original: e.original,
-        corrected: e.suggestion,
-        explanation: e.explanation ?? '',
+        original: originalText,
+        corrected: correctedText,
+        explanation: e.explanation || 'Grammar error',
         startPos: 0,
-        endPos: e.original.length
+        endPos: originalText.length
       })
     })
     // Include any other errors array entries
@@ -217,7 +242,9 @@ export function parseEvaluationResult(text: string): EvaluationResult {
       paragraphOptimizations: result.paragraphOptimizations ?? [],
       vocabularyHighlights: result.vocabularyHighlights ?? [],
       sentenceDiversifications: result.sentenceDiversifications ?? [],
-      sampleEssays: result.sampleEssays ?? []
+      sampleEssays: result.sampleEssays ?? [],
+      // Include annotatedText if provided by the evaluation result
+      annotatedText: typeof result.annotatedText === 'string' ? result.annotatedText : undefined
     }
   } catch (e) {
     console.error('Raw text that caused parsing error:', text)
