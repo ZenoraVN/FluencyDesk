@@ -188,61 +188,44 @@ export function parseEvaluationResult(text: string, answer: string): EvaluationR
       .replace(/,\s*([}\]])/g, '$1')
     const result = JSON.parse(jsonString)
 
-    // Merge spellingErrors and grammarErrors into a single array of WritingError
-    const spellingErrorsRaw: any[] = result.spellingErrors ?? []
-    const grammarErrorsRaw: any[] = result.grammarErrors ?? []
-    const combinedErrors: WritingError[] = []
-    let idCounter = 1
-
-    spellingErrorsRaw.forEach((e) => {
-      const originalText = e.original ?? e.error ?? ''
-      const correctedText = e.suggestion ?? e.correction ?? ''
-      combinedErrors.push({
-        id: idCounter++,
-        type: 'spelling',
-        original: originalText,
-        corrected: correctedText,
-        explanation: e.explanation || 'Spelling error',
-        startPos: 0,
-        endPos: originalText.length
-      })
-    })
-    grammarErrorsRaw.forEach((e) => {
-      const originalText = e.original ?? e.error ?? ''
-      const correctedText = e.suggestion ?? e.correction ?? ''
-      combinedErrors.push({
-        id: idCounter++,
-        type: 'grammar',
-        original: originalText,
-        corrected: correctedText,
-        explanation: e.explanation || 'Grammar error',
-        startPos: 0,
-        endPos: originalText.length
-      })
-    })
-    // Include any other errors array entries
-    if (Array.isArray(result.errors)) {
-      result.errors.forEach((e: WritingError) => combinedErrors.push(e))
-    }
-    console.log('Parsed errors:', result.errors)
-    console.log('Parsed paragraphOptimizations:', result.paragraphOptimizations)
-    console.log('Parsed vocabularyHighlights:', result.vocabularyHighlights)
-
-    // Keep all errors as provided without merging by span/type
-    const processedErrors: WritingError[] = combinedErrors.slice()
-
-    // Compute actual start/end positions based on the original answer string
-    processedErrors.forEach((error) => {
-      const pos = answer.indexOf(error.original)
-      if (pos >= 0) {
-        error.startPos = pos
-        error.endPos = pos + error.original.length
+    // Build errors from annotatedText if available, else fallback to raw result.errors
+    const rawErrors: WritingError[] = Array.isArray(result.errors)
+      ? (result.errors as WritingError[])
+      : []
+    let errors: WritingError[] = []
+    if (typeof result.annotatedText === 'string') {
+      const annErrors: WritingError[] = []
+      const tagRe = /<ERR id="(\d+)" type="(\w+)">([\s\S]*?)<\/ERR>/g
+      let match: RegExpExecArray | null
+      while ((match = tagRe.exec(result.annotatedText))) {
+        const id = Number(match[1])
+        const type = match[2] as WritingError['type']
+        const original = match[3]
+        const detail = rawErrors.find((e) => e.id === id)
+        const pos = answer.indexOf(original)
+        annErrors.push({
+          id,
+          type,
+          original,
+          corrected: detail?.corrected ?? '',
+          explanation: detail?.explanation ?? '',
+          startPos: pos >= 0 ? pos : 0,
+          endPos: pos >= 0 ? pos + original.length : original.length
+        })
       }
-    })
-
-    // Debug: log each error's computed position
-    console.log('parseEvaluationResult — total errors:', processedErrors.length)
-    processedErrors.forEach((e) =>
+      errors = annErrors
+    } else {
+      errors = rawErrors.map((e) => {
+        const pos = answer.indexOf(e.original)
+        return {
+          ...e,
+          startPos: pos >= 0 ? pos : 0,
+          endPos: pos >= 0 ? pos + e.original.length : e.original.length
+        }
+      })
+    }
+    console.log('parseEvaluationResult — total errors:', errors.length)
+    errors.forEach((e) =>
       console.log(`Error id=${e.id} original="${e.original}" start=${e.startPos} end=${e.endPos}`)
     )
 
@@ -262,7 +245,7 @@ export function parseEvaluationResult(text: string, answer: string): EvaluationR
         LR: extract(['LR', 'lr', 'lexicalResource', 'lexical_resource'])
       },
       overallFeedback: result.overallFeedback ?? '',
-      errors: processedErrors,
+      errors: errors,
       paragraphOptimizations: result.paragraphOptimizations ?? [],
       vocabularyHighlights: result.vocabularyHighlights ?? [],
       sentenceDiversifications: result.sentenceDiversifications ?? [],
