@@ -21,6 +21,7 @@ import {
 import { ListeningDetailForm } from './forms/ListeningDetailForm'
 import { ReadingDetailForm } from './forms/ReadingDetailForm'
 import { FillInBlankForm } from './forms/FillInBlankForm'
+import { ChoiceOneForm } from './forms/ChoiceOneForm'
 
 interface QuestionCreateCardProps {
   question: QuestionDefinition
@@ -141,6 +142,14 @@ export const QuestionCreateCard: React.FC<QuestionCreateCardProps> = ({
       key: 'quiztype',
       label: 'Quiz Điền từ',
       content: <FillInBlankForm />
+    })
+  }
+
+  if (question.type === 'choice_one') {
+    tabs.push({
+      key: 'choice_one_form',
+      label: 'Quiz Lựa chọn đơn',
+      content: <ChoiceOneForm />
     })
   }
   const [selectedTab, setSelectedTab] = useState(tabs[0].key)

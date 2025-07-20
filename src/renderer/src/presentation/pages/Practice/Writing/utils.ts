@@ -2,63 +2,6 @@ import { EvaluationResult } from './types'
 import type { WritingError } from './types'
 
 /**
- * Remove instructional lines from a writing prompt.
- */
-export function stripWritingPromptInstructions(input: string): string {
-  const lines = input
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-  const instructionPatterns = [
-    /^(\*\*[^*]+\*\*)$/,
-    /you should spend about/i,
-    /write at least/i,
-    /write about the following topic/i,
-    /write about the following chart/i,
-    /give reasons for your answer/i,
-    /include any relevant examples/i,
-    /discuss both sides/i,
-    /discuss both views/i,
-    /give your own opinion/i,
-    /write no more than/i,
-    /write your answer in/i,
-    /your answer should be/i,
-    /please write your response/i,
-    /use specific reasons and examples/i,
-    /make sure to/i,
-    /be sure to/i,
-    /this is a/i,
-    /remember to/i,
-    /you are required to/i,
-    /your essay should/i,
-    /support your arguments/i,
-    /provide examples/i,
-    /at least \d+ words/i,
-    /between \d+ and \d+ words/i,
-    /around \d+ words/i,
-    /approximately \d+ words/i,
-    /you have \d+ minutes/i,
-    /spend no more than \d+ minutes/i,
-    /spend about \d+ minutes/i,
-    /^task \d+:$/i,
-    /^ielts writing task \d+$/i,
-    /^toefl (integrated|independent) writing$/i,
-    /^cefr writing$/i,
-    /^toeic writing$/i,
-    /^#\s+/,
-    /You should write at least \d+ words/i,
-    /You do not need to include your name or addresses/i,
-    /Your response will be evaluated in terms of/i,
-    /Task fulfillment, Organization, Vocabulary, and Grammar/i
-  ]
-  const filtered = lines.filter(
-    (line) => !instructionPatterns.some((pattern) => pattern.test(line))
-  )
-  const cleaned = filtered.map((line) => line.replace(/^\*\*|\*\*$/g, '').trim())
-  return cleaned.join('\n').trim()
-}
-
-/**
  * Count paragraphs by blocks separated by empty lines.
  */
 export function countParagraphs(text: string): number {
@@ -133,94 +76,171 @@ BEGIN EVALUATION NOW:
  */
 export function buildIeltsTask2EvaluationPrompt(question: string, answer: string): string {
   return `
-CRITICAL INSTRUCTIONS FOR ENGLISH WRITING EVALUATION
+IELTS TASK 2 WRITING EVALUATION - COMPREHENSIVE ERROR DETECTION SYSTEM
 
-You are an expert IELTS/TOEFL writing examiner with 10+ years experience. Evaluate the essay STRICTLY following these rules:
+You are an expert IELTS examiner with 15+ years of experience evaluating Vietnamese learners' essays. Follow this detailed protocol:
 
-### 1. SCORING (0-9 scale, .5 increments)
-- Overall Band: Holistic assessment
-- Task Response (TR): Addresses prompt fully? Ideas developed?
-- Coherence & Cohesion (CC): Logical flow? Linking words?
-- Lexical Resource (LR): Word choice? Collocations? Range?
-- Grammatical Range (GRA): Sentence structures? Accuracy?
+## SECTION 1: SYSTEMATIC ERROR CATEGORIES WITH EXAMPLES
 
-Output as NUMBERS:
+### A. SPELLING ERRORS (Type: "spelling")
+**Common patterns from Vietnamese learners:**
+- Double letters: "yearss" → "years", "programms" → "programs"
+- Letter confusion: "mandetory" → "mandatory", "recieve" → "receive" 
+- Omissions: "comunication" → "communication", "problmes" → "problems"
+- Compound words: "highschool" → "high school", "lifeskills" → "life skills"
+- Capitalization: "i" → "I"
+
+### B. GRAMMAR ERRORS (Type: "grammar")
+**High-priority patterns:**
+1. **Subject-verb agreement**: 
+   - "service equip students" → "service equips students"
+   - "Participating in volunteer work foster" → "fosters"
+2. **Article errors**:
+   - "should be mandetory part" → "should be a mandatory part"
+   - "helping eldery" → "helping the elderly"
+3. **Missing prepositions/conjunctions**:
+   - "agree integrate" → "agree with integrating" / "agree that integrating"
+   - "argued that forcing" → "argue that forcing"
+4. **Infinitive structures**:
+   - "encourages them take" → "encourages them to take"
+   - "could volunteers" → "could volunteer"
+5. **Pronoun case**:
+   - "prepare they better" → "prepare them better"
+6. **Possessive markers**:
+   - "students interest" → "students' interests"
+7. **Comma usage**:
+   - "However with proper planning" → "However, with proper planning"
+8. **Relative clauses**:
+   - "programs match students interest" → "programs that match students' interests"
+
+### C. VOCABULARY ERRORS (Type: "vocabulary") 
+**Word form and choice issues:**
+- Word form: "academical" → "academic", "voluntar" → "volunteer"
+- Plural forms: "benefit" → "benefits", "peoples" → "people"
+- Compound adjectives: "well rounded" → "well-rounded"
+- Collocation: "big rain" → "heavy rain", "real world problmes" → "real-world issues"
+
+### D. PUNCTUATION ERRORS (Type: "punctuation")
+- Missing commas after conjunctive adverbs: "However with" → "However, with"
+- Missing commas in compound sentences
+- Incorrect apostrophe usage
+
+## SECTION 2: SAMPLE EVALUATION DEMONSTRATION
+
+**Sample Text:** "In recent yearss there is growing debates about whether unpaid community servise should be mandetory part of education."
+
+**Sample Analysis:**
+\\\`\\\`\\\`json
+{
+  "errors": [
+    {
+      "id": 1,
+      "type": "spelling",
+      "original": "yearss",
+      "corrected": "years",
+      "explanation": "extra 's' - double letter error",
+      "level": "word"
+    },
+    {
+      "id": 2,
+      "type": "grammar", 
+      "original": "there is growing debates",
+      "corrected": "there are growing debates",
+      "explanation": "subject-verb disagreement - 'debates' is plural",
+      "level": "word"
+    },
+    {
+      "id": 3,
+      "type": "spelling",
+      "original": "servise",
+      "corrected": "service",
+      "explanation": "incorrect spelling - 'c' not 's'",
+      "level": "word"
+    },
+    {
+      "id": 4,
+      "type": "grammar",
+      "original": "should be mandetory part",
+      "corrected": "should be a mandatory part",
+      "explanation": "missing indefinite article 'a'",
+      "level": "word"
+    }
+  ],
+  "annotatedText": "In recent <ERR id=\\"1\\" type=\\"spelling\\">yearss</ERR> <ERR id=\\"2\\" type=\\"grammar\\">there is growing debates</ERR> about whether unpaid community <ERR id=\\"3\\" type=\\"spelling\\">servise</ERR> <ERR id=\\"4\\" type=\\"grammar\\">should be mandetory part</ERR> of education."
+}
+\\\`\\\`\\\`
+
+## SECTION 3: DETAILED ANNOTATION RULES
+
+### ERROR IDENTIFICATION PROTOCOL:
+1. **Confidence threshold**: Mark errors only with 98%+ certainty
+2. **Minimal span principle**: Mark ONLY the smallest text containing the error
+3. **Original text preservation**: Use EXACT case-sensitive text from student essay
+4. **Error type assignment**: Choose ONE most appropriate type per error
+5. **Correction principle**: Fix ONLY the specific error, don't rephrase
+
+### ANNOTATED TEXT FORMATTING:
+- **Correct format**: <ERR id="1" type="spelling">mispeled</ERR>
+- **Rules**:
+  - Use sequential numbering (1, 2, 3...)
+  - NO nested tags
+  - NO overlapping spans
+  - Preserve ALL original spacing, line breaks, punctuation
+  - Use double quotes for attributes
+
+### ERROR EXPLANATION GUIDELINES:
+- **Spelling**: "extra letter", "missing 'c'", "wrong vowel"
+- **Grammar**: "subject-verb disagreement", "missing article", "wrong preposition"
+- **Vocabulary**: "wrong word form", "incorrect collocation", "word choice"
+- **Punctuation**: "missing comma", "incorrect apostrophe"
+
+## SECTION 4: SYSTEMATIC ERROR PATTERNS TO PRIORITIZE
+...
+
+## SECTION 5: BAND SCORE CORRELATION
+...
+
+## SECTION 6: OUTPUT FORMAT REQUIREMENTS
+
+**MANDATORY JSON STRUCTURE:**
+\\\`\\\`\\\`json
 {
   "bandScores": {
     "overall": 6.5,
     "TR": 7.0,
-    "CC": 6.0,
+    "CC": 6.0, 
     "LR": 6.5,
     "GRA": 5.5
-  }
+  },
+  "errors": [
+    {
+      "id": 1,
+      "type": "spelling|grammar|vocabulary|punctuation",
+      "original": "exact text from essay",
+      "corrected": "minimal correction",
+      "explanation": "brief reason (3-8 words)",
+      "level": "word"
+    }
+  ],
+  "annotatedText": "Full essay with <ERR> tags",
+  "overallFeedback": "2-3 specific improvement suggestions",
+  "vocabularyHighlights": ["3-5 well-used advanced words"],
+  "sentenceDiversifications": ["1-2 specific sentence improvement suggestions"]
 }
+\\\`\\\`\\\`
 
-### 2. ERROR MARKING PROTOCOL (STRICT HIERARCHY)
-A. WORD-LEVEL (MINIMAL SPAN):
-   ✓ Mark ONLY when >95% confidence
-   ✓ Types:
-     • Spelling: Undeniably wrong (e.g., "recieve" → "receive")
-     • Grammar: Clear S-V agreement, tense, article errors
-     • Vocabulary: Wrong word in context (e.g., "big rain" → "heavy rain")
-     • Punctuation: Missing/extra essential punctuation
+## SECTION 7: QUALITY ASSURANCE CHECKLIST
+...
 
-B. SENTENCE-LEVEL (ENTIRE SENTENCE ONLY IF):
-   ✓ Multiple word errors requiring full rewrite
-   ✓ Structurally incomprehensible
-   ✓ Contains 3+ word-level errors
+---
 
-C. PARAGRAPH-LEVEL (ENTIRE PARAGRAPH ONLY IF):
-   ✓ Completely off-topic
-   ✓ Missing core argument
-   ✓ Contains 3+ sentence-level issues
-
-### 3. ERROR ANNOTATION RULES
-- ID: Unique integer (start from 1)
-- Type: EXACTLY one of: spelling/grammar/vocabulary/sentence/paragraph
-- Original: EXACT text from answer (case-sensitive)
-- Corrected: MINIMAL correction to fix ONLY the error
-- Explanation: 3-5 word reason (e.g., "wrong preposition", "spelling error")
-- Level: word/sentence/paragraph
-
-### 4. ANNOTATED TEXT REQUIREMENTS
-<ERR id="1" type="spelling">mispeled</ERR> word
-- NO nested tags
-- NO overlapping spans
-- For paragraph errors: [PARAGRAPH ISSUE: reason]
-- Preserve ALL original formatting
-
-### 5. ZERO TOLERANCE RULES
-❌ NEVER mark:
-   - Acceptable variants (e.g., "color" vs "colour")
-   - Stylistic choices
-   - Debatable but grammatically correct structures
-❌ NO multiple marks on same text
-❌ NO guessing - skip uncertain cases
-❌ NO corrections changing original meaning
-
-### 6. FEEDBACK COMPONENTS
-- overallFeedback: 2-3 concise improvement suggestions
-- vocabularyHighlights: 3-5 well-used advanced words
-- sentenceDiversifications: 1-2 sentences to upgrade
-
-### OUTPUT FORMAT (STRICT JSON ONLY)
-{
-  "bandScores": { ... },
-  "errors": [ ... ],
-  "annotatedText": "...",
-  "overallFeedback": "...",
-  "vocabularyHighlights": [...],
-  "sentenceDiversifications": [...],
-  "sampleEssays": [...]
-}
-
-**Prompt:**
+**Essay Prompt:** 
 ${question}
 
-**Student's Answer:**
+**Student Essay to Analyze:**
 ${answer}
 
-BEGIN EVALUATION NOW:
+**BEGIN COMPREHENSIVE ANALYSIS - RETURN VALID JSON ONLY:**
 `
 }
 
@@ -260,10 +280,10 @@ Output as NUMBERS:
 ✓ Paragraph structure (intro-body-conclusion)
 
 **Prompt:**
-\${question}
+${question}
 
 **Student's Answer:**
-\${answer}
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -284,28 +304,17 @@ You are an expert TOEIC Writing examiner. Evaluate the opinion essay STRICTLY fo
 - Vocabulary: Range and appropriateness
 - Grammar: Accuracy and complexity
 
-Output as NUMBERS:
-{
-  "bandScores": {
-    "overall": 4.0,
-    "Content": 4.0,
-    "Organization": 3.5,
-    "Vocabulary": 4.5,
-    "Grammar": 3.0
-  }
-}
-
 ### 2. SPECIAL REQUIREMENTS
 ✓ Clear position statement
 ✓ 2-3 supporting arguments
 ✓ Counterargument (if appropriate)
 ✓ Concluding summary
 
-**Prompt:**
-\${question}
+**Prompt:**  
+${question}
 
-**Student's Answer:**
-\${answer}
+**Student's Answer:**  
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -333,10 +342,10 @@ You are an expert TOEFL Writing examiner. Evaluate the integrated response STRIC
 ✓ Synthesis of information
 
 **Prompt:**
-\${question}
+${question}
 
 **Student's Answer:**
-\${answer}
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -364,10 +373,10 @@ You are an expert TOEFL Writing examiner. Evaluate the independent essay STRICTL
 ✓ Varied sentence structures
 
 **Prompt:**
-\${question}
+${question}
 
 **Student's Answer:**
-\${answer}
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -395,10 +404,10 @@ You are an expert PTE Writing examiner. Evaluate the summary STRICTLY following 
 ✓ Grammatically complex sentence
 
 **Prompt:**
-\${question}
+${question}
 
 **Student's Answer:**
-\${answer}
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -428,10 +437,10 @@ You are an expert PTE Writing examiner. Evaluate the essay STRICTLY following th
 ✓ Error-free sentences
 
 **Prompt:**
-\${question}
+${question}
 
 **Student's Answer:**
-\${answer}
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -459,10 +468,10 @@ You are an expert VSTEP examiner. Evaluate the letter STRICTLY following these r
 ✓ Error tolerance (B1 level)
 
 **Prompt:**
-\${question}
+${question}
 
 **Student's Answer:**
-\${answer}
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -490,10 +499,10 @@ You are an expert VSTEP examiner. Evaluate the essay STRICTLY following these ru
 ✓ C1: Complex arguments, advanced structures
 
 **Prompt:**
-\${question}
+${question}
 
 **Student's Answer:**
-\${answer}
+${answer}
 
 BEGIN EVALUATION NOW:
 `
@@ -548,6 +557,7 @@ function getBandScoreValue(bandObj: any, keys: string[], defaultValue = 0): numb
  */
 export function parseEvaluationResult(text: string, answer: string): EvaluationResult {
   try {
+    console.log('Raw AI output:', text)
     // Extract JSON from optional ```json``` fences or raw text
     const fenceMatch = text.match(/```json\s*([\s\S]*?)\s*```/i)
     let jsonString = fenceMatch ? fenceMatch[1] : text
@@ -557,6 +567,7 @@ export function parseEvaluationResult(text: string, answer: string): EvaluationR
       .replace(/[\u0000-\u001F]+/g, ' ')
       .replace(/,\s*([}\]])/g, '$1')
     const result = JSON.parse(jsonString)
+    console.log('Parsed AI JSON result:', result)
 
     // Build errors from annotatedText if available, else fallback to raw result.errors
     const rawErrors: WritingError[] = Array.isArray(result.errors)
@@ -634,7 +645,8 @@ export function parseEvaluationResult(text: string, answer: string): EvaluationR
       paragraphOptimizations: [],
       vocabularyHighlights: [],
       sentenceDiversifications: [],
-      sampleEssays: []
+      sampleEssays: [],
+      annotatedText: undefined
     }
   }
 }

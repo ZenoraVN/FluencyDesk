@@ -78,15 +78,6 @@ const WritingDoingSection: React.FC<WritingDoingSectionProps> = ({
   // Use minParagraphs from task if not explicitly passed in props
   const actualMinParagraphs = typeof minParagraphs === 'number' ? minParagraphs : task.minParagraphs
 
-  // DEBUG: Log what is being passed to WritingWarnings
-  // eslint-disable-next-line no-console
-  console.log(
-    '[WritingDoingSection] actualMinParagraphs:',
-    actualMinParagraphs,
-    '| actualParagraphCount:',
-    actualParagraphCount
-  )
-
   return (
     <div className="flex flex-row h-screen gap-6 px-4 pt-4 pb-8 w-full max-w-full min-w-0 overflow-x-hidden">
       {/* Left panel: 70% - Question and answering */}

@@ -26,7 +26,9 @@ interface RichtextchtEditorProps {
   count?: boolean
   min?: boolean
   hideToolbar?: boolean
-  hideColor?: boolean // NEW: hide color picker button if true
+  hideColor?: boolean // hide color picker button if true
+  hideH1?: boolean // hide H1 button if true
+  hideH2?: boolean // hide H2 button if true
 }
 
 export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
@@ -37,7 +39,9 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
   count = true,
   min = false,
   hideToolbar = false,
-  hideColor = false
+  hideColor = false,
+  hideH1 = false,
+  hideH2 = false
 }) => {
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [wordCount, setWordCount] = useState(0)
@@ -114,64 +118,71 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
 
   return (
     <div
-      className={`${isMinimal ? 'h-10 relative' : 'space-y-2'} rounded-lg bg-gray-50 ${className}`}
+      className={`${isMinimal ? 'h-10' : 'space-y-2'} relative rounded-lg bg-[#fdfdfb] ${className}`}
     >
       {/* Toolbar (shown unless min or hideToolbar) */}
       {!isMinimal && !hideToolbar && (
-        <div
-          className={`flex items-center gap-1 p-1 border border-[#52aaa5]/20 rounded-t-lg ${className}`}
-        >
-          <div className="flex items-center gap-1 pr-2 border-r border-[#52aaa5]/20">
-            <button
-              type="button"
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive('heading', { level: 1 })
-                  ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40'
-                  : ''
-              }`}
-            >
-              <Heading1 size={18} className="text-[#2D3748]" />
-            </button>
-            <button
-              type="button"
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive('heading', { level: 2 })
-                  ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40'
-                  : ''
-              }`}
-            >
-              <Heading2 size={18} className="text-[#2D3748]" />
-            </button>
+        <div className="absolute bottom-0 left-2 z-10 flex items-center gap-1 p-1">
+          <div className="flex items-center gap-1 pr-2">
+            {!hideH1 && (
+              <button
+                type="button"
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                className="p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none"
+              >
+                <Heading1
+                  size={14}
+                  className={
+                    editor?.isActive('heading', { level: 1 }) ? 'text-[#52aaa5]' : 'text-gray-500'
+                  }
+                />
+              </button>
+            )}
+            {!hideH2 && (
+              <button
+                type="button"
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                className="p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none"
+              >
+                <Heading2
+                  size={14}
+                  className={
+                    editor?.isActive('heading', { level: 2 }) ? 'text-[#52aaa5]' : 'text-gray-500'
+                  }
+                />
+              </button>
+            )}
           </div>
-          <div className="flex items-center gap-1 px-2 border-r border-[#52aaa5]/20">
+          <div className="flex items-center gap-1 px-2">
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleBold().run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive('bold') ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40' : ''
-              }`}
+              className="p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none"
             >
-              <Bold size={18} className="text-[#2D3748]" />
+              <Bold
+                size={14}
+                className={editor?.isActive('bold') ? 'text-[#52aaa5]' : 'text-gray-500'}
+              />
             </button>
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleItalic().run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive('italic') ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40' : ''
-              }`}
+              className="p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none"
             >
-              <Italic size={18} className="text-[#2D3748]" />
+              <Italic
+                size={14}
+                className={editor?.isActive('italic') ? 'text-[#52aaa5]' : 'text-gray-500'}
+              />
             </button>
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleUnderline().run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive('underline') ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40' : ''
-              }`}
+              className="p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none"
             >
-              <UnderlineIcon size={18} className="text-[#2D3748]" />
+              <UnderlineIcon
+                size={14}
+                className={editor?.isActive('underline') ? 'text-[#52aaa5]' : 'text-gray-500'}
+              />
             </button>
           </div>
           {/* Color picker block, conditionally hidden */}
@@ -180,11 +191,12 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
               <button
                 type="button"
                 onClick={() => setShowColorPicker(!showColorPicker)}
-                className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                  showColorPicker ? 'bg-[#52aaa5]/20' : ''
-                }`}
+                className="p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none"
               >
-                <Palette size={18} className="text-[#2D3748]" />
+                <Palette
+                  size={14}
+                  className={showColorPicker ? 'text-[#52aaa5]' : 'text-gray-500'}
+                />
               </button>
               {showColorPicker && (
                 <div
@@ -207,7 +219,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
                           editor?.chain().focus().setColor(color.value).run()
                           setShowColorPicker(false)
                         }}
-                        className={`w-6 h-6 border ${color.border ? 'border-gray-300' : 'border-[#e5e7eb]'} rounded-lg shadow-sm transition-transform hover:scale-110 hover:shadow-md`}
+                        className="w-6 h-6"
                         style={{ backgroundColor: color.value, borderRadius: 8 }}
                         title={color.value}
                       />
@@ -221,35 +233,32 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive({ textAlign: 'left' })
-                  ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40'
-                  : ''
-              }`}
+              className={`p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none`}
             >
-              <AlignLeft size={18} className="text-[#2D3748]" />
+              <AlignLeft
+                size={14}
+                className={`${editor?.isActive({ textAlign: 'left' }) ? 'text-[#52aaa5]' : ''}`}
+              />
             </button>
             <button
               type="button"
               onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive({ textAlign: 'center' })
-                  ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40'
-                  : ''
-              }`}
+              className={`p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none`}
             >
-              <AlignCenter size={18} className="text-[#2D3748]" />
+              <AlignCenter
+                size={14}
+                className={`${editor?.isActive({ textAlign: 'center' }) ? 'text-[#52aaa5]' : ''}`}
+              />
             </button>
             <button
               type="button"
               onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-              className={`p-2 rounded hover:bg-[#52aaa5]/10 ${
-                editor?.isActive({ textAlign: 'right' })
-                  ? 'bg-[#52aaa5]/20 border border-[#52aaa5]/40'
-                  : ''
-              }`}
+              className={`p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none`}
             >
-              <AlignRight size={18} className="text-[#2D3748]" />
+              <AlignRight
+                size={14}
+                className={`${editor?.isActive({ textAlign: 'right' }) ? 'text-[#52aaa5]' : ''}`}
+              />
             </button>
           </div>
         </div>
@@ -305,7 +314,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
           <div
             className={`absolute ${
               isMinimal ? 'bottom-1 right-2 text-xs' : 'bottom-2 right-3'
-            } flex gap-4 text-sm text-[#52aaa5]/70`}
+            } flex gap-4 text-xs text-[#52aaa5]/70`}
           >
             <span className={className}>{wordCount} words</span>
             <span className={className}>{charCount} characters</span>

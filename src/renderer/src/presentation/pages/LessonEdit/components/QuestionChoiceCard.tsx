@@ -4,7 +4,7 @@ import { QuestionTypeGrid } from './QuestionTypeGrid'
 import { SKILLS } from '../../QuestionCreate/types/questionDetail'
 import { QUESTION_DEFINITIONS } from '../../QuestionCreate/types/questionDetail'
 import type { SkillType, QuestionDefinition } from '../../QuestionCreate/types/questionDetail'
-import { QuestionCreateCard } from './QuestionCreateCard'
+// import { QuestionCreateCard } from './QuestionCreateCard'
 
 /**
  * This card allows the user to pick a skill area and then a question type to create.

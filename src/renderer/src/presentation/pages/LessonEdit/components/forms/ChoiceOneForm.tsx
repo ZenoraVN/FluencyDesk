@@ -200,7 +200,7 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({ initialData }): JSX.Elem
                             <div className="block w-full">
                               <CustomInput
                                 value={inputField.value || ''}
-                                onChange={(val) => {
+                                onChange={(val: any) => {
                                   inputField.onChange(val)
                                   form.trigger('choice_one_options')
                                 }}
@@ -248,7 +248,7 @@ export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({ initialData }): JSX.Elem
                   return true
                 }
               }}
-              render={({ field, fieldState: { error } }) => {
+              render={({ field }) => {
                 const plain = (field.value || '').replace(/<p>|<\/p>|<br\s*\/?>/gi, '').trim()
                 return (
                   <FormItem>

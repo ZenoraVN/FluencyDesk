@@ -299,7 +299,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'choice_one',
-    name: 'Multiple Choice - Single Answer',
+    name: 'One Choice',
     skills: ['listening', 'reading', 'grammar'],
     purpose: 'Assess context understanding, vocabulary, and basic grammar knowledge.',
     icon: 'LucideCircleDot',
@@ -307,7 +307,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'choice_multi',
-    name: 'Multiple Choice - Multi Answer',
+    name: 'Multiple Choice',
     skills: ['listening', 'reading'],
     purpose: 'Develop skills for analyzing multi-faceted information.',
     icon: 'LucideListTodo',

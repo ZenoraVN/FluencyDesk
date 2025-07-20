@@ -32,13 +32,7 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
   activeErrorId,
   onErrorClick
 }) => {
-  // DEBUG: Log incoming errors and spans
-  console.log(`DEBUG AnnotatedAnswerBox – total errors prop: ${errors.length}`)
-  errors.forEach((e) =>
-    console.log(`  id=${e.id} original="${e.original}" startPos=${e.startPos} endPos=${e.endPos}"`)
-  )
   const renderAnnotatedText = (): React.ReactNode[] => {
-    console.log('AnnotatedAnswerBox props:', { answer, errors })
     if (!answer) {
       return [
         <span key="no-answer" className="text-gray-500 italic">
@@ -51,7 +45,6 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
     const displayErrors = errors.filter(
       (e) => e.startPos != null && e.endPos != null && e.startPos >= 0
     )
-    console.log('AnnotatedAnswerBox displayErrors:', displayErrors)
 
     // Group errors by position to prevent overlapping highlights
     const errorGroups: Map<string, WritingError[]> = new Map()
@@ -61,7 +54,6 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
         errorGroups.set(key, [])
       }
       errorGroups.get(key)!.push(error)
-      console.log('AnnotatedAnswerBox errorGroups:', errorGroups)
     })
 
     const parts: React.ReactNode[] = []
@@ -75,7 +67,6 @@ export const AnnotatedAnswerBox: React.FC<AnnotatedAnswerBoxProps> = ({
         errors
       }))
       .sort((a, b) => a.startPos - b.startPos)
-    console.log('AnnotatedAnswerBox sortedGroups:', sortedGroups)
 
     sortedGroups.forEach((group) => {
       const { startPos, endPos, errors } = group
