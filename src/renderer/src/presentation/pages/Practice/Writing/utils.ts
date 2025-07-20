@@ -79,11 +79,44 @@ export function countParagraphs(text: string): number {
 }
 
 /**
- * Build the Gemini evaluation prompt given question and answer.
+ * IELTS Task 1 Prompt Builder (chart description).
  */
-export function buildEvaluationPrompt(question: string, answer: string): string {
+export function buildIeltsTask1EvaluationPrompt(question: string, answer: string): string {
   return `
-You are an expert English writing examiner. Please evaluate the following essay and return the result as a JSON object.
+CRITICAL INSTRUCTIONS FOR TASK 1 WRITING EVALUATION
+
+You are an expert IELTS Writing Task 1 examiner with 10+ years experience. Evaluate the report STRICTLY following these rules:
+
+### 1. SCORING (0-9 scale, .5 increments)
+- Overall Band: Holistic assessment
+- Task Achievement: Addresses task fully? Accurate overview and data comparison.
+- Coherence & Cohesion: Logical flow, grouping, and linking words.
+- Lexical Resource: Range and accuracy of vocabulary.
+- Grammatical Accuracy: Sentence structures and correctness.
+
+Output as NUMBERS:
+{
+  "bandScores": {
+    "overall": 6.5,
+    "TaskAchievement": 7.0,
+    "CC": 6.0,
+    "LR": 6.5,
+    "GRA": 5.5
+  }
+}
+
+### 2. ERROR MARKING PROTOCOL (STRICT HIERARCHY)
+- Use same word-level and sentence-level rules as Task 2.
+
+### 3. OUTPUT FORMAT (STRICT JSON ONLY)
+{
+  "bandScores": { ... },
+  "errors": [ ... ],
+  "annotatedText": "...",
+  "overallFeedback": "...",
+  "vocabularyHighlights": [...],
+  "sentenceDiversifications": [...]
+}
 
 **Prompt:**
 ${question}
@@ -91,68 +124,406 @@ ${question}
 **Student's Answer:**
 ${answer}
 
-**Evaluation Instructions:**
-1. Assign an overall band score (0-9), AND 4 separate band scores (0-9, using .0 or .5 steps) for:
-   - Task Response (TR)
-   - Coherence & Cohesion (CC)
-   - Lexical Resource (LR)
-   - Grammatical Range & Accuracy (GRA)
-   Return these scores under "bandScores" with keys: overall, TR, CC, GRA, LR (all numbers).
+BEGIN EVALUATION NOW:
+`
+}
 
-2. Analyze errors at different levels:
-   A. WORD-LEVEL ERRORS (mark minimal spans):
-      - Spelling: Incorrectly spelled words
-      - Vocabulary: Wrong word choice, incorrect collocations
-      - Punctuation: Missing/extra commas, periods, etc.
-      - Grammar: Verb tense, subject-verb agreement, articles, etc.
-   
-   B. SENTENCE-LEVEL ERRORS (mark entire sentences only when):
-      - Multiple word errors in one sentence
-      - Structural issues requiring complete rewrite
-      - Missing/extra sentences in paragraphs
+/**
+ * IELTS Task 2 Prompt Builder (essay).
+ */
+export function buildIeltsTask2EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR ENGLISH WRITING EVALUATION
 
-   C. PARAGRAPH-LEVEL ISSUES (mark entire paragraphs only when):
-      - Multiple problematic sentences
-      - Missing paragraphs
-      - Completely off-topic paragraphs
+You are an expert IELTS/TOEFL writing examiner with 10+ years experience. Evaluate the essay STRICTLY following these rules:
 
-3. For each error, create an object with:
-   - "id": Unique integer
-   - "type": Error category
-   - "original": Original text span
-   - "corrected": Suggested correction
-   - "explanation": Brief reason
-   - "level": 'word', 'sentence', or 'paragraph'
+### 1. SCORING (0-9 scale, .5 increments)
+- Overall Band: Holistic assessment
+- Task Response (TR): Addresses prompt fully? Ideas developed?
+- Coherence & Cohesion (CC): Logical flow? Linking words?
+- Lexical Resource (LR): Word choice? Collocations? Range?
+- Grammatical Range (GRA): Sentence structures? Accuracy?
 
-4. Include an "annotatedText" field with:
-   - <ERR id="{id}" type="{type}">error text</ERR> tags around errors
-   - For paragraph-level issues: [Placeholder] tags
-- Do not nest &lt;ERR&gt; tags; ensure tags do not overlap—use adjacent tags (&lt;ERR&gt;…&lt;/ERR&gt;&lt;ERR&gt;…&lt;/ERR&gt;) instead of nesting.
+Output as NUMBERS:
+{
+  "bandScores": {
+    "overall": 6.5,
+    "TR": 7.0,
+    "CC": 6.0,
+    "LR": 6.5,
+    "GRA": 5.5
+  }
+}
 
-5. Error prioritization:
-   - Prefer word-level marking when possible
-   - Only mark sentence/paragraph when absolutely necessary
-   - For overlapping errors, mark the largest meaningful unit
+### 2. ERROR MARKING PROTOCOL (STRICT HIERARCHY)
+A. WORD-LEVEL (MINIMAL SPAN):
+   ✓ Mark ONLY when >95% confidence
+   ✓ Types:
+     • Spelling: Undeniably wrong (e.g., "recieve" → "receive")
+     • Grammar: Clear S-V agreement, tense, article errors
+     • Vocabulary: Wrong word in context (e.g., "big rain" → "heavy rain")
+     • Punctuation: Missing/extra essential punctuation
 
-**Output format (JSON):**
+B. SENTENCE-LEVEL (ENTIRE SENTENCE ONLY IF):
+   ✓ Multiple word errors requiring full rewrite
+   ✓ Structurally incomprehensible
+   ✓ Contains 3+ word-level errors
+
+C. PARAGRAPH-LEVEL (ENTIRE PARAGRAPH ONLY IF):
+   ✓ Completely off-topic
+   ✓ Missing core argument
+   ✓ Contains 3+ sentence-level issues
+
+### 3. ERROR ANNOTATION RULES
+- ID: Unique integer (start from 1)
+- Type: EXACTLY one of: spelling/grammar/vocabulary/sentence/paragraph
+- Original: EXACT text from answer (case-sensitive)
+- Corrected: MINIMAL correction to fix ONLY the error
+- Explanation: 3-5 word reason (e.g., "wrong preposition", "spelling error")
+- Level: word/sentence/paragraph
+
+### 4. ANNOTATED TEXT REQUIREMENTS
+<ERR id="1" type="spelling">mispeled</ERR> word
+- NO nested tags
+- NO overlapping spans
+- For paragraph errors: [PARAGRAPH ISSUE: reason]
+- Preserve ALL original formatting
+
+### 5. ZERO TOLERANCE RULES
+❌ NEVER mark:
+   - Acceptable variants (e.g., "color" vs "colour")
+   - Stylistic choices
+   - Debatable but grammatically correct structures
+❌ NO multiple marks on same text
+❌ NO guessing - skip uncertain cases
+❌ NO corrections changing original meaning
+
+### 6. FEEDBACK COMPONENTS
+- overallFeedback: 2-3 concise improvement suggestions
+- vocabularyHighlights: 3-5 well-used advanced words
+- sentenceDiversifications: 1-2 sentences to upgrade
+
+### OUTPUT FORMAT (STRICT JSON ONLY)
 {
   "bandScores": { ... },
   "errors": [ ... ],
   "annotatedText": "...",
   "overallFeedback": "...",
-  ... // other fields
+  "vocabularyHighlights": [...],
+  "sentenceDiversifications": [...],
+  "sampleEssays": [...]
 }
 
-**Important:**
-- Output ONLY valid JSON, no additional text
-- For word-level errors, mark ONLY the affected word(s)
-- For sentence/paragraph errors, ENTIRE unit must be marked
-- Use exact text matching from student's answer
-**Important:**
-  - For overlapping errors, report ONLY the most significant error
-  - Avoid reporting multiple errors on the same text span
-  - Prioritize sentence-level errors over word-level errors when appropriate
+**Prompt:**
+${question}
+
+**Student's Answer:**
+${answer}
+
+BEGIN EVALUATION NOW:
 `
+}
+
+/**
+ * TOEIC Task 1 Prompt Builder (Email/Letter).
+ */
+export function buildToeicTask1EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR TOEIC WRITING TASK 1 (EMAIL/LETTER)
+
+You are an expert TOEIC Writing examiner. Evaluate the email/letter STRICTLY following these rules:
+
+### 1. SCORING (0-5 scale)
+- Content: Completeness of response (all points addressed)
+- Organization: Logical structure and paragraphing
+- Vocabulary: Appropriateness and range
+- Grammar: Accuracy and sentence structures
+
+Output as NUMBERS:
+{
+  "bandScores": {
+    "overall": 4.0,
+    "Content": 4.0,
+    "Organization": 3.5,
+    "Vocabulary": 4.5,
+    "Grammar": 3.0
+  }
+}
+
+### 2. ERROR MARKING (SAME AS IELTS)
+- Use same word/sentence level rules as IELTS Task 2
+
+### 3. SPECIAL FOCUS FOR EMAIL/LETTER
+✓ Appropriate greeting and closing
+✓ Clear purpose statement
+✓ Formal/informal tone consistency
+✓ Paragraph structure (intro-body-conclusion)
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * TOEIC Task 2 Prompt Builder (Opinion Essay).
+ */
+export function buildToeicTask2EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR TOEIC WRITING TASK 2 (OPINION ESSAY)
+
+You are an expert TOEIC Writing examiner. Evaluate the opinion essay STRICTLY following these rules:
+
+### 1. SCORING (0-5 scale)
+- Content: Relevance to prompt and argument development
+- Organization: Logical flow and cohesion
+- Vocabulary: Range and appropriateness
+- Grammar: Accuracy and complexity
+
+Output as NUMBERS:
+{
+  "bandScores": {
+    "overall": 4.0,
+    "Content": 4.0,
+    "Organization": 3.5,
+    "Vocabulary": 4.5,
+    "Grammar": 3.0
+  }
+}
+
+### 2. SPECIAL REQUIREMENTS
+✓ Clear position statement
+✓ 2-3 supporting arguments
+✓ Counterargument (if appropriate)
+✓ Concluding summary
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * TOEFL Task 1 Prompt Builder (Integrated).
+ */
+export function buildToeflTask1EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR TOEFL INTEGRATED WRITING
+
+You are an expert TOEFL Writing examiner. Evaluate the integrated response STRICTLY following these rules:
+
+### 1. SCORING (0-5 scale)
+- Content: Accuracy in summarizing lecture and relationship to reading
+- Organization: Logical structure and coherence
+- Vocabulary: Academic appropriateness
+- Grammar: Accuracy in complex sentences
+
+### 2. SPECIAL FOCUS
+✓ Accurate representation of lecture points
+✓ Clear connection to reading passage
+✓ Paraphrasing (not copying)
+✓ Synthesis of information
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * TOEFL Task 2 Prompt Builder (Independent).
+ */
+export function buildToeflTask2EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR TOEFL INDEPENDENT WRITING
+
+You are an expert TOEFL Writing examiner. Evaluate the independent essay STRICTLY following these rules:
+
+### 1. SCORING (0-5 scale)
+- Development: Depth of ideas and examples
+- Organization: Logical structure and transitions
+- Language: Vocabulary range and accuracy
+- Grammar: Sentence structure variety
+
+### 2. SPECIAL REQUIREMENTS
+✓ Clear thesis statement
+✓ Well-developed paragraphs with specific examples
+✓ Academic vocabulary
+✓ Varied sentence structures
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * PTE Task 1 Prompt Builder (Summarize Written Text).
+ */
+export function buildPteTask1EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR PTE SUMMARIZE WRITTEN TEXT
+
+You are an expert PTE Writing examiner. Evaluate the summary STRICTLY following these rules:
+
+### 1. SCORING CRITERIA
+- Content: Inclusion of main points
+- Form: Single sentence (5-75 words)
+- Vocabulary: Appropriate word choice
+- Grammar: Correct sentence structure
+
+### 2. SPECIAL FOCUS
+✓ One sentence only
+✓ Includes all key points
+✓ Proper academic vocabulary
+✓ Grammatically complex sentence
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * PTE Task 2 Prompt Builder (Essay).
+ */
+export function buildPteTask2EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR PTE ESSAY WRITING
+
+You are an expert PTE Writing examiner. Evaluate the essay STRICTLY following these rules:
+
+### 1. SCORING (0-3 scale per criterion)
+- Content: Relevance to prompt
+- Form: 200-300 words
+- Development: Structure and coherence
+- Grammar: Accuracy and range
+- Vocabulary: Appropriateness and range
+- Spelling: Correct spelling
+
+### 2. SPECIAL REQUIREMENTS
+✓ Strict word count adherence
+✓ Clear position and arguments
+✓ Academic style
+✓ Error-free sentences
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * VSTEP Task 1 Prompt Builder (Letter).
+ */
+export function buildVstepTask1EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR VSTEP LETTER WRITING (B1-B2 LEVEL)
+
+You are an expert VSTEP examiner. Evaluate the letter STRICTLY following these rules:
+
+### 1. SCORING (0-10 scale)
+- Task Fulfillment: Complete all required points
+- Organization: Logical paragraph structure
+- Language: Appropriate vocabulary and grammar
+- Register: Formal/informal consistency
+
+### 2. SPECIAL FOCUS
+✓ Appropriate opening/closing
+✓ Clear purpose statement
+✓ Vietnamese cultural context awareness
+✓ Error tolerance (B1 level)
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * VSTEP Task 2 Prompt Builder (Essay).
+ */
+export function buildVstepTask2EvaluationPrompt(question: string, answer: string): string {
+  return `
+CRITICAL INSTRUCTIONS FOR VSTEP ESSAY WRITING (B1-C1 LEVEL)
+
+You are an expert VSTEP examiner. Evaluate the essay STRICTLY following these rules:
+
+### 1. SCORING (0-10 scale)
+- Content: Relevance and development
+- Organization: Logical structure
+- Vocabulary: Range and accuracy
+- Grammar: Complexity and accuracy
+- Mechanics: Spelling and punctuation
+
+### 2. LEVEL ADJUSTMENT
+✓ B1: Basic arguments, simple sentences
+✓ B2: Developed arguments, compound sentences
+✓ C1: Complex arguments, advanced structures
+
+**Prompt:**
+\${question}
+
+**Student's Answer:**
+\${answer}
+
+BEGIN EVALUATION NOW:
+`
+}
+
+/**
+ * Mapping of all prompt builders.
+ */
+export const evaluationPromptBuilders: Record<
+  string,
+  (question: string, answer: string) => string
+> = {
+  IELTS_task1: buildIeltsTask1EvaluationPrompt,
+  IELTS_task2: buildIeltsTask2EvaluationPrompt,
+  TOEIC_task1: buildToeicTask1EvaluationPrompt,
+  TOEIC_task2: buildToeicTask2EvaluationPrompt,
+  TOEFL_task1: buildToeflTask1EvaluationPrompt,
+  TOEFL_task2: buildToeflTask2EvaluationPrompt,
+  PTE_task1: buildPteTask1EvaluationPrompt,
+  PTE_task2: buildPteTask2EvaluationPrompt,
+  VSTEP_task1: buildVstepTask1EvaluationPrompt,
+  VSTEP_task2: buildVstepTask2EvaluationPrompt
+}
+
+/**
+ * Build an evaluation prompt dynamically based on task key.
+ */
+export function buildEvaluationPrompt(taskKey: string, question: string, answer: string): string {
+  const builder = evaluationPromptBuilders[taskKey] || buildIeltsTask2EvaluationPrompt
+  return builder(question, answer)
 }
 
 function getBandScoreValue(bandObj: any, keys: string[], defaultValue = 0): number {
@@ -223,14 +594,9 @@ export function parseEvaluationResult(text: string, answer: string): EvaluationR
         }
       })
     }
-    console.log('parseEvaluationResult — total errors:', errors.length)
-    errors.forEach((e) =>
-      console.log(`Error id=${e.id} original="${e.original}" start=${e.startPos} end=${e.endPos}`)
-    )
 
     // Flexible band score parsing
     const bandObj = result.bandScores || result.bandScore || result.band_scores || {}
-
     const extract = (keys: string[]) => getBandScoreValue(bandObj, keys, 0)
 
     return {
@@ -240,16 +606,15 @@ export function parseEvaluationResult(text: string, answer: string): EvaluationR
           typeof result.score === 'number' ? result.score : extract(['overall', 'total', 'band']),
         TR: extract(['TR', 'tr', 'taskResponse', 'task_response']),
         CC: extract(['CC', 'cc', 'coherenceCohesion', 'coherence_cohesion']),
-        GRA: extract(['GRA', 'gra', 'grammaticalRangeAccuracy', 'grammar', 'grammatical']),
+        GRA: extract(['GRA', 'gra', 'grammaticalRangeAccuracy', 'grammar']),
         LR: extract(['LR', 'lr', 'lexicalResource', 'lexical_resource'])
       },
       overallFeedback: result.overallFeedback ?? '',
-      errors: errors,
+      errors,
       paragraphOptimizations: result.paragraphOptimizations ?? [],
       vocabularyHighlights: result.vocabularyHighlights ?? [],
       sentenceDiversifications: result.sentenceDiversifications ?? [],
       sampleEssays: result.sampleEssays ?? [],
-      // Include annotatedText if provided by the evaluation result
       annotatedText: typeof result.annotatedText === 'string' ? result.annotatedText : undefined
     }
   } catch (e) {

@@ -61,7 +61,7 @@ const PracticeWritingPage: React.FC = () => {
         setError('No Gemini API key configured')
         return
       }
-      const prompt = buildEvaluationPrompt(preview.text, answer)
+      const prompt = buildEvaluationPrompt(task.key, preview.text, answer)
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         {
