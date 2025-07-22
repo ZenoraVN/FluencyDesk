@@ -155,21 +155,42 @@ export interface QuestionDetail {
   open_paragraph?: OpenParagraph
 }
 
-export type SkillType = 'listening' | 'reading' | 'grammar' | 'speaking' | 'writing' | 'vocabulary'
+export type SkillType =
+  | 'reading'
+  | 'listening'
+  | 'writing'
+  | 'grammar'
+  | 'social'
+  | 'vocabulary'
+  | 'speaking'
 
 export type QuestionType =
-  | 'fill_in_the_blank'
-  | 'choice_one'
-  | 'choice_multi'
-  | 'matching'
-  | 'true_false_not_given'
-  | 'error_identification'
-  | 'sentence_completion'
-  | 'word_repetition'
-  | 'phrase_repetition'
-  | 'conversational_repetition'
-  | 'open_conversation'
-  | 'open_paragraph'
+  | 'shadow_words'
+  | 'shadow_script_dialogue'
+  | 'gap_in_dialogue'
+  | 'choice_dialogue'
+  | 'chatting'
+  | 'translate'
+  | 'reverse_translation'
+  | 'gap_fill_listening'
+  | 'gap_fill_reading'
+  | 'choice_one_listening'
+  | 'choice_one_reading'
+  | 'choice_multi_listening'
+  | 'choice_multi_reading'
+  | 'matching_listening'
+  | 'matching_reading'
+  | 'true_false_not_given_listening'
+  | 'true_false_not_given_reading'
+  | 'ipa_assembly'
+  | 'lexical_fix'
+  | 'grammar_transformation'
+  | 'pronunciation_verification'
+  | 'dictation'
+  | 'ipa_reconstruction'
+  | 'writing_task'
+  | 'speaking_task'
+  | 'sentence_puzzle'
 
 export type LevelType = 'beginner' | 'intermediate' | 'advanced'
 
@@ -181,28 +202,16 @@ interface Skill {
 }
 export const SKILLS: Skill[] = [
   {
-    value: 'listening',
-    label: 'Listening',
-    color: '#FF6B6B',
-    description: 'Practice listening and understanding audio content'
-  },
-  {
     value: 'reading',
     label: 'Reading',
     color: '#4ECDC4',
     description: 'Improve reading comprehension and vocabulary'
   },
   {
-    value: 'grammar',
-    label: 'Grammar',
-    color: '#6366F1',
-    description: 'Master grammar rules and structures'
-  },
-  {
-    value: 'speaking',
-    label: 'Speaking',
-    color: '#96CEB4',
-    description: 'Develop speaking fluency and pronunciation'
+    value: 'listening',
+    label: 'Listening',
+    color: '#FF6B6B',
+    description: 'Practice listening and understanding audio content'
   },
   {
     value: 'writing',
@@ -211,10 +220,28 @@ export const SKILLS: Skill[] = [
     description: 'Enhance writing skills and coherence'
   },
   {
+    value: 'grammar',
+    label: 'Grammar',
+    color: '#6366F1',
+    description: 'Master grammar rules and structures'
+  },
+  {
+    value: 'social',
+    label: 'Social',
+    color: '#F59E42',
+    description: 'Develop social and dialogue skills'
+  },
+  {
     value: 'vocabulary',
     label: 'Vocabulary',
     color: '#FBBF24',
     description: 'Expand and master vocabulary usage'
+  },
+  {
+    value: 'speaking',
+    label: 'Speaking',
+    color: '#96CEB4',
+    description: 'Develop speaking fluency and pronunciation'
   }
 ]
 
@@ -223,53 +250,111 @@ export interface QuestionTypeInfo {
   overview: string
 }
 export const QUESTION_TYPES: Record<QuestionType, QuestionTypeInfo> = {
-  fill_in_the_blank: {
-    label: 'Fill in the blank',
-    overview: 'Điền từ thích hợp vào chỗ trống để hoàn thành câu'
+  shadow_words: { label: 'Shadow Words', overview: 'Lặp lại chính xác từ/cụm từ/câu/đoạn' },
+  shadow_script_dialogue: {
+    label: 'Shadow Script Dialogue',
+    overview:
+      'Đóng vai theo kịch bản hội thoại, lặp lại câu thoại của người dùng trong ngữ cảnh giao tiếp'
   },
-  choice_one: {
-    label: 'Single choice',
-    overview: 'Chọn một đáp án đúng từ nhiều lựa chọn'
+  gap_in_dialogue: {
+    label: 'Gap In Dialogue',
+    overview: 'Điền từ/cụm từ còn thiếu vào chỗ trống trong câu hội thoại dựa trên ngữ cảnh'
   },
-  choice_multi: {
-    label: 'Multiple choice',
-    overview: 'Chọn nhiều đáp án đúng từ các lựa chọn'
+  choice_dialogue: {
+    label: 'Choice One Dialogue',
+    overview: 'Chọn 1 câu trả lời phù hợp nhất trong các lựa chọn để hoàn thành đoạn hội thoại'
   },
-  matching: {
-    label: 'Matching',
-    overview: 'Ghép nối các cặp thông tin tương ứng'
+  chatting: {
+    label: 'Chatting',
+    overview: 'Thực hành giao tiếp tự do theo chủ đề, không giới hạn kịch bản'
   },
-  true_false_not_given: {
-    label: 'True/False/Not Given',
-    overview: 'Xác định tính đúng sai của câu dựa trên thông tin cho trước'
+  translate: {
+    label: 'Translate',
+    overview: 'Dịch từ/cụm từ/câu/đoạn từ tiếng Anh sang tiếng mẹ đẻ'
   },
-  error_identification: {
-    label: 'Error Identification',
-    overview: 'Xác định lỗi ngữ pháp trong câu'
+  reverse_translation: {
+    label: 'Reverser Translation',
+    overview: 'Dịch ngược từ/cụm từ/câu/đoạn từ tiếng mẹ đẻ sang tiếng Anh'
   },
-  sentence_completion: {
-    label: 'Sentence Completion',
-    overview: 'Hoàn thành câu với cấu trúc phù hợp'
+  gap_fill_listening: {
+    label: 'Gap Fill (Listening)',
+    overview:
+      'Nghe audio và điền từ vào chỗ trống: có thể điền ngay khi nghe (real-time) hoặc sau khi nghe toàn bộ'
   },
-  word_repetition: {
-    label: 'Word Repetition',
-    overview: 'Lặp lại từ theo phát âm chuẩn'
+  gap_fill_reading: {
+    label: 'Gap Fill (Reading)',
+    overview:
+      'Đọc văn bản và điền từ vào chỗ trống: có thể điền ngay khi đọc hoặc sau khi đọc toàn bộ'
   },
-  phrase_repetition: {
-    label: 'Phrase Repetition',
-    overview: 'Lặp lại cụm từ theo phát âm chuẩn'
+  choice_one_listening: {
+    label: 'Choice One (Listening)',
+    overview:
+      'Nghe audio và chọn 1 đáp án đúng từ các lựa chọn: làm theo từng câu hỏi nhỏ hoặc sau khi nghe toàn bộ'
   },
-  conversational_repetition: {
-    label: 'Conversation Repetition',
-    overview: 'Lặp lại đoạn hội thoại theo phát âm chuẩn'
+  choice_one_reading: {
+    label: 'Choice One (Reading)',
+    overview:
+      'Đọc văn bản và chọn 1 đáp án đúng từ các lựa chọn: làm theo từng câu hỏi nhỏ hoặc sau khi đọc toàn bộ'
   },
-  open_conversation: {
-    label: 'Open Conversation',
-    overview: 'Thực hành hội thoại tự do về chủ đề cho trước'
+  choice_multi_listening: {
+    label: 'Choice Multi (Listening)',
+    overview: 'Nghe audio và chọn nhiều đáp án đúng từ các lựa chọn (dạng câu hỏi đa lựa chọn)'
   },
-  open_paragraph: {
-    label: 'Open Paragraph',
-    overview: 'Viết đoạn văn về chủ đề cho trước'
+  choice_multi_reading: {
+    label: 'Choice Multi (Reading)',
+    overview: 'Đọc văn bản và chọn nhiều đáp án đúng từ các lựa chọn (dạng câu hỏi đa lựa chọn)'
+  },
+  matching_listening: {
+    label: 'Matching (Listening)',
+    overview: 'Nghe audio và ghép các cặp thông tin phù hợp (ví dụ: nối câu hỏi với câu trả lời)'
+  },
+  matching_reading: {
+    label: 'Matching (Reading)',
+    overview: 'Đọc văn bản và ghép các cặp thông tin phù hợp (ví dụ: nối ý chính với đoạn văn)'
+  },
+  true_false_not_given_listening: {
+    label: 'True/False/Not Given (Listening)',
+    overview: 'Nghe audio và xác định thông tin là Đúng/Sai/Không có trong bài'
+  },
+  true_false_not_given_reading: {
+    label: 'True/False/Not Given (Reading)',
+    overview: 'Đọc văn bản và xác định thông tin là Đúng/Sai/Không có trong bài'
+  },
+  ipa_assembly: {
+    label: 'IPA Assembly',
+    overview: 'Nghe từ và sắp xếp các ký hiệu IPA để tạo thành phiên âm chính xác của từ đó'
+  },
+  lexical_fix: {
+    label: 'Lexical Fix',
+    overview: 'Phát hiện và sửa lỗi từ vựng (từ dùng sai, collocation sai) trong câu/đoạn văn'
+  },
+  grammar_transformation: {
+    label: 'Grammar Transformation',
+    overview: 'Chuyển hóa ngữ pháp cụ thể từ câu cũ sang câu mới'
+  },
+  pronunciation_verification: {
+    label: 'Pronunciation Verification',
+    overview: 'Nghe máy phát âm từ/cụm từ và xác nhận tính chính xác (đúng/sai) và sửa nếu sai'
+  },
+  dictation: { label: 'Dictation', overview: 'Gõ lại chính xác toàn bộ nội dung đã nghe từ audio' },
+  ipa_reconstruction: {
+    label: 'IPA Reconstruction',
+    overview: 'Nhìn phiên âm IPA và đoán từ gốc tiếng Anh tương ứng'
+  },
+  writing_task: {
+    label: 'Writing Task',
+    overview:
+      'Viết bài luận/đoạn văn (tối thiểu 100 từ) theo chủ đề hoặc yêu cầu giống đề thi IELTS/TOEIC'
+  },
+  speaking_task: {
+    label: 'Speaking Task',
+    overview:
+      'Nói (tối thiểu 100 từ) theo chủ đề hoặc yêu cầu giống đề thi IELTS/TOEIC, có thể ghi âm và nhận phản hồi'
+  },
+  sentence_puzzle: {
+    label: 'Sentence Puzzle',
+    overview:
+      'Sắp xếp các từ/cụm từ/ký tự tiếng Anh bị xáo trộn thành câu/cụm từ hoàn chỉnh có nghĩa'
   }
 }
 export const LEVELS: { value: LevelType; label: string; color: string }[] = [
@@ -290,203 +375,211 @@ export interface QuestionDefinition {
 // Rich definitions of 25 question types as in requirements
 export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   {
-    type: 'fill_in_the_blank',
-    name: 'Fill in the Blank',
-    skills: ['listening', 'reading', 'grammar'],
-    purpose: 'Test vocabulary, grammar, and detailed listening comprehension.',
-    icon: 'LucideDot',
-    color: '#FFA500'
-  },
-  {
-    type: 'choice_one',
-    name: 'Multiple Choice - Single Answer',
-    skills: ['listening', 'reading', 'grammar'],
-    purpose: 'Assess context understanding, vocabulary, and basic grammar knowledge.',
-    icon: 'LucideCircleDot',
-    color: '#007BFF'
-  },
-  {
-    type: 'choice_multi',
-    name: 'Multiple Choice - Multi Answer',
-    skills: ['listening', 'reading'],
-    purpose: 'Develop skills for analyzing multi-faceted information.',
-    icon: 'LucideListTodo',
-    color: '#4ECDC4'
-  },
-  {
-    type: 'true_false_not_given',
-    name: 'True/False/Not Given',
-    skills: ['listening', 'reading'],
-    purpose: 'Practice reasoning and information verification skills.',
-    icon: 'LucideCheckCheck',
-    color: '#16A34A'
-  },
-  {
-    type: 'matching',
-    name: 'Matching',
-    skills: ['listening', 'reading'],
-    purpose: 'Practice connecting ideas, vocabulary, or images with definitions.',
-    icon: 'LucideLink2',
+    type: 'shadow_words',
+    name: 'Shadow Words',
+    skills: ['speaking'],
+    purpose: 'Repeat words/phrases/sentences exactly.',
+    icon: 'LucideRepeat2',
     color: '#6366F1'
   },
   {
-    type: 'error_identification',
-    name: 'Error Identification',
-    skills: ['grammar', 'writing'],
-    purpose: 'Improve accuracy in grammar and sentence structure.',
-    icon: 'LucideBug',
-    color: '#EF4444'
-  },
-  {
-    type: 'sentence_rearrangement',
-    name: 'Sentence Rearrangement',
-    skills: ['reading', 'writing'],
-    purpose: 'Understand paragraph structure and logical idea organization.',
-    icon: 'LucideMoveUpRight',
-    color: '#F59E42'
-  },
-  {
-    type: 'summarization',
-    name: 'Summarization',
-    skills: ['reading', 'writing'],
-    purpose: 'Practice filtering and briefly presenting information.',
-    icon: 'LucideFileText',
-    color: '#38BDF8'
-  },
-  {
-    type: 'dictation',
-    name: 'Dictation',
-    skills: ['listening', 'writing'],
-    purpose: 'Practice attentive listening and accurate writing.',
-    icon: 'LucideClipboardEdit',
-    color: '#F472B6'
-  },
-  {
-    type: 'shadowing',
-    name: 'Shadowing',
-    skills: ['speaking', 'listening'],
-    purpose: 'Improve pronunciation, intonation, and listening-speaking response.',
+    type: 'shadow_script_dialogue',
+    name: 'Shadow Script Dialogue',
+    skills: ['speaking'],
+    purpose: 'Role-play scripted dialogue, repeating lines in context.',
     icon: 'LucideMic',
     color: '#6366F1'
   },
   {
-    type: 'role_play',
-    name: 'Role-play',
-    skills: ['speaking'],
-    purpose: 'Develop communication skills for real-life scenarios.',
-    icon: 'LucideUsersRound',
+    type: 'gap_in_dialogue',
+    name: 'Gap In Dialogue',
+    skills: ['social'],
+    purpose: 'Fill missing words in dialogues based on context.',
+    icon: 'LucideEdit',
+    color: '#4ECDC4'
+  },
+  {
+    type: 'choice_dialogue',
+    name: 'Choice One Dialogue',
+    skills: ['social'],
+    purpose: 'Select the best response to complete a dialogue.',
+    icon: 'LucideCheckCircle',
+    color: '#007BFF'
+  },
+  {
+    type: 'chatting',
+    name: 'Chatting',
+    skills: ['social'],
+    purpose: 'Practice free conversation on topics without script.',
+    icon: 'LucideMessageCircle',
     color: '#52AAA5'
   },
   {
-    type: 'picture_description',
-    name: 'Picture Description',
-    skills: ['speaking', 'writing'],
-    purpose: 'Boost observation and descriptive language skills.',
-    icon: 'LucideImage',
-    color: '#FBBF24'
-  },
-  {
-    type: 'debate',
-    name: 'Debate',
-    skills: ['speaking', 'listening'],
-    purpose: 'Practice critical thinking and persuasion.',
-    icon: 'LucideGavel',
-    color: '#2563EB'
-  },
-  {
-    type: 'storytelling',
-    name: 'Storytelling',
-    skills: ['speaking', 'writing'],
-    purpose: 'Develop creativity and coherent storytelling.',
-    icon: 'LucideBookOpen',
-    color: '#F9A8D4'
-  },
-  {
-    type: 'paraphrasing',
-    name: 'Paraphrasing',
-    skills: ['writing', 'reading'],
-    purpose: 'Deepen understanding and express content flexibly.',
-    icon: 'LucideRepeat2',
-    color: '#7C3AED'
-  },
-  {
-    type: 'translation',
-    name: 'Translation',
-    skills: ['reading', 'writing'],
-    purpose: 'Increase knowledge of language and cultural differences.',
+    type: 'translate',
+    name: 'Translate',
+    skills: ['vocabulary'],
+    purpose: 'Translate from English to native language.',
     icon: 'LucideLanguages',
     color: '#E11D48'
   },
   {
-    type: 'word_form',
-    name: 'Word Form',
-    skills: ['grammar'],
-    purpose: 'Master the use of word forms (noun, verb, adjective, etc).',
-    icon: 'LucideAtom',
-    color: '#94A3B8'
-  },
-  {
-    type: 'synonym_antonym',
-    name: 'Synonym/Antonym',
+    type: 'reverse_translation',
+    name: 'Reverse Translation',
     skills: ['vocabulary'],
-    purpose: 'Expand vocabulary and flexible word usage.',
-    icon: 'LucideShuffle',
-    color: '#FBBF24'
+    purpose: 'Translate from native language to English.',
+    icon: 'LucideRefreshCw',
+    color: '#E11D48'
   },
   {
-    type: 'conversation_completion',
-    name: 'Conversation Completion',
-    skills: ['speaking', 'listening'],
-    purpose: 'Practice real-time communication in everyday contexts.',
-    icon: 'LucideMessageCircle',
-    color: '#059669'
+    type: 'gap_fill_listening',
+    name: 'Gap Fill (Listening)',
+    skills: ['listening'],
+    purpose: 'Listen and fill blanks in real-time or after full listening.',
+    icon: 'LucideHeadphones',
+    color: '#FF6B6B'
   },
   {
-    type: 'pronunciation_check',
-    name: 'Pronunciation Check',
-    skills: ['speaking'],
-    purpose: 'Correct pronunciation errors and practice standard speaking.',
+    type: 'gap_fill_reading',
+    name: 'Gap Fill (Reading)',
+    skills: ['reading'],
+    purpose: 'Read and fill blanks in real-time or after full reading.',
+    icon: 'LucideBookOpen',
+    color: '#4ECDC4'
+  },
+  {
+    type: 'choice_one_listening',
+    name: 'Choice One (Listening)',
+    skills: ['listening'],
+    purpose: 'Listen and choose one correct answer.',
     icon: 'LucideVolume2',
-    color: '#EAB308'
+    color: '#FF6B6B'
+  },
+  {
+    type: 'choice_one_reading',
+    name: 'Choice One (Reading)',
+    skills: ['reading'],
+    purpose: 'Read and choose one correct answer.',
+    icon: 'LucideBookOpen',
+    color: '#4ECDC4'
+  },
+  {
+    type: 'choice_multi_listening',
+    name: 'Choice Multi (Listening)',
+    skills: ['listening'],
+    purpose: 'Listen and select multiple correct answers.',
+    icon: 'LucideList',
+    color: '#FF6B6B'
+  },
+  {
+    type: 'choice_multi_reading',
+    name: 'Choice Multi (Reading)',
+    skills: ['reading'],
+    purpose: 'Read and select multiple correct answers.',
+    icon: 'LucideList',
+    color: '#4ECDC4'
+  },
+  {
+    type: 'matching_listening',
+    name: 'Matching (Listening)',
+    skills: ['listening'],
+    purpose: 'Match pairs based on audio.',
+    icon: 'LucideLink2',
+    color: '#FF6B6B'
+  },
+  {
+    type: 'matching_reading',
+    name: 'Matching (Reading)',
+    skills: ['reading'],
+    purpose: 'Match pairs based on text.',
+    icon: 'LucideLink2',
+    color: '#4ECDC4'
+  },
+  {
+    type: 'true_false_not_given_listening',
+    name: 'True/False/Not Given (Listening)',
+    skills: ['listening'],
+    purpose: 'Determine if info is true, false, or not given.',
+    icon: 'LucideCheckCheck',
+    color: '#16A34A'
+  },
+  {
+    type: 'true_false_not_given_reading',
+    name: 'True/False/Not Given (Reading)',
+    skills: ['reading'],
+    purpose: 'Determine if info is true, false, or not given.',
+    icon: 'LucideCheckCheck',
+    color: '#16A34A'
+  },
+  {
+    type: 'ipa_assembly',
+    name: 'IPA Assembly',
+    skills: ['listening'],
+    purpose: 'Assemble IPA symbols into correct transcription.',
+    icon: 'LucideAperture',
+    color: '#6366F1'
+  },
+  {
+    type: 'lexical_fix',
+    name: 'Lexical Fix',
+    skills: ['vocabulary'],
+    purpose: 'Identify and correct vocabulary errors.',
+    icon: 'LucideBug',
+    color: '#EF4444'
   },
   {
     type: 'grammar_transformation',
     name: 'Grammar Transformation',
     skills: ['grammar'],
-    purpose: 'Master complex grammar structures.',
+    purpose: 'Transform sentences to practice grammar structures.',
     icon: 'LucideFunctionSquare',
     color: '#6366F1'
   },
   {
-    type: 'contextual_cloze',
-    name: 'Contextual Cloze',
-    skills: ['reading', 'vocabulary'],
-    purpose: 'Understand word use in specific contexts.',
-    icon: 'LucideAlignJustify',
-    color: '#14B8A6'
+    type: 'pronunciation_verification',
+    name: 'Pronunciation Verification',
+    skills: ['speaking'],
+    purpose: 'Verify and correct pronunciation.',
+    icon: 'LucideVolume2',
+    color: '#EAB308'
   },
   {
-    type: 'listening_for_gist',
-    name: 'Listening for Gist',
+    type: 'dictation',
+    name: 'Dictation',
     skills: ['listening'],
-    purpose: 'Develop listening skills for main ideas.',
-    icon: 'LucideEar',
-    color: '#A3E635'
+    purpose: 'Type exactly what you hear.',
+    icon: 'LucideClipboardEdit',
+    color: '#F472B6'
   },
   {
-    type: 'listening_for_details',
-    name: 'Listening for Details',
-    skills: ['listening'],
-    purpose: 'Practice listening for specific details (numbers, names, etc).',
-    icon: 'LucideListMusic',
-    color: '#6366F1'
+    type: 'ipa_reconstruction',
+    name: 'IPA Reconstruction',
+    skills: ['vocabulary'],
+    purpose: 'Reconstruct words from IPA transcription.',
+    icon: 'LucideShuffle',
+    color: '#94A3B8'
   },
   {
-    type: 'inference_questions',
-    name: 'Inference Questions',
-    skills: ['reading', 'listening'],
-    purpose: 'Practice reasoning from implicit information.',
-    icon: 'LucideHelpCircle',
+    type: 'writing_task',
+    name: 'Writing Task',
+    skills: ['writing'],
+    purpose: 'Write essays or paragraphs on given topics.',
+    icon: 'LucideEdit',
+    color: '#45B7D1'
+  },
+  {
+    type: 'speaking_task',
+    name: 'Speaking Task',
+    skills: ['speaking'],
+    purpose: 'Speak on topics, record and get feedback.',
+    icon: 'LucideMic2',
+    color: '#96CEB4'
+  },
+  {
+    type: 'sentence_puzzle',
+    name: 'Sentence Puzzle',
+    skills: ['grammar'],
+    purpose: 'Rearrange words to form coherent sentences.',
+    icon: 'LucidePuzzle',
     color: '#F59E42'
   }
 ]

@@ -408,7 +408,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
           <div>
             <CustomInput
               value={localTitle}
-              onChange={(v) => {
+              onChange={(v: any) => {
                 setLocalTitle(v)
                 setTitleError('')
                 setTitleChanged(v.trim() !== course.title.trim())
@@ -695,7 +695,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
                   <>
                     <CustomInput
                       value={localYear === '' ? '' : String(localYear)}
-                      onChange={(v) => {
+                      onChange={(v: any) => {
                         const val = v.replace(/\D/g, '')
                         setLocalYear(val ? parseInt(val, 10) : '')
                         setYearChanged(

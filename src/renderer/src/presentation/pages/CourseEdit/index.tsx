@@ -9,7 +9,6 @@ import ApiService from '../../../service/ApiService'
 import { Course } from './types/course'
 import { CourseSection } from './components/CourseSection'
 import { LessonSection } from './components/LessonSection'
-import { CreateQuestionSection } from './components/CreateQuestionSection'
 
 const CourseEditPage: FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
@@ -168,33 +167,6 @@ const CourseEditPage: FC = () => {
                 }}
               />
             </div>
-          )}
-        </div>
-        {/* Create Question Section */}
-        <div
-          className={`absolute inset-0 h-full transition-all duration-500 ease-in-out transform 
-            ${
-              showCreateQuestion
-                ? 'opacity-100 translate-x-0 pointer-events-auto'
-                : 'opacity-0 translate-x-full pointer-events-none'
-            }`}
-        >
-          {showCreateQuestion && (
-            <CreateQuestionSection
-              lessonId={showCreateQuestion.lessonId}
-              lessonTitle={
-                course.lessons.find((l: { id: string }) => l.id === showCreateQuestion.lessonId)
-                  ?.title || ''
-              }
-              lessonSequence={
-                course.lessons.find(
-                  (l: { id: string; sequence: number }) => l.id === showCreateQuestion.lessonId
-                )?.sequence || 0
-              }
-              questionSequence={showCreateQuestion.questionSequence}
-              onClose={() => setShowCreateQuestion(null)}
-              onCreated={refetch}
-            />
           )}
         </div>
       </div>
