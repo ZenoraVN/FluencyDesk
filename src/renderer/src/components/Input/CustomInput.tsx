@@ -97,8 +97,8 @@ export const CustomInput = forwardRef<CustomInputHandle, CustomInputProps>(
 
     return (
       <div
-        className={`relative ${className} rounded-lg border border-[#ddd] p-2 ${
-          disabled ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''
+        className={`relative ${className} rounded-lg border border-[#ddd] p-2 bg-[#fdfdfb] ${
+          disabled ? 'bg-[#fdfdfb] cursor-not-allowed opacity-70' : ''
         }`}
         style={{ borderRadius: 8, ...(rest.style || {}) }}
         {...rest}

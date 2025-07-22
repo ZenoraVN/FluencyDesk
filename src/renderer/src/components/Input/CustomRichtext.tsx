@@ -128,7 +128,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-                className="p-1 text-gray-500 focus:text-[#52aaa5] focus:outline-none"
+                className="p-1 text-gray-500 focus:text-[#587b79] focus:outline-none"
               >
                 <Heading1
                   size={14}
@@ -187,7 +187,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
           </div>
           {/* Color picker block, conditionally hidden */}
           {!hideColor && (
-            <div className="relative flex items-center gap-1 px-2 border-r border-[#52aaa5]/20">
+            <div className="relative flex items-center gap-1 px-2 border-r border-gray-300">
               <button
                 type="button"
                 onClick={() => setShowColorPicker(!showColorPicker)}
@@ -201,7 +201,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
               {showColorPicker && (
                 <div
                   ref={colorPickerRef}
-                  className="absolute top-full left-0 mt-1 p-2 bg-white border border-[#52aaa5]/20 rounded-lg shadow-lg z-10"
+                  className="absolute top-full left-0 mt-1 p-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10"
                 >
                   {/* All quick access colors: black, white, red, green, blue, yellow */}
                   <div className="flex items-center gap-2 mb-2">
@@ -283,8 +283,8 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
         <EditorContent
           editor={editor}
           className={
-            (isMinimal ? 'px-3 py-0 text-base h-full min-h-0' : 'min-h-[100px] p-3 pb-8') +
-            ' border border-[#52aaa5]/20 rounded-lg text-[#2D3748] w-full outline-none bg-transparent ' +
+            (isMinimal ? 'px-3 py-0 text-base h-full min-h-0' : 'min-h-[64px] p-3 pb-8') +
+            ' border border-gray-300 rounded-lg text-[#2D3748] w-full outline-none focus:outline-none focus:ring-0 bg-transparent ' +
             className
           }
           style={{
@@ -322,9 +322,12 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
         )}
       </div>
       <style>{`
+        .ProseMirror, .ProseMirror * {
+          outline: none !important;
+          box-shadow: none !important;
+        }
         .ProseMirror {
-          min-height: 100px;
-          outline: none;
+          min-height: 64px;
           color: #2D3748;
           white-space: pre-wrap !important;
           word-break: break-word !important;
@@ -345,8 +348,7 @@ export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
           margin: 0.5em 0;
           color: #2D3748;
         }
-        .ProseMirror ul,
-        .ProseMirror ol {
+        .ProseMirror ul, .ProseMirror ol {
           padding-left: 1.5em;
           margin: 0.5em 0;
         }
