@@ -2,7 +2,6 @@ import { FC, useState, useRef, useEffect } from 'react'
 import { PlusCircle, ArrowUpDown } from 'lucide-react'
 import { Course } from '../types/course'
 import { QuestionDetail } from '../types/questionDetail'
-import { ViewQuestionDrawer } from './ViewQuestionDrawer'
 import { LessonItem } from './LessonItem'
 import ApiService from '../../../../service/ApiService'
 import { Button } from '../../../../components/ui/button'
@@ -216,11 +215,6 @@ export const LessonSection: FC<LessonSectionProps> = ({
           />
         ))}
       </div>
-      <ViewQuestionDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        question={drawerQuestion}
-      />
       <div ref={bottomRef} />
     </div>
   )
