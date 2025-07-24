@@ -76,59 +76,58 @@ export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({ initialData, onC
   return (
     <Form {...form}>
       <form className="space-y-6">
-        <div className="rounded-lg space-y-6">
-          {/* Title */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-[#2D3748] font-medium">
-                  Tiêu đề (Không bắt buộc)
-                </FormLabel>
-                <FormControl>
-                  <CustomInput
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    className="bg-white text-[#2D3748]"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 rounded-lg">
+          <div className="space-y-6">
+            {/* Title */}
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#2D3748] font-medium">Title (Optional)</FormLabel>
+                  <FormControl>
+                    <CustomInput
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      className="bg-white text-[#2D3748]"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-          {/* Passage */}
-          <FormField
-            control={form.control}
-            name="passage"
-            rules={{ required: 'Vui lòng nhập nội dung bài đọc' }}
-            render={({ field, fieldState: { error } }) => (
-              <FormItem>
-                <FormLabel className="text-[#2D3748] font-medium">Nội dung bài đọc</FormLabel>
-                <FormControl>
-                  <RichtextchtEditor
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    className={`rounded-lg overflow-hidden ${
-                      error ? 'border-red-500 focus:ring-red-500' : 'border-[#52aaa5]/20'
-                    }`}
-                  />
-                </FormControl>
-                {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
-              </FormItem>
-            )}
-          />
-
-          {/* Image Upload */}
-          <FormItem>
-            <FormLabel className="text-[#2D3748] font-medium">Hình ảnh (Không bắt buộc)</FormLabel>
-            <FormControl>
-              <MultiImageDropzone
-                files={form.watch('image_files') || []}
-                onChange={handleImageDrop}
-              />
-            </FormControl>
-            {/* {form.watch("image_files")?.length > 0 && (
+            {/* Passage */}
+            <FormField
+              control={form.control}
+              name="passage"
+              render={({ field, fieldState: { error } }) => (
+                <FormItem>
+                  <FormLabel className="text-[#2D3748] font-medium">Reading Content</FormLabel>
+                  <FormControl>
+                    <RichtextchtEditor
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      className={`rounded-lg overflow-hidden ${
+                        error ? 'border-red-500 focus:ring-red-500' : 'border-[#52aaa5]/20'
+                      }`}
+                    />
+                  </FormControl>
+                  {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="space-y-6">
+            {/* Image Upload */}
+            <FormItem>
+              <FormLabel className="text-[#2D3748] font-medium">Images (Optional)</FormLabel>
+              <FormControl>
+                <MultiImageDropzone
+                  files={form.watch('image_files') || []}
+                  onChange={handleImageDrop}
+                />
+              </FormControl>
+              {/* {form.watch("image_files")?.length > 0 && (
               <div className="grid grid-cols-2 gap-4 mt-4">
                 {form.watch("image_files")!.map((file: File, i: number) => (
                   <div key={i} className="relative bg-gray-50 rounded-lg p-4">
@@ -158,7 +157,8 @@ export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({ initialData, onC
                 ))}
               </div>
             )} */}
-          </FormItem>
+            </FormItem>
+          </div>
         </div>
       </form>
     </Form>

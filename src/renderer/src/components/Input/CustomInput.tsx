@@ -97,7 +97,7 @@ export const CustomInput = forwardRef<CustomInputHandle, CustomInputProps>(
 
     return (
       <div
-        className={`relative ${className} rounded-lg border border-[#ddd] p-2 bg-[#fdfdfb] ${
+        className={`relative w-full min-w-0 overflow-hidden whitespace-normal ${className} rounded-lg border border-[#ddd] p-2 bg-[#fdfdfb] ${
           disabled ? 'bg-[#fdfdfb] cursor-not-allowed opacity-70' : ''
         }`}
         style={{ borderRadius: 8, ...(rest.style || {}) }}
@@ -126,11 +126,14 @@ export const CustomInput = forwardRef<CustomInputHandle, CustomInputProps>(
             recalcHeight()
           }}
           onKeyDown={onKeyDown}
-          className="w-full outline-none bg-transparent text-[#2D3748] min-h-[20px] relative"
+          className="w-full break-words break-all whitespace-normal outline-none bg-transparent text-[#2D3748] min-h-[20px] relative"
           style={{
             minHeight: 20,
             whiteSpace: 'pre-wrap',
             boxSizing: 'border-box',
+            wordBreak: 'break-all',
+            overflowWrap: 'break-word',
+            wordWrap: 'break-word',
             overflow: 'auto',
             pointerEvents: disabled ? 'none' : 'auto'
           }}

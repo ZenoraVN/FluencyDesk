@@ -198,7 +198,7 @@ export const ChoiceOneReadingForm: FC<ChoiceOneReadingFormProps> = ({
                       />
                     </div>
                     {/* Đáp án - Input */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 max-w-full overflow-hidden">
                       <FormField
                         control={form.control}
                         name={`choice_one_options.${index}.option`}
@@ -208,14 +208,14 @@ export const ChoiceOneReadingForm: FC<ChoiceOneReadingFormProps> = ({
                         render={({ field: inputField, fieldState: { error } }) => (
                           <FormItem>
                             <FormControl>
-                              <div className="block w-full">
+                              <div className="block w-full max-w-full overflow-hidden min-w-0">
                                 <CustomInput
                                   value={inputField.value || ''}
                                   onChange={(val: any) => {
                                     inputField.onChange(val)
                                     form.trigger('choice_one_options')
                                   }}
-                                  className={`w-full bg-[#fdfdfb] text-[#2D3748] min-h-[40px] py-1.5 my-1 ${
+                                  className={`w-full max-w-full break-words bg-[#fdfdfb] text-[#2D3748] min-h-[40px] py-1.5 my-1 ${
                                     error || form.formState.errors.choice_one_options?.root
                                       ? 'border-red-500 focus:ring-red-500'
                                       : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
