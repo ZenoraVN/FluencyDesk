@@ -277,47 +277,47 @@ export const QUESTION_TYPES: Record<QuestionType, QuestionTypeInfo> = {
     overview: 'Dịch ngược từ/cụm từ/câu/đoạn từ tiếng mẹ đẻ sang tiếng Anh'
   },
   gap_fill_listening: {
-    label: 'Gap Fill (Listening)',
+    label: 'Gap Fill',
     overview:
       'Nghe audio và điền từ vào chỗ trống: có thể điền ngay khi nghe (real-time) hoặc sau khi nghe toàn bộ'
   },
   gap_fill_reading: {
-    label: 'Gap Fill (Reading)',
+    label: 'Gap Fill',
     overview:
       'Đọc văn bản và điền từ vào chỗ trống: có thể điền ngay khi đọc hoặc sau khi đọc toàn bộ'
   },
   choice_one_listening: {
-    label: 'Choice One (Listening)',
+    label: 'Choice One',
     overview:
       'Nghe audio và chọn 1 đáp án đúng từ các lựa chọn: làm theo từng câu hỏi nhỏ hoặc sau khi nghe toàn bộ'
   },
   choice_one_reading: {
-    label: 'Choice One (Reading)',
+    label: 'Choice One',
     overview:
       'Đọc văn bản và chọn 1 đáp án đúng từ các lựa chọn: làm theo từng câu hỏi nhỏ hoặc sau khi đọc toàn bộ'
   },
   choice_multi_listening: {
-    label: 'Choice Multi (Listening)',
+    label: 'Choice Multi',
     overview: 'Nghe audio và chọn nhiều đáp án đúng từ các lựa chọn (dạng câu hỏi đa lựa chọn)'
   },
   choice_multi_reading: {
-    label: 'Choice Multi (Reading)',
+    label: 'Choice Multi',
     overview: 'Đọc văn bản và chọn nhiều đáp án đúng từ các lựa chọn (dạng câu hỏi đa lựa chọn)'
   },
   matching_listening: {
-    label: 'Matching (Listening)',
+    label: 'Matching',
     overview: 'Nghe audio và ghép các cặp thông tin phù hợp (ví dụ: nối câu hỏi với câu trả lời)'
   },
   matching_reading: {
-    label: 'Matching (Reading)',
+    label: 'Matching',
     overview: 'Đọc văn bản và ghép các cặp thông tin phù hợp (ví dụ: nối ý chính với đoạn văn)'
   },
   true_false_not_given_listening: {
-    label: 'True/False/Not Given (Listening)',
+    label: 'True/False/Not Given',
     overview: 'Nghe audio và xác định thông tin là Đúng/Sai/Không có trong bài'
   },
   true_false_not_given_reading: {
-    label: 'True/False/Not Given (Reading)',
+    label: 'True/False/Not Given',
     overview: 'Đọc văn bản và xác định thông tin là Đúng/Sai/Không có trong bài'
   },
   ipa_assembly: {
@@ -432,7 +432,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'gap_fill_listening',
-    name: 'Gap Fill (Listening)',
+    name: 'Gap Fill',
     skills: ['listening'],
     purpose: 'Listen and fill blanks in real-time or after full listening.',
     icon: 'LucideHeadphones',
@@ -440,7 +440,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'gap_fill_reading',
-    name: 'Gap Fill (Reading)',
+    name: 'Gap Fill',
     skills: ['reading'],
     purpose: 'Read and fill blanks in real-time or after full reading.',
     icon: 'LucideBookOpen',
@@ -448,7 +448,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'choice_one_listening',
-    name: 'Choice One (Listening)',
+    name: 'Choice One',
     skills: ['listening'],
     purpose: 'Listen and choose one correct answer.',
     icon: 'LucideVolume2',
@@ -456,7 +456,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'choice_one_reading',
-    name: 'Choice One (Reading)',
+    name: 'Choice One',
     skills: ['reading'],
     purpose: 'Read and choose one correct answer.',
     icon: 'LucideBookOpen',
@@ -464,7 +464,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'choice_multi_listening',
-    name: 'Choice Multi (Listening)',
+    name: 'Choice Multi',
     skills: ['listening'],
     purpose: 'Listen and select multiple correct answers.',
     icon: 'LucideList',
@@ -472,7 +472,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'choice_multi_reading',
-    name: 'Choice Multi (Reading)',
+    name: 'Choice Multi',
     skills: ['reading'],
     purpose: 'Read and select multiple correct answers.',
     icon: 'LucideList',
@@ -480,7 +480,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'matching_listening',
-    name: 'Matching (Listening)',
+    name: 'Matching',
     skills: ['listening'],
     purpose: 'Match pairs based on audio.',
     icon: 'LucideLink2',
@@ -488,7 +488,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'matching_reading',
-    name: 'Matching (Reading)',
+    name: 'Matching',
     skills: ['reading'],
     purpose: 'Match pairs based on text.',
     icon: 'LucideLink2',
@@ -496,7 +496,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'true_false_not_given_listening',
-    name: 'True/False/Not Given (Listening)',
+    name: 'True/False/Not Given',
     skills: ['listening'],
     purpose: 'Determine if info is true, false, or not given.',
     icon: 'LucideCheckCheck',
@@ -504,7 +504,7 @@ export const QUESTION_DEFINITIONS: QuestionDefinition[] = [
   },
   {
     type: 'true_false_not_given_reading',
-    name: 'True/False/Not Given (Reading)',
+    name: 'True/False/Not Given',
     skills: ['reading'],
     purpose: 'Determine if info is true, false, or not given.',
     icon: 'LucideCheckCheck',

@@ -75,9 +75,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         </p>
       </div>
       {/* Footer: skill icon và action badge */}
-      <div className="flex items-end justify-between px-5 pb-3 pt-0 w-full">
+      <div className="flex items-end justify-end px-5 pb-3 pt-0 w-full">
         {/* Skill icon group: remove color badges, show icons colored, bottom left */}
-        <div className="flex flex-row gap-2 items-end">
+        <div className="hidden">
           {skills.map((s, idx) => (
             <span
               key={s.label + idx}

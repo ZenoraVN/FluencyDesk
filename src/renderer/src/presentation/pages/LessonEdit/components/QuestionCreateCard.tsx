@@ -1,5 +1,4 @@
 import React from 'react'
-import type { QuestionType } from '../../QuestionCreate/types/questionDetail'
 import { MdOutlineHelpOutline, MdDeleteOutline } from 'react-icons/md'
 import { List, Edit2, CheckCircle, Shuffle } from 'lucide-react'
 import {
@@ -15,11 +14,12 @@ import {
   QUESTION_DEFINITIONS,
   SkillType,
   QuestionDefinition
-} from '../../QuestionCreate/types/questionDetail'
-import { ListeningDetailForm } from './forms/ListeningDetailForm'
-import { ReadingDetailForm } from './forms/ReadingDetailForm'
+} from '../types/questionDetail'
+// import { ListeningDetailForm } from './forms/ListeningDetailForm'
+// import { ReadingDetailForm } from './forms/ReadingDetailForm'
 import { FillInBlankForm } from './forms/FillInBlankForm'
 import { ChoiceOneForm } from './forms/ChoiceOneForm'
+import { ShadowWordForm } from './forms/ShadowWordForm'
 
 interface QuestionCreateCardProps {
   question: QuestionDefinition
@@ -151,10 +151,9 @@ export const QuestionCreateCard: React.FC<QuestionCreateCardProps> = ({
       </div>
       {/* Content */}
       <div className="w-full mt-1">
-        {skillDef?.value === 'listening' && <ListeningDetailForm onChange={() => {}} />}
-        {skillDef?.value === 'reading' && <ReadingDetailForm onChange={() => {}} />}
         {question.type === 'fill_in_the_blank' && <FillInBlankForm />}
         {question.type === 'choice_one' && <ChoiceOneForm />}
+        {question.type === 'shadow_words' && <ShadowWordForm />}
       </div>
     </div>
   )

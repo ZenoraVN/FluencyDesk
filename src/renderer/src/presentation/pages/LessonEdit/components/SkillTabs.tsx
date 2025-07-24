@@ -16,6 +16,7 @@ const iconMap: Record<SkillType, keyof typeof LucideIcons> = {
   grammar: 'LucideAtom',
   speaking: 'LucideMic',
   writing: 'LucidePen',
+  social: 'LucideUsers',
   vocabulary: 'LucideSpellCheck'
 }
 

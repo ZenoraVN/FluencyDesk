@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import { SkillTabs } from './SkillTabs'
 import { QuestionTypeGrid } from './QuestionTypeGrid'
-import { SKILLS } from '../../QuestionCreate/types/questionDetail'
-import { QUESTION_DEFINITIONS } from '../../QuestionCreate/types/questionDetail'
-import type { SkillType, QuestionDefinition } from '../../QuestionCreate/types/questionDetail'
+import {
+  SKILLS,
+  QUESTION_DEFINITIONS,
+  SkillType,
+  QuestionDefinition
+} from '../types/questionDetail'
 // import { QuestionCreateCard } from './QuestionCreateCard'
 
 /**
