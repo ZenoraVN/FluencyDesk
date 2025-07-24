@@ -13,7 +13,7 @@ import { Plus, Minus } from 'lucide-react'
 import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
-export interface ChoiceOneFormData {
+export interface ChoiceOneListeningFormData {
   choice_one_question: {
     question: string
     explain: string
@@ -24,15 +24,17 @@ export interface ChoiceOneFormData {
   }>
 }
 
-interface ChoiceOneFormProps {
-  initialData?: ChoiceOneFormData
+interface ChoiceOneListeningFormProps {
+  initialData?: ChoiceOneListeningFormData
 }
 
-export const ChoiceOneForm: FC<ChoiceOneFormProps> = ({ initialData }): JSX.Element => {
-  const form = useFormContext<ChoiceOneFormData>()
+export const ChoiceOneListeningForm: FC<ChoiceOneListeningFormProps> = ({
+  initialData
+}): JSX.Element => {
+  const form = useFormContext<ChoiceOneListeningFormData>()
   const initialized = useRef(false)
 
-  const { fields, append, remove } = useFieldArray<ChoiceOneFormData>({
+  const { fields, append, remove } = useFieldArray<ChoiceOneListeningFormData>({
     control: form.control,
     name: 'choice_one_options',
     rules: { required: 'Vui lòng thêm ít nhất một lựa chọn' }

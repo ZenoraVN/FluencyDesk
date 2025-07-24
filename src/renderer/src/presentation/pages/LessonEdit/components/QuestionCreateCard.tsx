@@ -17,9 +17,12 @@ import {
 } from '../types/questionDetail'
 // import { ListeningDetailForm } from './forms/ListeningDetailForm'
 // import { ReadingDetailForm } from './forms/ReadingDetailForm'
-import { FillInBlankForm } from './forms/FillInBlankForm'
-import { ChoiceOneForm } from './forms/ChoiceOneForm'
+import { GapFillListeningForm } from './forms/GapFillListeningForm'
+import { ChoiceOneListeningForm } from './forms/ChoiceOneListeningForm'
 import { ShadowWordForm } from './forms/ShadowWordForm'
+import { ChoiceMultiListeningForm } from './forms/ChoiceMultiListeningForm'
+import { ChoiceMultiReadingForm } from './forms/ChoiceMultiReadingForm'
+import { ChoiceOneReadingForm } from './forms/ChoiceOneReadingForm'
 
 interface QuestionCreateCardProps {
   question: QuestionDefinition
@@ -98,6 +101,7 @@ export const QuestionCreateCard: React.FC<QuestionCreateCardProps> = ({
   number = 1,
   onDelete
 }) => {
+  console.log('QuestionCreateCard rendering type:', question.type)
   const typeDef = getQuizDefinition(question.type)
   const skillDef = getSkill(question.skills[0])
   const typeMeta = typeMetaMap[question.type]
@@ -151,9 +155,12 @@ export const QuestionCreateCard: React.FC<QuestionCreateCardProps> = ({
       </div>
       {/* Content */}
       <div className="w-full mt-1">
-        {question.type === 'fill_in_the_blank' && <FillInBlankForm />}
-        {question.type === 'choice_one' && <ChoiceOneForm />}
+        {question.type === 'gap_fill_listening' && <GapFillListeningForm />}
+        {question.type === 'choice_one_listening' && <ChoiceOneListeningForm />}
+        {question.type === 'choice_multi_listening' && <ChoiceMultiListeningForm />}
         {question.type === 'shadow_words' && <ShadowWordForm />}
+        {question.type === 'choice_one_reading' && <ChoiceOneReadingForm />}
+        {question.type === 'choice_multi_reading' && <ChoiceMultiReadingForm />}
       </div>
     </div>
   )

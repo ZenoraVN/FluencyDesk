@@ -22,27 +22,29 @@ const HEX_COLORS = (() => {
   return Array.from(colors)
 })()
 
-export interface FillInBlankAnswer {
+export interface GapFillListeningAnswer {
   id: string // hex color id
   answer: string
   explain: string
 }
 
-export interface FillInBlankFormData {
+export interface GapFillListeningFormData {
   fill_in_the_blank_question: {
     question: string
   }
-  fill_in_the_blank_answers: FillInBlankAnswer[]
+  fill_in_the_blank_answers: GapFillListeningAnswer[]
 }
 
-interface FillInBlankFormProps {
-  initialData?: FillInBlankFormData
+interface GapFillListeningFormProps {
+  initialData?: GapFillListeningFormData
 }
 
-export const FillInBlankForm: FC<FillInBlankFormProps> = ({ initialData }): JSX.Element => {
+export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
+  initialData
+}): JSX.Element => {
   const [selectedBlankId, setSelectedBlankId] = useState<string | null>(null)
   const [blankValidation, setBlankValidation] = useState<string | null>(null)
-  const form = useFormContext<FillInBlankFormData>()
+  const form = useFormContext<GapFillListeningFormData>()
   const questionInputRef = useRef<any>(null)
   const answerRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -149,7 +151,7 @@ export const FillInBlankForm: FC<FillInBlankFormProps> = ({ initialData }): JSX.
   useEffect(() => {
     const sub = form.watch((value) => {
       const q = value.fill_in_the_blank_question?.question || ''
-      const answersData = (value.fill_in_the_blank_answers ?? []) as FillInBlankAnswer[]
+      const answersData = (value.fill_in_the_blank_answers ?? []) as GapFillListeningAnswer[]
       const blanks = q.match(/\*\*\*([a-f0-9]{6})\*\*\*/g) || []
       const ids = blanks.map((b) => b.replace(/\*\*\*/g, ''))
       // add missing answer entries
@@ -380,7 +382,7 @@ export const FillInBlankForm: FC<FillInBlankFormProps> = ({ initialData }): JSX.
                               if (!plain) return true
                               const allExplanations = form
                                 .getValues('fill_in_the_blank_answers')
-                                .map((a: FillInBlankAnswer) => (a.explain || '').trim())
+                                .map((a: GapFillListeningAnswer) => (a.explain || '').trim())
                                 .filter((_, i) => i !== index)
                               return (
                                 !allExplanations.includes(plain) ||

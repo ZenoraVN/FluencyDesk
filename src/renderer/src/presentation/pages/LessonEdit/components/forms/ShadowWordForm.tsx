@@ -48,7 +48,7 @@ export const ShadowWordForm: FC<ShadowWordFormProps> = ({ initialData }) => {
     <>
       <div className="space-y-4">
         {fields.map((field, index) => (
-          <div key={field.id} className="grid grid-cols-[auto_1fr_1fr_auto] gap-x-4 items-start">
+          <div key={field.id} className="grid grid-cols-[auto_1fr_1fr_auto] gap-x-4 items-center">
             {/* Sequence number */}
             <div className="flex items-center justify-center">
               <span className="text-gray-500">{index + 1}.</span>
@@ -97,11 +97,11 @@ export const ShadowWordForm: FC<ShadowWordFormProps> = ({ initialData }) => {
               />
             </div>
             {fields.length > 1 && (
-              <div className="self-center">
+              <div className="self-start mt-6 flex items-center justify-center">
                 <Button
                   type="button"
                   onClick={() => remove(index)}
-                  className="h-10 w-10 flex items-center justify-center text-gray-400 hover:text-red-600"
+                  className="h-10 w-10 flex items-center justify-center text-gray-400 hover:text-red-600 border border-red-600 rounded-lg"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
