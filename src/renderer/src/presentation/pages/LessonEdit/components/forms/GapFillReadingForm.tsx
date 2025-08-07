@@ -7,6 +7,8 @@ import {
   FormItem,
   FormLabel
 } from '../../../../../components/ui/form'
+import { Badge } from '../../../../../components/ui/badge'
+import { Trash } from 'lucide-react'
 import { Button } from '../../../../../components/ui/button'
 import { RichtextFillInBlankView } from '../RichtextFillInBlankView'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
@@ -187,7 +189,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                         return (
                           <div
                             key={hex}
-                            className={`inline-flex items-center justify-center px-2 py-1 text-xs text-white font-mono rounded-lg cursor-pointer ${used ? 'hidden' : ''}`}
+                            className={`inline-flex items-center justify-center px-2 py-1 text-xs text-white font-mono rounded-md border border-gray-200 cursor-pointer ${used ? 'hidden' : ''}`}
                             style={{ backgroundColor: `#${hex}` }}
                             onClick={() => {
                               const current =
@@ -274,35 +276,23 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
             <div className="flex items-center gap-2 mb-1">
               <h4 className="text-sm font-medium text-[#2D3748]">Answers & Explanations</h4>
             </div>
-            <div className="space-y-4">
+            <div>
               {fields.length > 0 &&
                 fields.map((field, index) => {
                   const answer = answers[index] || { id: '', answer: '', explain: '' }
                   const hexId = answer.id || ''
-                  const isSelected = selectedBlankId === hexId
-                  const bgColor = `#${hexId}33`
                   return (
                     <div
                       key={field.id}
                       ref={(el) => (answerRefs.current[index] = el)}
-                      className={`p-4 rounded-lg transition-all border ${
-                        isSelected
-                          ? 'border-blue-300 shadow-sm'
-                          : 'border-gray-200 hover:border-[#52aaaf] hover:shadow-sm'
-                      }`}
-                      style={{ backgroundColor: bgColor }}
+                      className="rounded-lg transition-all space-y-2"
                     >
                       <div className="mb-2 flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-[#2D3748]">
-                            Answer {index + 1}
-                          </span>
+                          <span className="text-sm font-medium">{index + 1}. </span>
                           <span
-                            className="text-xs px-1.5 py-0.5 rounded border"
-                            style={{
-                              backgroundColor: `#${hexId}22`,
-                              borderColor: `#${hexId}`
-                            }}
+                            className="text-xs px-1.5 py-0.5 rounded-md border"
+                            style={{ backgroundColor: `#${hexId}` }}
                           >
                             #{hexId}
                           </span>
@@ -310,9 +300,11 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                         <Button
                           type="button"
                           onClick={() => remove(index)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          variant="ghost"
+                          size="icon"
+                          className="text-gray-500 hover:text-red-600"
                         >
-                          Delete
+                          <Trash className="w-4 h-4" />
                         </Button>
                       </div>
                       {/* Answer */}
@@ -327,7 +319,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                             return true
                           }
                         }}
-                        render={({ field: ansField, fieldState: { error } }) => {
+                        render={({ field: ansField }) => {
                           const plain = (ansField.value || '').trim()
                           return (
                             <FormItem>
@@ -346,9 +338,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                                   />
                                 </div>
                               </FormControl>
-                              {!plain && error && (
-                                <div className="text-sm text-red-500 mt-1">{error.message}</div>
-                              )}
+                              {/* error display removed */}
                             </FormItem>
                           )
                         }}
@@ -381,12 +371,12 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                         render={({ field: expField, fieldState: { error } }) => {
                           const plain = (expField.value || '').trim()
                           return (
-                            <FormItem className="mt-6 pt-4 border-t border-gray-100">
+                            <FormItem>
                               <FormLabel className="text-[#2D3748] font-medium">
                                 Explanation
                               </FormLabel>
                               <FormControl>
-                                <div className="mt-2">
+                                <div>
                                   <CustomInput
                                     value={expField.value || ''}
                                     onChange={(val: string) => {
@@ -399,9 +389,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                                   />
                                 </div>
                               </FormControl>
-                              {!plain && error && (
-                                <div className="text-sm text-red-500 mt-1">{error.message}</div>
-                              )}
+                              {/* error display removed */}
                             </FormItem>
                           )
                         }}
