@@ -11,16 +11,18 @@ import { Button } from '../../../../../components/ui/button'
 import { RichtextFillInBlankView } from '../RichtextFillInBlankView'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
-const HEX_COLORS = (() => {
-  const colors = new Set<string>()
-  while (colors.size < 100) {
-    const color = Math.floor(Math.random() * 0xffffff)
-      .toString(16)
-      .padStart(6, '0')
-    colors.add(color)
-  }
-  return Array.from(colors)
-})()
+const HEX_COLORS = [
+  '3E8E7E',
+  'C44536',
+  'F4A261',
+  'E6B800',
+  '7D5A50',
+  '5D5C61',
+  '8D6A9F',
+  '70C1B3',
+  'A98467',
+  '2D4059'
+]
 
 export interface GapFillReadingAnswer {
   id: string // hex color id
@@ -93,36 +95,6 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
     return HEX_COLORS.find((c) => !used.has(c)) || HEX_COLORS[0]
   }
 
-  // Insert blank placeholder at cursor with styled span
-  const insertBlankAtCursor = () => {
-    const selection = window.getSelection()
-    if (!selection || !questionInputRef.current) return
-
-    const hex = getNextAvailableHex()
-    const span = document.createElement('span')
-    span.className = 'blank-placeholder'
-    span.style.backgroundColor = `#${hex}33`
-    span.style.border = `1px dashed #${hex}`
-    span.style.padding = '2px 4px'
-    span.style.borderRadius = '4px'
-    span.style.margin = '0 2px'
-    span.textContent = '___'
-    span.dataset.blankId = hex
-
-    const range = selection.getRangeAt(0)
-    range.deleteContents()
-    range.insertNode(span)
-
-    const newValue = questionInputRef.current.innerHTML
-    form.setValue('fill_in_the_blank_question.question', newValue)
-
-    if (!answers.find((a) => a.id === hex)) {
-      append({ id: hex, answer: '', explain: '' })
-    }
-
-    setTimeout(() => form.trigger('fill_in_the_blank_question.question'), 10)
-  }
-
   // Handle blank selection
   const handleBlankClick = (hex: string) => {
     setSelectedBlankId(hex)
@@ -145,28 +117,21 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
     if (idx >= 0) remove(idx)
   }
 
-  // Sync answers with blanks using form.watch
+  // Subscription: sync manual typing of placeholders to answers
   useEffect(() => {
-    const sub = form.watch((value) => {
+    const subscription = form.watch((value) => {
       const q = value.fill_in_the_blank_question?.question || ''
-      const answersData = (value.fill_in_the_blank_answers ?? []) as GapFillReadingAnswer[]
       const blanks = q.match(/\*\*\*([a-f0-9]{6})\*\*\*/g) || []
       const ids = blanks.map((b) => b.replace(/\*\*\*/g, ''))
-      // add missing answer entries
+      const currentAnswers = form.getValues('fill_in_the_blank_answers') as GapFillReadingAnswer[]
       ids.forEach((id) => {
-        if (!answersData.find((a) => a.id === id)) {
+        if (!currentAnswers.find((a) => a.id === id)) {
           append({ id, answer: '', explain: '' })
         }
       })
-      // remove orphaned answers
-      answersData.forEach((a, i) => {
-        if (!ids.includes(a.id)) {
-          remove(i)
-        }
-      })
     })
-    return () => sub.unsubscribe()
-  }, [form, append, remove])
+    return () => subscription.unsubscribe()
+  }, [form, append])
 
   // On load, preload from initial data if any
   useEffect(() => {
@@ -213,14 +178,38 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                       <FormLabel className="text-[#2D3748] font-medium flex items-center gap-2">
                         Question
                       </FormLabel>
-                      <Button
-                        type="button"
-                        onClick={insertBlankAtCursor}
-                        className="flex items-center gap-1 text-sm"
-                      >
-                        <PlusIcon className="w-4 h-4" />
-                        Add Blank
-                      </Button>
+                      {/* "Add Blank" button removed: blanks auto-insert on "***" */}
+                    </div>
+                    {/* Color palette: click to copy hex; greyed out when used */}
+                    <div className="flex gap-2 my-2 overflow-hidden whitespace-nowrap">
+                      {HEX_COLORS.map((hex) => {
+                        const used = question.includes(`***${hex}***`)
+                        return (
+                          <div
+                            key={hex}
+                            className={`inline-flex items-center justify-center px-2 py-1 text-xs text-white font-mono rounded-lg cursor-pointer ${used ? 'hidden' : ''}`}
+                            style={{ backgroundColor: `#${hex}` }}
+                            onClick={() => {
+                              const current =
+                                form.getValues('fill_in_the_blank_question.question') || ''
+                              if (!current.includes(`***${hex}***`)) {
+                                const updated = current + `***${hex}***`
+                                form.setValue('fill_in_the_blank_question.question', updated, {
+                                  shouldValidate: true,
+                                  shouldDirty: true
+                                })
+                                append({ id: hex, answer: '', explain: '' })
+                                setTimeout(() => {
+                                  form.trigger('fill_in_the_blank_question.question')
+                                  form.trigger('fill_in_the_blank_answers')
+                                }, 10)
+                              }
+                            }}
+                          >
+                            {hex}
+                          </div>
+                        )
+                      })}
                     </div>
                     <FormControl>
                       <div className="mt-2">
@@ -427,17 +416,3 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
     </Form>
   )
 }
-
-// PlusIcon component
-const PlusIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    className={className}
-  >
-    <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)

@@ -24,6 +24,7 @@ import { ShadowWordForm } from './forms/ShadowWordForm'
 import { ChoiceMultiListeningForm } from './forms/ChoiceMultiListeningForm'
 import { ChoiceMultiReadingForm } from './forms/ChoiceMultiReadingForm'
 import { ChoiceOneReadingForm } from './forms/ChoiceOneReadingForm'
+import { GapFillReadingForm } from './forms/GapFillReadingForm'
 
 interface QuestionCreateCardProps {
   question: QuestionDefinition
@@ -103,6 +104,7 @@ export const QuestionCreateCard: React.FC<QuestionCreateCardProps> = ({
     content: (
       <>
         {question.type === 'gap_fill_listening' && <GapFillListeningForm />}
+        {question.type === 'gap_fill_reading' && <GapFillReadingForm />}
         {question.type === 'choice_one_listening' && <ChoiceOneListeningForm />}
         {question.type === 'choice_multi_listening' && <ChoiceMultiListeningForm />}
         {question.type === 'shadow_words' && <ShadowWordForm />}
