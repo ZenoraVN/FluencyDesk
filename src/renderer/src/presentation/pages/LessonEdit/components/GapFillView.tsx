@@ -1,6 +1,6 @@
 import { FC } from 'react'
 
-interface RichtextFillInBlankViewProps {
+interface GapFillViewProps {
   content: string
   onBlankClick?: (hex: string) => void
   onBlankRemove?: (hex: string) => void
@@ -8,7 +8,7 @@ interface RichtextFillInBlankViewProps {
   className?: string
 }
 
-export const RichtextFillInBlankView: FC<RichtextFillInBlankViewProps> = ({
+export const GapFillView: FC<GapFillViewProps> = ({
   content,
   onBlankClick,
   onBlankRemove,

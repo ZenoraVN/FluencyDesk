@@ -7,10 +7,9 @@ import {
   FormItem,
   FormLabel
 } from '../../../../../components/ui/form'
-import { Badge } from '../../../../../components/ui/badge'
 import { Trash } from 'lucide-react'
 import { Button } from '../../../../../components/ui/button'
-import { RichtextFillInBlankView } from '../RichtextFillInBlankView'
+import { GapFillView } from '../GapFillView'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
 const HEX_COLORS = [
@@ -45,12 +44,12 @@ interface GapFillReadingFormProps {
 
 export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData }): JSX.Element => {
   const [selectedBlankId, setSelectedBlankId] = useState<string | null>(null)
-  const [blankValidation, setBlankValidation] = useState<string | null>(null)
+  const [blankValidation] = useState<string | null>(null)
   const form = useFormContext<GapFillReadingFormData>()
   const questionInputRef = useRef<any>(null)
   const answerRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'fill_in_the_blank_answers'
   })
@@ -58,44 +57,8 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
   const answers = form.watch('fill_in_the_blank_answers') || []
   const question = form.watch('fill_in_the_blank_question.question') || ''
 
-  // Validate blanks - improved with state
-  const validateBlanks = (question: string) => {
-    const blanks = question.match(/\*\*\*([a-f0-9]{6})\*\*\*/g) || []
-    if (blanks.length === 0) {
-      const msg = 'The question must have at least one blank (***1a2b3c***)'
-      setBlankValidation(msg)
-      return msg
-    }
-    const blankIds = blanks.map((b) => b.replace(/\*\*\*/g, ''))
-    const answerIds = answers.map((a) => a.id)
-
-    const missingInQuestion = answerIds.filter((id) => !blankIds.includes(id))
-    const missingInAnswers = blankIds.filter((id) => !answerIds.includes(id))
-    if (missingInQuestion.length || missingInAnswers.length) {
-      const parts = []
-      if (missingInQuestion.length) {
-        parts.push(`Answers exist for missing blanks: ${missingInQuestion.join(', ')}`)
-      }
-      if (missingInAnswers.length) {
-        parts.push(`Blanks exist without answers: ${missingInAnswers.join(', ')}`)
-      }
-      const msg = parts.join('. ')
-      setBlankValidation(msg)
-      return msg
-    }
-
-    setBlankValidation(null)
-    return true
-  }
-
-  // Get next unused hex across question and answers
-  const getNextAvailableHex = (): string => {
-    const questionContent = form.getValues('fill_in_the_blank_question.question') || ''
-    const usedInQ = [...questionContent.matchAll(/\*\*\*([a-f0-9]{6})\*\*\*/g)].map((m) => m[1])
-    const usedInA = answers.map((a) => a.id)
-    const used = new Set([...usedInQ, ...usedInA])
-    return HEX_COLORS.find((c) => !used.has(c)) || HEX_COLORS[0]
-  }
+  // Validate blanks - disabled
+  const validateBlanks = (): true => true
 
   // Handle blank selection
   const handleBlankClick = (hex: string) => {
@@ -251,7 +214,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
               </div>
               <div className="p-4 border border-gray-200 rounded-b-lg min-h-[80px] hover:border-[#52aaaf] rounded-lg bg-gray-50">
                 {question ? (
-                  <RichtextFillInBlankView
+                  <GapFillView
                     content={question}
                     onBlankClick={handleBlankClick}
                     onBlankRemove={handleBlankRemove}
@@ -291,7 +254,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">{index + 1}. </span>
                           <span
-                            className="text-xs px-1.5 py-0.5 rounded-md border"
+                            className="text-xs px-1.5 py-0.5 rounded-md border text-white"
                             style={{ backgroundColor: `#${hexId}` }}
                           >
                             #{hexId}
@@ -368,7 +331,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                             }
                           }
                         }}
-                        render={({ field: expField, fieldState: { error } }) => {
+                        render={({ field: expField }) => {
                           const plain = (expField.value || '').trim()
                           return (
                             <FormItem>
