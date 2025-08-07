@@ -18,19 +18,19 @@ export const GapFillView: FC<GapFillViewProps> = ({
   const renderContent = () => {
     if (!content) return null
 
-    const parts = content.split(/(\*\*\*[a-f0-9]{6}\*\*\*)/g)
+    const parts = content.split(/(\*\*\*[A-Fa-f0-9]{6}\*\*\*)/gi)
     return parts.map((part: string, index: number) => {
-      const match = part.match(/\*\*\*([a-f0-9]{6})\*\*\*/)
+      const match = part.match(/\*\*\*([A-Fa-f0-9]{6})\*\*\*/i)
       if (match) {
         const hex = match[1]
-        const bgColor = `#${hex}33`
+        const bgColor = `#${hex}80`
         const borderColor = selectedBlankId === hex ? '#3b82f6' : `#${hex}`
         return (
-          <span key={index} className="blank-wrapper inline-flex items-center mx-1">
+          <div key={index} className="blank-wrapper inline-flex items-center mx-1">
             <button
               type="button"
               onClick={() => onBlankClick?.(hex)}
-              className="blank-button flex items-center px-2 py-1 rounded transition-all"
+              className="blank-button flex items-center px-1 py-0.5 rounded transition-all"
               style={{
                 backgroundColor: bgColor,
                 border: `1px solid ${borderColor}`
@@ -38,17 +38,7 @@ export const GapFillView: FC<GapFillViewProps> = ({
             >
               <span style={{ color: `#${hex}` }}>___</span>
             </button>
-            <button
-              type="button"
-              className="delete-blank ml-1 text-red-500 hover:text-red-700"
-              onClick={(e) => {
-                e.stopPropagation()
-                onBlankRemove?.(hex)
-              }}
-            >
-              ✕
-            </button>
-          </span>
+          </div>
         )
       }
       return (

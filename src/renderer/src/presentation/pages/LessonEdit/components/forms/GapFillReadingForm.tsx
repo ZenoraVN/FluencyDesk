@@ -250,7 +250,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                       ref={(el) => (answerRefs.current[index] = el)}
                       className="rounded-lg transition-all space-y-2"
                     >
-                      <div className="mb-2 flex justify-between items-center">
+                      <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">{index + 1}. </span>
                           <span
@@ -346,7 +346,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                                       expField.onChange(val)
                                       form.trigger(`fill_in_the_blank_answers.${index}.explain`)
                                     }}
-                                    className={`bg-gray-50 ${!plain ? 'border-red-500 text-red-500' : ''}`}
+                                    className={`bg-gray-50 border-b pb-2 ${!plain ? 'border-red-500 text-red-500' : ''}`}
                                     placeholder="Enter explanation here"
                                     min={true}
                                   />

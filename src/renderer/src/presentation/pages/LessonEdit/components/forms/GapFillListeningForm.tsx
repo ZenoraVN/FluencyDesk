@@ -8,7 +8,7 @@ import {
   FormLabel
 } from '../../../../../components/ui/form'
 import { Button } from '../../../../../components/ui/button'
-import { RichtextFillInBlankView } from '../RichtextFillInBlankView'
+import { GapFillView } from '../GapFillView'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
 const HEX_COLORS = (() => {
@@ -262,7 +262,7 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
               </div>
               <div className="p-4 border border-gray-200 rounded-b-lg min-h-[80px] hover:border-[#52aaaf] rounded-lg bg-gray-50">
                 {question ? (
-                  <RichtextFillInBlankView
+                  <GapFillView
                     content={question}
                     onBlankClick={handleBlankClick}
                     onBlankRemove={handleBlankRemove}
