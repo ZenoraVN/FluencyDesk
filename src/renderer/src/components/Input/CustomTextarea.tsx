@@ -18,7 +18,7 @@ import {
   Palette
 } from 'lucide-react'
 
-interface RichtextchtEditorProps {
+interface CustomTextareaProps {
   value: string
   onChange: (value: string) => void
   className?: string
@@ -31,7 +31,7 @@ interface RichtextchtEditorProps {
   hideH2?: boolean // hide H2 button if true
 }
 
-export const RichtextchtEditor: FC<RichtextchtEditorProps> = ({
+export const CustomTextarea: FC<CustomTextareaProps> = ({
   value,
   onChange,
   className = '',

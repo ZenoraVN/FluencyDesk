@@ -1,6 +1,6 @@
 import { FC, useRef, useEffect, useState } from 'react'
 import { Editor } from '@tiptap/react'
-import { RichtextchtEditor } from '../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../components/Input/CustomTextarea'
 import { CustomInput } from '../../../../components/Input/CustomInput'
 import { X, Edit2, Save, Upload } from 'lucide-react'
 import ApiService from '../../../../service/ApiService'
@@ -532,7 +532,7 @@ export const CourseSection: FC<CourseSectionProps> = ({
       {/* Overview */}
       <div>
         <h3 className="text-base font-medium text-[#2D3748] mb-2">Overview</h3>
-        <RichtextchtEditor
+        <CustomTextarea
           value={localOverview}
           onChange={(value: string) => {
             setLocalOverview(value)

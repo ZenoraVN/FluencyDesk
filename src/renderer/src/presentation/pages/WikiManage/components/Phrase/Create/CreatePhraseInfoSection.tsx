@@ -12,7 +12,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { CreatePhraseFormData } from './CreatePhraseDrawer'
 import { Button } from '../../../../../components/ui/button'
 import { Sparkles, Search, Plus, Minus } from 'lucide-react'
-import { RichtextchtEditor } from '../../../../../componentsInput/CustomRichtext'
+import { CustomTextarea } from '../../../../../componentsInput/CustomTextarea'
 import { RichtextView } from '../../../../../componentscommon/RichtextView'
 
 interface Props {
@@ -244,7 +244,7 @@ export const CreatePhraseInfoSection = ({
           <FormControl>
             <div className="space-y-2">
               <div className="flex-1">
-                <RichtextchtEditor
+                <CustomTextarea
                   value={usageNoteInput}
                   onChange={setUsageNoteInput}
                   className={error ? 'border-red-500' : ''}

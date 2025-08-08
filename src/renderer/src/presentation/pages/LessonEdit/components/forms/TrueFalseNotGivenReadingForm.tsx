@@ -16,7 +16,7 @@ import {
 } from '../../../../../components/ui/form'
 import { Button } from '../../../../../components/ui/button'
 import { Plus, Minus } from 'lucide-react'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 
 export interface TrueFalseNotGivenReadingFormData {
   true_false_not_givens: Array<{
@@ -184,7 +184,7 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
                         <FormLabel className="text-[#2D3748] font-medium">Câu hỏi</FormLabel>
                         <FormControl>
                           <div className="mt-2">
-                            <RichtextchtEditor
+                            <CustomTextarea
                               value={questionField.value || ''}
                               onChange={questionField.onChange}
                               className={error ? 'border-red-500' : ''}
@@ -241,7 +241,7 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
                         <FormLabel className="text-[#2D3748] font-medium">Giải thích</FormLabel>
                         <FormControl>
                           <div className="mt-2">
-                            <RichtextchtEditor
+                            <CustomTextarea
                               value={explainField.value || ''}
                               onChange={explainField.onChange}
                               className={error ? 'border-red-500' : ''}

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { RichtextView } from '../../../../../componentscommon/RichtextView'
-import { RichtextchtEditor } from '../../../../../componentsInput/CustomRichtext'
+import { CustomTextarea } from '../../../../../componentsInput/CustomTextarea'
 import { Button } from '../../../../components/ui/button'
 import { Plus, Minus, Pencil, Check, X, Loader2 } from 'lucide-react'
 
@@ -132,7 +132,7 @@ export function EditUsageNoteSection({
         </div>
       </div>
       <div className="space-y-4">
-        <RichtextchtEditor
+        <CustomTextarea
           value={usageNoteInput}
           onChange={setUsageNoteInput}
           className="hover:border-[#52aaa5]"
@@ -145,7 +145,7 @@ export function EditUsageNoteSection({
           >
             {editingIdx === index ? (
               <div>
-                <RichtextchtEditor value={editContent} onChange={setEditContent} className="mb-2" />
+                <CustomTextarea value={editContent} onChange={setEditContent} className="mb-2" />
                 <div className="flex gap-2 mt-2">
                   <Button
                     onClick={handleSaveEdit}

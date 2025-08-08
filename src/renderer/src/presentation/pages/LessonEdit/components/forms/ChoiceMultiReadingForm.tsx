@@ -10,7 +10,7 @@ import {
 import { Button } from '../../../../../components/ui/button'
 import { Checkbox } from '../../../../../components/ui/checkbox'
 import { Plus, Minus } from 'lucide-react'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
 export interface ChoiceMultiReadingFormData {
@@ -108,7 +108,7 @@ export const ChoiceMultiReadingForm: FC<ChoiceMultiReadingFormProps> = ({ initia
                       <FormLabel className="text-[#2D3748] font-medium">Câu hỏi</FormLabel>
                       <FormControl>
                         <div className="mt-2">
-                          <RichtextchtEditor
+                          <CustomTextarea
                             value={field.value || ''}
                             onChange={field.onChange}
                             className={
@@ -137,7 +137,7 @@ export const ChoiceMultiReadingForm: FC<ChoiceMultiReadingFormProps> = ({ initia
                       <FormLabel className="text-[#2D3748] font-medium">Giải thích</FormLabel>
                       <FormControl>
                         <div className="mt-2">
-                          <RichtextchtEditor
+                          <CustomTextarea
                             value={field.value || ''}
                             onChange={field.onChange}
                             className={

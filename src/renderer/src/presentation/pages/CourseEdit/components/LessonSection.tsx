@@ -8,7 +8,7 @@ import { Button } from '../../../../components/ui/button'
 import { Input } from '../../../../components/ui/input'
 import { Loader2 } from 'lucide-react'
 import { CustomInput } from '../../../../components/Input/CustomInput'
-import { RichtextchtEditor } from '../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../components/Input/CustomTextarea'
 
 interface LessonSectionProps {
   course: Course
@@ -28,7 +28,7 @@ interface LessonSectionProps {
   onCloseCreateQuestion: () => void
 }
 
-// NewLessonForm với CustomInput và RichtextchtEditor
+// NewLessonForm với CustomInput và CustomTextarea
 const NewLessonForm: FC<{
   title: string
   overview: string
@@ -50,7 +50,7 @@ const NewLessonForm: FC<{
       </div>
       <div>
         <label className="block font-medium mb-1 text-gray-700 text-sm">Tổng quan</label>
-        <RichtextchtEditor
+        <CustomTextarea
           value={overview}
           onChange={onOverviewChange}
           placeholder="Tổng quan bài học"

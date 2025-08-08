@@ -9,7 +9,7 @@ import {
 } from '../../../../../components/ui/form'
 import { Button } from '../../../../../components/ui/button'
 import { Plus, Minus } from 'lucide-react'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 
 // Type definitions
 export interface OpenParagraphFormData {
@@ -63,7 +63,7 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({ initialData }) =
               <FormItem>
                 <FormLabel className="text-[#2D3748] font-medium">Đoạn văn mẫu</FormLabel>
                 <FormControl>
-                  <RichtextchtEditor
+                  <CustomTextarea
                     value={field.value || ''}
                     onChange={field.onChange}
                     placeholder="Nhập đoạn văn mẫu bằng tiếng Anh..."
@@ -90,7 +90,7 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({ initialData }) =
               <FormItem>
                 <FormLabel className="text-[#2D3748] font-medium">Nghĩa đoạn văn mẫu</FormLabel>
                 <FormControl>
-                  <RichtextchtEditor
+                  <CustomTextarea
                     value={field.value || ''}
                     onChange={field.onChange}
                     placeholder="Nhập nghĩa tiếng Việt của đoạn văn mẫu..."
@@ -129,7 +129,7 @@ export const OpenParagraphForm: FC<OpenParagraphFormProps> = ({ initialData }) =
                     <Minus className="h-4 w-4" /> Xóa
                   </Button>
                 </div>
-                <RichtextchtEditor
+                <CustomTextarea
                   value={tip}
                   onChange={(val) => updateTip(index, val)}
                   placeholder={`Nhập mẹo viết ${index + 1}...`}

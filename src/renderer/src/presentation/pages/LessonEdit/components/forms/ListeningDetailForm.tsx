@@ -10,7 +10,7 @@ import {
 import { Button } from '../../../../../components/ui/button'
 import { Upload, X } from 'lucide-react'
 import { useDropzone } from 'react-dropzone'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 import { MultiImageDropzone } from '../../../../../components/Image/CustomMultiImageDropzone'
 
 export interface ListeningDetailFormData {
@@ -231,7 +231,7 @@ export const ListeningDetailForm: FC<ListeningDetailFormProps> = ({ initialData,
                 </FormLabel>
                 <FormControl>
                   <div className="mt-2">
-                    <RichtextchtEditor
+                    <CustomTextarea
                       value={field.value || ''}
                       onChange={field.onChange}
                       className="border-[#52aaa5]/20"

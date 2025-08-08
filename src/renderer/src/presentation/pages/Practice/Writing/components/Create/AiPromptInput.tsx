@@ -1,5 +1,5 @@
 import React from 'react'
-import { RichtextchtEditor } from '../../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../../components/Input/CustomTextarea'
 
 interface AiPromptInputProps {
   value: string
@@ -21,7 +21,7 @@ const AiPromptInput: React.FC<AiPromptInputProps> = ({
       <span className="text-xl text-purple-600">&#129302;</span>
       <h3 className="text-lg font-bold">AI Prompt</h3>
     </div>
-    <RichtextchtEditor
+    <CustomTextarea
       value={value}
       onChange={onChange}
       placeholder="Enter a special writing prompt..."

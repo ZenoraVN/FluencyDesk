@@ -10,7 +10,7 @@ import {
 import { Button } from '../../../../../components/ui/button'
 import { Minus, Plus } from 'lucide-react'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 
 interface Role {
   id: string
@@ -162,7 +162,7 @@ export const OpenConversationForm: FC<OpenConversationFormProps> = ({ initialDat
             <FormItem>
               <FormLabel className="text-[#2D3748] font-medium">Tổng quan</FormLabel>
               <FormControl>
-                <RichtextchtEditor
+                <CustomTextarea
                   value={field.value || ''}
                   onChange={(val) => {
                     field.onChange(val)

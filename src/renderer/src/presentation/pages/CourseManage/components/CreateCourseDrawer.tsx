@@ -5,7 +5,7 @@ import { Loader2, CheckCircle2, Sparkles } from 'lucide-react'
 import ApiService from '../../../../service/ApiService'
 import { CustomSingleImageDropzone } from '../../../../components/Image/CustomSinglemageDropzone'
 import { CustomInput } from '../../../../components/Input/CustomInput'
-import { RichtextchtEditor } from '../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../components/Input/CustomTextarea'
 import CustomCombobox from '../../../../components/Combobox/CustomCombobox'
 import { ButtonGroup } from '../../../../components/Button/ButtonGroup'
 import { suggestCourseTags } from '../service/AutoSuggestTagsGemini'
@@ -262,7 +262,7 @@ const CreateCourseDrawer: FC<CreateCourseDrawerProps> = ({
                 ({newCourse.overview.length}/1000)
               </span>
             </label>
-            <RichtextchtEditor
+            <CustomTextarea
               value={newCourse.overview}
               onChange={(val) => onCourseChange({ ...newCourse, overview: val })}
               placeholder="Nhập tổng quan về khóa học..."

@@ -7,7 +7,7 @@ import {
   FormItem,
   FormLabel
 } from '../../../../../components/ui/form'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 import { MultiImageDropzone } from '../../../../../components/Image/CustomMultiImageDropzone'
 
@@ -104,7 +104,7 @@ export const ReadingDetailForm: FC<ReadingDetailFormProps> = ({ initialData, onC
                 <FormItem>
                   <FormLabel className="text-[#2D3748] font-medium">Reading Content</FormLabel>
                   <FormControl>
-                    <RichtextchtEditor
+                    <CustomTextarea
                       value={field.value || ''}
                       onChange={field.onChange}
                       className={`rounded-lg overflow-hidden ${

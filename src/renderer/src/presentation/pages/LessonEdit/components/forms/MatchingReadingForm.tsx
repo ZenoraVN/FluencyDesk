@@ -9,7 +9,7 @@ import {
 } from '../../../../../components/ui/form'
 import { Button } from '../../../../../components/ui/button'
 import { Plus, Minus } from 'lucide-react'
-import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
+import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
 export interface MatchingReadingFormData {
@@ -256,7 +256,7 @@ export const MatchingReadingForm: FC<MatchingReadingFormProps> = ({ initialData 
                           <FormLabel className="text-[#2D3748] font-medium">Giải thích</FormLabel>
                           <FormControl>
                             <div className="mt-2">
-                              <RichtextchtEditor
+                              <CustomTextarea
                                 value={eField.value || ''}
                                 onChange={eField.onChange}
                                 className={
