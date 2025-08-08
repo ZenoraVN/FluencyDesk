@@ -15,7 +15,7 @@ import {
   FormMessage
 } from '../../../../../components/ui/form'
 import { Button } from '../../../../../components/ui/button'
-import { Plus, Minus } from 'lucide-react'
+import { Plus, Trash } from 'lucide-react'
 import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 import CustomCombobox from '../../../../../components/Combobox/CustomCombobox'
@@ -130,38 +130,30 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
         <div className="space-y-4">
           <div className="flex justify-between items-center pb-2 border-b border-gray-200">
             <div>
-              <h4 className="text-sm font-medium text-[#2D3748]">True/False/Not Given Questions</h4>
+              <h4 className="text-sm font-medium text-[#2D3748]"></h4>
               {form.formState.errors.true_false_not_givens?.root && (
                 <div className="text-sm text-red-500 mt-1">
                   {form.formState.errors.true_false_not_givens.root.message}
                 </div>
               )}
             </div>
-            {fields.length < 10 && (
-              <Button
-                type="button"
-                onClick={() => append({ question: '', answer: 'TRUE', explain: '' })}
-                className="flex items-center gap-2 px-4 py-1.5 text-sm bg-[#52aaa5]/10 text-[#52aaa5] hover:bg-[#52aaa5]/20 rounded-lg transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                Add Question
-              </Button>
-            )}
           </div>
 
           <div className="flex flex-col gap-4">
             {fields.map((field, index) => (
-              <div key={field.id} className="relative rounded-lg border border-gray-100 p-4">
+              <div
+                key={field.id}
+                className="relative rounded-lg border border-gray-100 border-b p-4"
+              >
                 <div className="flex justify-between items-center mb-4">
-                  <h5 className="text-sm font-medium text-[#2D3748]">Câu hỏi {index + 1}</h5>
+                  <h5 className="text-sm font-medium text-[#2D3748]">Question {index + 1}</h5>
                   {fields.length > 2 && (
                     <Button
                       type="button"
                       onClick={() => remove(index)}
                       className="flex items-center gap-2 px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-lg"
                     >
-                      <Minus className="h-4 w-4" />
-                      Xóa
+                      <Trash className="h-4 w-4" />
                     </Button>
                   )}
                 </div>
@@ -238,6 +230,18 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
                 </div>
               </div>
             ))}
+          </div>
+          <div className="flex justify-end pt-4">
+            {fields.length < 10 && (
+              <Button
+                type="button"
+                onClick={() => append({ question: '', answer: 'TRUE', explain: '' })}
+                className="flex items-center gap-2 px-4 py-1.5 text-sm bg-[#52aaa5]/10 text-[#52aaa5] hover:bg-[#52aaa5]/20 rounded-lg transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                Add Question
+              </Button>
+            )}
           </div>
         </div>
       </div>
