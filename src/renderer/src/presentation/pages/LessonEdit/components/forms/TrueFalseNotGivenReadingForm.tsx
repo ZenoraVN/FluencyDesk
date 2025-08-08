@@ -17,6 +17,8 @@ import {
 import { Button } from '../../../../../components/ui/button'
 import { Plus, Minus } from 'lucide-react'
 import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
+import { CustomInput } from '../../../../../components/Input/CustomInput'
+import CustomCombobox from '../../../../../components/Combobox/CustomCombobox'
 
 export interface TrueFalseNotGivenReadingFormData {
   true_false_not_givens: Array<{
@@ -77,12 +79,7 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
           (value && value.length >= 2) || 'Phải có ít nhất 2 câu hỏi',
         maxTen: (value: Array<{ question: string; answer: string; explain: string }>) =>
           (value && value.length <= 10) || 'Chỉ được tối đa 10 câu hỏi',
-        noDuplicates: (value: Array<{ question: string; answer: string; explain: string }>) => {
-          if (!value) return true
-          const questions = value.map((v) => v.question.trim())
-          const uniqueQuestions = new Set(questions)
-          return questions.length === uniqueQuestions.size || 'Các câu hỏi không được trùng nhau'
-        },
+
         uniqueExplanations: (
           value: Array<{ question: string; answer: string; explain: string }>
         ) => {
@@ -133,9 +130,7 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
         <div className="space-y-4">
           <div className="flex justify-between items-center pb-2 border-b border-gray-200">
             <div>
-              <h4 className="text-sm font-medium text-[#2D3748]">
-                Các câu hỏi True/False/Not Given
-              </h4>
+              <h4 className="text-sm font-medium text-[#2D3748]">True/False/Not Given Questions</h4>
               {form.formState.errors.true_false_not_givens?.root && (
                 <div className="text-sm text-red-500 mt-1">
                   {form.formState.errors.true_false_not_givens.root.message}
@@ -149,7 +144,7 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
                 className="flex items-center gap-2 px-4 py-1.5 text-sm bg-[#52aaa5]/10 text-[#52aaa5] hover:bg-[#52aaa5]/20 rounded-lg transition-colors"
               >
                 <Plus className="h-4 w-4" />
-                Thêm câu hỏi
+                Add Question
               </Button>
             )}
           </div>
@@ -172,86 +167,74 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
                 </div>
 
                 <div className="space-y-4">
-                  {/* Question */}
-                  <FormField
-                    control={form.control}
-                    name={`true_false_not_givens.${index}.question`}
-                    rules={{
-                      required: 'Vui lòng nhập câu hỏi'
-                    }}
-                    render={({ field: questionField, fieldState: { error } }: RenderProps) => (
-                      <FormItem>
-                        <FormLabel className="text-[#2D3748] font-medium">Câu hỏi</FormLabel>
-                        <FormControl>
-                          <div className="mt-2">
-                            <CustomTextarea
-                              value={questionField.value || ''}
+                  {/* Row 1: Question + Answer */}
+                  <div className="flex flex-col sm:flex-row sm:gap-4">
+                    <FormField
+                      control={form.control}
+                      name={`true_false_not_givens.${index}.question`}
+                      rules={{ required: true }}
+                      render={({ field: questionField }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel className="text-[#2D3748] font-medium">Question</FormLabel>
+                          <FormControl>
+                            <CustomInput
+                              value={questionField.value}
                               onChange={questionField.onChange}
-                              className={error ? 'border-red-500' : ''}
+                              placeholder="Enter question"
                             />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`true_false_not_givens.${index}.answer`}
+                      rules={{ required: true }}
+                      render={() => (
+                        <FormItem className="w-full sm:w-1/3">
+                          <FormLabel className="text-[#2D3748] font-medium">Answer</FormLabel>
+                          <FormControl>
+                            <CustomCombobox
+                              label=""
+                              value={form.getValues(`true_false_not_givens.${index}.answer`)}
+                              options={ANSWER_OPTIONS.map((o) => ({
+                                value: o.value,
+                                label: o.label
+                              }))}
+                              onChange={(val: string | string[]) =>
+                                form.setValue(`true_false_not_givens.${index}.answer`, val as any)
+                              }
+                              placeholder="Select answer"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {/* End Row 1 */}
 
-                  {/* Answer Buttons */}
-                  <FormField
-                    control={form.control}
-                    name={`true_false_not_givens.${index}.answer`}
-                    rules={{ required: 'Vui lòng chọn đáp án' }}
-                    render={({ field: answerField }: RenderProps) => (
-                      <FormItem>
-                        <FormLabel className="text-[#2D3748] font-medium">Đáp án</FormLabel>
-                        <div className="flex gap-3">
-                          {ANSWER_OPTIONS.map((option) => (
-                            <Button
-                              key={option.value}
-                              type="button"
-                              onClick={() => answerField.onChange(option.value)}
-                              className={`flex-1 ${option.color} ${
-                                answerField.value === option.value
-                                  ? 'ring-2 ring-offset-2 ring-current'
-                                  : ''
-                              }`}
-                            >
-                              {option.label}
-                            </Button>
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Explanation */}
+                  {/* Row 2: Explanation */}
                   <FormField
                     control={form.control}
                     name={`true_false_not_givens.${index}.explain`}
-                    rules={{
-                      required: 'Vui lòng nhập giải thích',
-                      validate: (value: string) => {
-                        if (!value?.trim()) return 'Vui lòng nhập giải thích'
-                        return true
-                      }
-                    }}
-                    render={({ field: explainField, fieldState: { error } }: RenderProps) => (
+                    rules={{ required: true }}
+                    render={({ field: explainField }) => (
                       <FormItem>
-                        <FormLabel className="text-[#2D3748] font-medium">Giải thích</FormLabel>
+                        <FormLabel className="text-[#2D3748] font-medium">Explanation</FormLabel>
                         <FormControl>
-                          <div className="mt-2">
-                            <CustomTextarea
-                              value={explainField.value || ''}
-                              onChange={explainField.onChange}
-                              className={error ? 'border-red-500' : ''}
-                            />
-                          </div>
+                          <CustomTextarea
+                            value={explainField.value}
+                            onChange={explainField.onChange}
+                            placeholder="Enter explanation"
+                          />
                         </FormControl>
-                        {error && <div className="text-sm text-red-500 mt-1">{error.message}</div>}
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
+                  {/* End Row 2 */}
                 </div>
               </div>
             ))}
