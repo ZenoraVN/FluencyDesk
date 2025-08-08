@@ -48,17 +48,17 @@ interface RenderProps<
 const ANSWER_OPTIONS = [
   {
     value: 'TRUE',
-    label: 'Đúng',
+    label: 'True',
     color: 'bg-green-50 text-green-600 hover:bg-green-100'
   },
   {
     value: 'FALSE',
-    label: 'Sai',
+    label: 'False',
     color: 'bg-red-50 text-red-600 hover:bg-red-100'
   },
   {
     value: 'NOT_GIVEN',
-    label: 'Không chắc chắn',
+    label: 'Not given',
     color: 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100'
   }
 ] as const
@@ -143,7 +143,7 @@ export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps>
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="relative rounded-lg border border-gray-100 border-b p-4"
+                className="relative rounded-lg border-b hover:border-b-[#52aaad] p-4"
               >
                 <div className="flex justify-between items-center mb-4">
                   <h5 className="text-sm font-medium text-[#2D3748]">Question {index + 1}</h5>
