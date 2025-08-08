@@ -12,7 +12,7 @@ import { Plus, Minus } from 'lucide-react'
 import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
-export interface MatchingFormData {
+export interface MatchingListeningFormData {
   matchings: Array<{
     question: string
     answer: string
@@ -20,25 +20,25 @@ export interface MatchingFormData {
   }>
 }
 
-interface MatchingFormProps {
-  initialData?: MatchingFormData
+interface MatchingListeningFormProps {
+  initialData?: MatchingListeningFormData
 }
 
-export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
-  const form = useFormContext<MatchingFormData>()
+export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialData }) => {
+  const form = useFormContext<MatchingListeningFormData>()
   const initialized = useRef(false)
 
-  const { fields, append, remove } = useFieldArray<MatchingFormData>({
+  const { fields, append, remove } = useFieldArray<MatchingListeningFormData>({
     control: form.control,
     name: 'matchings',
     rules: {
       required: 'Vui lòng thêm ít nhất một cặp ghép nối',
       validate: {
-        atLeastTwo: (value: MatchingFormData['matchings']) =>
+        atLeastTwo: (value: MatchingListeningFormData['matchings']) =>
           value && value.length >= 2 ? true : 'Phải có ít nhất 2 cặp ghép nối',
-        maxTen: (value: MatchingFormData['matchings']) =>
+        maxTen: (value: MatchingListeningFormData['matchings']) =>
           value && value.length <= 10 ? true : 'Chỉ được tối đa 10 cặp ghép nối',
-        noDuplicateContent: (value: MatchingFormData['matchings']) => {
+        noDuplicateContent: (value: MatchingListeningFormData['matchings']) => {
           if (!value) return true
           const clean = (val: string) =>
             (val || '')
@@ -171,7 +171,7 @@ export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
                           <FormControl>
                             <CustomInput
                               value={qField.value || ''}
-                              onChange={(val) => {
+                              onChange={(val: any) => {
                                 qField.onChange(val)
                                 form.trigger('matchings')
                               }}
@@ -209,7 +209,7 @@ export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
                           <FormControl>
                             <CustomInput
                               value={aField.value || ''}
-                              onChange={(val) => {
+                              onChange={(val: any) => {
                                 aField.onChange(val)
                                 form.trigger('matchings')
                               }}

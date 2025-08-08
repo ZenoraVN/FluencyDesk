@@ -7,20 +7,23 @@ import {
   FormItem,
   FormLabel
 } from '../../../../../components/ui/form'
+import { Trash } from 'lucide-react'
 import { Button } from '../../../../../components/ui/button'
 import { GapFillView } from '../GapFillView'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
-const HEX_COLORS = (() => {
-  const colors = new Set<string>()
-  while (colors.size < 100) {
-    const color = Math.floor(Math.random() * 0xffffff)
-      .toString(16)
-      .padStart(6, '0')
-    colors.add(color)
-  }
-  return Array.from(colors)
-})()
+const HEX_COLORS = [
+  '3E8E7E',
+  'C44536',
+  'F4A261',
+  'E6B800',
+  '7D5A50',
+  '5D5C61',
+  '8D6A9F',
+  '70C1B3',
+  'A98467',
+  '2D4059'
+]
 
 export interface GapFillListeningAnswer {
   id: string // hex color id
@@ -43,12 +46,12 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
   initialData
 }): JSX.Element => {
   const [selectedBlankId, setSelectedBlankId] = useState<string | null>(null)
-  const [blankValidation, setBlankValidation] = useState<string | null>(null)
+  const [blankValidation] = useState<string | null>(null)
   const form = useFormContext<GapFillListeningFormData>()
   const questionInputRef = useRef<any>(null)
   const answerRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'fill_in_the_blank_answers'
   })
@@ -56,74 +59,8 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
   const answers = form.watch('fill_in_the_blank_answers') || []
   const question = form.watch('fill_in_the_blank_question.question') || ''
 
-  // Validate blanks - improved with state
-  const validateBlanks = (question: string) => {
-    const blanks = question.match(/\*\*\*([a-f0-9]{6})\*\*\*/g) || []
-    if (blanks.length === 0) {
-      const msg = 'The question must have at least one blank (***1a2b3c***)'
-      setBlankValidation(msg)
-      return msg
-    }
-    const blankIds = blanks.map((b) => b.replace(/\*\*\*/g, ''))
-    const answerIds = answers.map((a) => a.id)
-
-    const missingInQuestion = answerIds.filter((id) => !blankIds.includes(id))
-    const missingInAnswers = blankIds.filter((id) => !answerIds.includes(id))
-    if (missingInQuestion.length || missingInAnswers.length) {
-      const parts = []
-      if (missingInQuestion.length) {
-        parts.push(`Answers exist for missing blanks: ${missingInQuestion.join(', ')}`)
-      }
-      if (missingInAnswers.length) {
-        parts.push(`Blanks exist without answers: ${missingInAnswers.join(', ')}`)
-      }
-      const msg = parts.join('. ')
-      setBlankValidation(msg)
-      return msg
-    }
-
-    setBlankValidation(null)
-    return true
-  }
-
-  // Get next unused hex across question and answers
-  const getNextAvailableHex = (): string => {
-    const questionContent = form.getValues('fill_in_the_blank_question.question') || ''
-    const usedInQ = [...questionContent.matchAll(/\*\*\*([a-f0-9]{6})\*\*\*/g)].map((m) => m[1])
-    const usedInA = answers.map((a) => a.id)
-    const used = new Set([...usedInQ, ...usedInA])
-    return HEX_COLORS.find((c) => !used.has(c)) || HEX_COLORS[0]
-  }
-
-  // Insert blank placeholder at cursor with styled span
-  const insertBlankAtCursor = () => {
-    const selection = window.getSelection()
-    if (!selection || !questionInputRef.current) return
-
-    const hex = getNextAvailableHex()
-    const span = document.createElement('span')
-    span.className = 'blank-placeholder'
-    span.style.backgroundColor = `#${hex}33`
-    span.style.border = `1px dashed #${hex}`
-    span.style.padding = '2px 4px'
-    span.style.borderRadius = '4px'
-    span.style.margin = '0 2px'
-    span.textContent = '___'
-    span.dataset.blankId = hex
-
-    const range = selection.getRangeAt(0)
-    range.deleteContents()
-    range.insertNode(span)
-
-    const newValue = questionInputRef.current.innerHTML
-    form.setValue('fill_in_the_blank_question.question', newValue)
-
-    if (!answers.find((a) => a.id === hex)) {
-      append({ id: hex, answer: '', explain: '' })
-    }
-
-    setTimeout(() => form.trigger('fill_in_the_blank_question.question'), 10)
-  }
+  // Validate blanks - disabled
+  const validateBlanks = (): true => true
 
   // Handle blank selection
   const handleBlankClick = (hex: string) => {
@@ -147,28 +84,21 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
     if (idx >= 0) remove(idx)
   }
 
-  // Sync answers with blanks using form.watch
+  // Subscription: sync manual typing of placeholders to answers
   useEffect(() => {
-    const sub = form.watch((value) => {
+    const subscription = form.watch((value) => {
       const q = value.fill_in_the_blank_question?.question || ''
-      const answersData = (value.fill_in_the_blank_answers ?? []) as GapFillListeningAnswer[]
       const blanks = q.match(/\*\*\*([a-f0-9]{6})\*\*\*/g) || []
       const ids = blanks.map((b) => b.replace(/\*\*\*/g, ''))
-      // add missing answer entries
+      const currentAnswers = form.getValues('fill_in_the_blank_answers') as GapFillListeningAnswer[]
       ids.forEach((id) => {
-        if (!answersData.find((a) => a.id === id)) {
+        if (!currentAnswers.find((a) => a.id === id)) {
           append({ id, answer: '', explain: '' })
         }
       })
-      // remove orphaned answers
-      answersData.forEach((a, i) => {
-        if (!ids.includes(a.id)) {
-          remove(i)
-        }
-      })
     })
-    return () => sub.unsubscribe()
-  }, [form, append, remove])
+    return () => subscription.unsubscribe()
+  }, [form, append])
 
   // On load, preload from initial data if any
   useEffect(() => {
@@ -215,14 +145,40 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
                       <FormLabel className="text-[#2D3748] font-medium flex items-center gap-2">
                         Question
                       </FormLabel>
-                      <Button
-                        type="button"
-                        onClick={insertBlankAtCursor}
-                        className="flex items-center gap-1 text-sm"
-                      >
-                        <PlusIcon className="w-4 h-4" />
-                        Add Blank
-                      </Button>
+                      {/* blanks auto-insert on "***" */}
+                    </div>
+                    {/* Color palette: click to insert hex placeholder */}
+                    <div className="flex gap-2 my-2 overflow-hidden whitespace-nowrap">
+                      {HEX_COLORS.map((hex) => {
+                        const used = question.includes(`***${hex}***`)
+                        return (
+                          <div
+                            key={hex}
+                            className={`inline-flex items-center justify-center px-2 py-1 text-xs text-white font-mono rounded-md border border-gray-200 cursor-pointer ${
+                              used ? 'hidden' : ''
+                            }`}
+                            style={{ backgroundColor: `#${hex}` }}
+                            onClick={() => {
+                              const current =
+                                form.getValues('fill_in_the_blank_question.question') || ''
+                              if (!current.includes(`***${hex}***`)) {
+                                const updated = current + `***${hex}***`
+                                form.setValue('fill_in_the_blank_question.question', updated, {
+                                  shouldValidate: true,
+                                  shouldDirty: true
+                                })
+                                append({ id: hex, answer: '', explain: '' })
+                                setTimeout(() => {
+                                  form.trigger('fill_in_the_blank_question.question')
+                                  form.trigger('fill_in_the_blank_answers')
+                                }, 10)
+                              }
+                            }}
+                          >
+                            {hex}
+                          </div>
+                        )
+                      })}
                     </div>
                     <FormControl>
                       <div className="mt-2">
@@ -240,7 +196,7 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
                             error ? 'border-red-500 text-red-500' : 'hover:border-[#52aaaf]'
                           }`}
                           min={true}
-                          placeholder="Enter the question here (e.g., The capital of France is ***1a2b3c***)"
+                          placeholder="Enter the question here (e.g., I heard a phrase with ***1a2b3c***)"
                         />
                       </div>
                     </FormControl>
@@ -260,7 +216,7 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
               <div className="pb-3 flex items-center gap-2">
                 <h4 className="text-sm font-medium text-[#2D3748]">Preview</h4>
               </div>
-              <div className="p-4 border border-gray-200 rounded-b-lg min-h-[80px] hover:border-[#52aaaf] rounded-lg bg-gray-50">
+              <div className="p-4 border border-gray-200 rounded-b-lg min-h-[80px] hover:border-[#52aaaf] bg-gray-50">
                 {question ? (
                   <GapFillView
                     content={question}
@@ -287,35 +243,23 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
             <div className="flex items-center gap-2 mb-1">
               <h4 className="text-sm font-medium text-[#2D3748]">Answers & Explanations</h4>
             </div>
-            <div className="space-y-4">
+            <div>
               {fields.length > 0 &&
                 fields.map((field, index) => {
                   const answer = answers[index] || { id: '', answer: '', explain: '' }
                   const hexId = answer.id || ''
-                  const isSelected = selectedBlankId === hexId
-                  const bgColor = `#${hexId}33`
                   return (
                     <div
                       key={field.id}
                       ref={(el) => (answerRefs.current[index] = el)}
-                      className={`p-4 rounded-lg transition-all border ${
-                        isSelected
-                          ? 'border-blue-300 shadow-sm'
-                          : 'border-gray-200 hover:border-[#52aaaf] hover:shadow-sm'
-                      }`}
-                      style={{ backgroundColor: bgColor }}
+                      className="rounded-lg transition-all space-y-2"
                     >
-                      <div className="mb-2 flex justify-between items-center">
+                      <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-[#2D3748]">
-                            Answer {index + 1}
-                          </span>
+                          <span className="text-sm font-medium">{index + 1}. </span>
                           <span
-                            className="text-xs px-1.5 py-0.5 rounded border"
-                            style={{
-                              backgroundColor: `#${hexId}22`,
-                              borderColor: `#${hexId}`
-                            }}
+                            className="text-xs px-1.5 py-0.5 rounded-md border text-white"
+                            style={{ backgroundColor: `#${hexId}` }}
                           >
                             #{hexId}
                           </span>
@@ -323,9 +267,11 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
                         <Button
                           type="button"
                           onClick={() => remove(index)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          variant="ghost"
+                          size="icon"
+                          className="text-gray-500 hover:text-red-600"
                         >
-                          Delete
+                          <Trash className="w-4 h-4" />
                         </Button>
                       </div>
                       {/* Answer */}
@@ -340,7 +286,7 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
                             return true
                           }
                         }}
-                        render={({ field: ansField, fieldState: { error } }) => {
+                        render={({ field: ansField }) => {
                           const plain = (ansField.value || '').trim()
                           return (
                             <FormItem>
@@ -353,15 +299,16 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
                                       ansField.onChange(val)
                                       form.trigger(`fill_in_the_blank_answers.${index}.answer`)
                                     }}
-                                    className={`bg-gray-50 ${!plain ? 'border-red-500 text-red-500' : 'hover:border-[#52aaaf]'}`}
+                                    className={`bg-gray-50 ${
+                                      !plain
+                                        ? 'border-red-500 text-red-500'
+                                        : 'hover:border-[#52aaaf]'
+                                    }`}
                                     placeholder="Enter answer here"
                                     min={true}
                                   />
                                 </div>
                               </FormControl>
-                              {!plain && error && (
-                                <div className="text-sm text-red-500 mt-1">{error.message}</div>
-                              )}
                             </FormItem>
                           )
                         }}
@@ -391,10 +338,10 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
                             }
                           }
                         }}
-                        render={({ field: expField, fieldState: { error } }) => {
+                        render={({ field: expField }) => {
                           const plain = (expField.value || '').trim()
                           return (
-                            <FormItem className="mt-6 pt-4 border-t border-gray-100">
+                            <FormItem>
                               <FormLabel className="text-[#2D3748] font-medium">
                                 Explanation
                               </FormLabel>
@@ -406,15 +353,14 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
                                       expField.onChange(val)
                                       form.trigger(`fill_in_the_blank_answers.${index}.explain`)
                                     }}
-                                    className={`bg-gray-50 ${!plain ? 'border-red-500 text-red-500' : ''}`}
+                                    className={`bg-gray-50 ${
+                                      !plain ? 'border-red-500 text-red-500' : ''
+                                    }`}
                                     placeholder="Enter explanation here"
                                     min={true}
                                   />
                                 </div>
                               </FormControl>
-                              {!plain && error && (
-                                <div className="text-sm text-red-500 mt-1">{error.message}</div>
-                              )}
                             </FormItem>
                           )
                         }}
@@ -429,17 +375,3 @@ export const GapFillListeningForm: FC<GapFillListeningFormProps> = ({
     </Form>
   )
 }
-
-// PlusIcon component
-const PlusIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    className={className}
-  >
-    <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)

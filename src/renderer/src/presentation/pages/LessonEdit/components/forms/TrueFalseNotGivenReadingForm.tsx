@@ -18,7 +18,7 @@ import { Button } from '../../../../../components/ui/button'
 import { Plus, Minus } from 'lucide-react'
 import { RichtextchtEditor } from '../../../../../components/Input/CustomRichtext'
 
-export interface TrueFalseNotGivenFormData {
+export interface TrueFalseNotGivenReadingFormData {
   true_false_not_givens: Array<{
     question: string
     answer: 'TRUE' | 'FALSE' | 'NOT_GIVEN'
@@ -26,19 +26,21 @@ export interface TrueFalseNotGivenFormData {
   }>
 }
 
-interface TrueFalseNotGivenFormProps {
-  initialData?: TrueFalseNotGivenFormData
+interface TrueFalseNotGivenReadingFormProps {
+  initialData?: TrueFalseNotGivenReadingFormData
 }
 
-type TrueFalseNotGivenFormPath =
+type TrueFalseNotGivenReadingFormPath =
   | `true_false_not_givens.${number}.question`
   | `true_false_not_givens.${number}.answer`
   | `true_false_not_givens.${number}.explain`
 
-interface RenderProps<TName extends TrueFalseNotGivenFormPath = TrueFalseNotGivenFormPath> {
-  field: ControllerRenderProps<TrueFalseNotGivenFormData, TName>
+interface RenderProps<
+  TName extends TrueFalseNotGivenReadingFormPath = TrueFalseNotGivenReadingFormPath
+> {
+  field: ControllerRenderProps<TrueFalseNotGivenReadingFormData, TName>
   fieldState: ControllerFieldState
-  formState: UseFormStateReturn<TrueFalseNotGivenFormData>
+  formState: UseFormStateReturn<TrueFalseNotGivenReadingFormData>
 }
 
 const ANSWER_OPTIONS = [
@@ -59,13 +61,13 @@ const ANSWER_OPTIONS = [
   }
 ] as const
 
-export const TrueFalseNotGivenForm: FC<TrueFalseNotGivenFormProps> = ({
+export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps> = ({
   initialData
 }): JSX.Element => {
-  const form = useFormContext<TrueFalseNotGivenFormData>()
+  const form = useFormContext<TrueFalseNotGivenReadingFormData>()
   const initialized = useRef(false)
 
-  const { fields, append, remove } = useFieldArray<TrueFalseNotGivenFormData>({
+  const { fields, append, remove } = useFieldArray<TrueFalseNotGivenReadingFormData>({
     control: form.control,
     name: 'true_false_not_givens',
     rules: {

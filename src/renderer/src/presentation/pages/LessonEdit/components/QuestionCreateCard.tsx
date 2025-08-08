@@ -25,6 +25,8 @@ import { ChoiceMultiListeningForm } from './forms/ChoiceMultiListeningForm'
 import { ChoiceMultiReadingForm } from './forms/ChoiceMultiReadingForm'
 import { ChoiceOneReadingForm } from './forms/ChoiceOneReadingForm'
 import { GapFillReadingForm } from './forms/GapFillReadingForm'
+import { MatchingReadingForm } from './forms/MatchingReadingForm'
+import { TrueFalseNotGivenReadingForm } from './forms/TrueFalseNotGivenReadingForm'
 
 interface QuestionCreateCardProps {
   question: QuestionDefinition
@@ -110,6 +112,8 @@ export const QuestionCreateCard: React.FC<QuestionCreateCardProps> = ({
         {question.type === 'shadow_words' && <ShadowWordForm />}
         {question.type === 'choice_one_reading' && <ChoiceOneReadingForm />}
         {question.type === 'choice_multi_reading' && <ChoiceMultiReadingForm />}
+        {question.type === 'true_false_not_given_reading' && <TrueFalseNotGivenReadingForm />}
+        {question.type === 'matching_reading' && <MatchingReadingForm />}
       </>
     )
   })
