@@ -12,7 +12,7 @@ import { Plus, Minus } from 'lucide-react'
 import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 
-export interface MatchingListeningFormData {
+export interface MatchingFormData {
   matchings: Array<{
     question: string
     answer: string
@@ -20,25 +20,23 @@ export interface MatchingListeningFormData {
   }>
 }
 
-interface MatchingListeningFormProps {
-  initialData?: MatchingListeningFormData
+interface MatchingFormProps {
+  initialData?: MatchingFormData
 }
 
-export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialData }) => {
-  const form = useFormContext<MatchingListeningFormData>()
+export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
+  const form = useFormContext<MatchingFormData>()
   const initialized = useRef(false)
 
-  const { fields, append, remove } = useFieldArray<MatchingListeningFormData>({
+  const { fields, append, remove } = useFieldArray<MatchingFormData>({
     control: form.control,
     name: 'matchings',
     rules: {
-      required: 'Vui lòng thêm ít nhất một cặp ghép nối',
+      required: true,
       validate: {
-        atLeastTwo: (value: MatchingListeningFormData['matchings']) =>
-          value && value.length >= 2 ? true : 'Phải có ít nhất 2 cặp ghép nối',
-        maxTen: (value: MatchingListeningFormData['matchings']) =>
-          value && value.length <= 10 ? true : 'Chỉ được tối đa 10 cặp ghép nối',
-        noDuplicateContent: (value: MatchingListeningFormData['matchings']) => {
+        atLeastTwo: (value) => !!value && value.length >= 2,
+        maxTen: (value) => !!value && value.length <= 10,
+        noDuplicateContent: (value) => {
           if (!value) return true
           const clean = (val: string) =>
             (val || '')
@@ -63,18 +61,18 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
             return filtered.length !== new Set(filtered).size
           }
 
-          if (hasDuplicates(questions)) return 'Các câu hỏi không được trùng nhau'
-          if (hasDuplicates(answers)) return 'Các đáp án không được trùng nhau'
-          if (hasDuplicates(explains)) return 'Các giải thích không được trùng nhau'
+          if (hasDuplicates(questions)) return false
+          if (hasDuplicates(answers)) return false
+          if (hasDuplicates(explains)) return false
 
           for (let i = 0; i < value.length; i++) {
             const q = clean(value[i].question)
             const a = clean(value[i].answer)
             const e = clean(value[i].explain)
             if (!q || !a || !e) continue
-            if (q === a) return `Câu hỏi và đáp án trong cặp ${i + 1} không được giống nhau`
-            if (q === e) return `Câu hỏi và giải thích trong cặp ${i + 1} không được giống nhau`
-            if (a === e) return `Đáp án và giải thích trong cặp ${i + 1} không được giống nhau`
+            if (q === a) return false
+            if (q === e) return false
+            if (a === e) return false
           }
           return true
         }
@@ -156,11 +154,10 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
                     control={form.control}
                     name={`matchings.${index}.question`}
                     rules={{
-                      required: 'Vui lòng nhập câu hỏi',
+                      required: true,
                       validate: (value: string) => {
                         const plain = (value || '').replace(/<[^>]*>/g, '').trim()
-                        if (!plain) return 'Vui lòng nhập câu hỏi'
-                        return true
+                        return Boolean(plain)
                       }
                     }}
                     render={({ field: qField }) => {
@@ -182,9 +179,6 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
                               }`}
                             />
                           </FormControl>
-                          {!plain && (
-                            <div className="text-sm text-red-500 mt-1">Vui lòng nhập câu hỏi</div>
-                          )}
                         </FormItem>
                       )
                     }}
@@ -194,11 +188,10 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
                     control={form.control}
                     name={`matchings.${index}.answer`}
                     rules={{
-                      required: 'Vui lòng nhập đáp án',
+                      required: true,
                       validate: (value: string) => {
                         const plain = (value || '').replace(/<[^>]*>/g, '').trim()
-                        if (!plain) return 'Vui lòng nhập đáp án'
-                        return true
+                        return Boolean(plain)
                       }
                     }}
                     render={({ field: aField }) => {
@@ -220,9 +213,6 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
                               }`}
                             />
                           </FormControl>
-                          {!plain && (
-                            <div className="text-sm text-red-500 mt-1">Vui lòng nhập đáp án</div>
-                          )}
                         </FormItem>
                       )
                     }}
@@ -232,7 +222,7 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
                     control={form.control}
                     name={`matchings.${index}.explain`}
                     rules={{
-                      required: 'Vui lòng nhập giải thích',
+                      required: true,
                       validate: (value: string) => {
                         const plain = (value || '')
                           .replace(/<p>|<\/p>|<br\s*\/?>/gi, '')
@@ -240,8 +230,7 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
                           .replace(/&nbsp;/g, ' ')
                           .replace(/\s+/g, ' ')
                           .trim()
-                        if (!plain) return 'Vui lòng nhập giải thích'
-                        return true
+                        return Boolean(plain)
                       }
                     }}
                     render={({ field: eField }) => {
@@ -265,11 +254,6 @@ export const MatchingListeningForm: FC<MatchingListeningFormProps> = ({ initialD
                               />
                             </div>
                           </FormControl>
-                          {!plain && (
-                            <div className="text-sm text-red-500 mt-1">
-                              Vui lòng nhập giải thích
-                            </div>
-                          )}
                         </FormItem>
                       )
                     }}

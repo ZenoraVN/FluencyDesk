@@ -1,11 +1,5 @@
 import { FC, useEffect, useRef } from 'react'
-import {
-  useFormContext,
-  useFieldArray,
-  ControllerRenderProps,
-  ControllerFieldState,
-  UseFormStateReturn
-} from 'react-hook-form'
+import { useFormContext, useFieldArray } from 'react-hook-form'
 import {
   Form,
   FormControl,
@@ -20,7 +14,7 @@ import { CustomTextarea } from '../../../../../components/Input/CustomTextarea'
 import { CustomInput } from '../../../../../components/Input/CustomInput'
 import CustomCombobox from '../../../../../components/Combobox/CustomCombobox'
 
-export interface TrueFalseNotGivenReadingFormData {
+export interface TrueFalseNotGivenFormData {
   true_false_not_givens: Array<{
     question: string
     answer: 'TRUE' | 'FALSE' | 'NOT_GIVEN'
@@ -28,21 +22,8 @@ export interface TrueFalseNotGivenReadingFormData {
   }>
 }
 
-interface TrueFalseNotGivenReadingFormProps {
-  initialData?: TrueFalseNotGivenReadingFormData
-}
-
-type TrueFalseNotGivenReadingFormPath =
-  | `true_false_not_givens.${number}.question`
-  | `true_false_not_givens.${number}.answer`
-  | `true_false_not_givens.${number}.explain`
-
-interface RenderProps<
-  TName extends TrueFalseNotGivenReadingFormPath = TrueFalseNotGivenReadingFormPath
-> {
-  field: ControllerRenderProps<TrueFalseNotGivenReadingFormData, TName>
-  fieldState: ControllerFieldState
-  formState: UseFormStateReturn<TrueFalseNotGivenReadingFormData>
+interface TrueFalseNotGivenFormProps {
+  initialData?: TrueFalseNotGivenFormData
 }
 
 const ANSWER_OPTIONS = [
@@ -63,13 +44,13 @@ const ANSWER_OPTIONS = [
   }
 ] as const
 
-export const TrueFalseNotGivenReadingForm: FC<TrueFalseNotGivenReadingFormProps> = ({
+export const TrueFalseNotGivenForm: FC<TrueFalseNotGivenFormProps> = ({
   initialData
 }): JSX.Element => {
-  const form = useFormContext<TrueFalseNotGivenReadingFormData>()
+  const form = useFormContext<TrueFalseNotGivenFormData>()
   const initialized = useRef(false)
 
-  const { fields, append, remove } = useFieldArray<TrueFalseNotGivenReadingFormData>({
+  const { fields, append, remove } = useFieldArray<TrueFalseNotGivenFormData>({
     control: form.control,
     name: 'true_false_not_givens',
     rules: {

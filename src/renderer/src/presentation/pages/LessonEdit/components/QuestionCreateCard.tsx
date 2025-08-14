@@ -18,15 +18,12 @@ import {
 
 import { ListeningDetailForm } from './forms/ListeningDetailForm'
 import { ReadingDetailForm } from './forms/ReadingDetailForm'
-import { GapFillListeningForm } from './forms/GapFillListeningForm'
-import { ChoiceOneListeningForm } from './forms/ChoiceOneListeningForm'
+import { GapFillForm } from './forms/GapFillForm'
+import { ChoiceOneForm } from './forms/ChoiceOneForm'
 import { ShadowWordForm } from './forms/ShadowWordForm'
-import { ChoiceMultiListeningForm } from './forms/ChoiceMultiListeningForm'
-import { ChoiceMultiReadingForm } from './forms/ChoiceMultiReadingForm'
-import { ChoiceOneReadingForm } from './forms/ChoiceOneReadingForm'
-import { GapFillReadingForm } from './forms/GapFillReadingForm'
-import { MatchingReadingForm } from './forms/MatchingReadingForm'
-import { TrueFalseNotGivenReadingForm } from './forms/TrueFalseNotGivenReadingForm'
+import { ChoiceMultiForm } from './forms/ChoiceMultiForm'
+import { MatchingForm } from './forms/MatchingForm'
+import { TrueFalseNotGivenForm } from './forms/TrueFalseNotGivenForm'
 
 interface QuestionCreateCardProps {
   question: QuestionDefinition
@@ -105,15 +102,17 @@ export const QuestionCreateCard: React.FC<QuestionCreateCardProps> = ({
     label: 'Nội dung Quiz',
     content: (
       <>
-        {question.type === 'gap_fill_listening' && <GapFillListeningForm />}
-        {question.type === 'gap_fill_reading' && <GapFillReadingForm />}
-        {question.type === 'choice_one_listening' && <ChoiceOneListeningForm />}
-        {question.type === 'choice_multi_listening' && <ChoiceMultiListeningForm />}
+        {question.type === 'gap_fill_listening' && <GapFillForm />}
+        {question.type === 'gap_fill_reading' && <GapFillForm />}
+        {question.type === 'choice_one_listening' && <ChoiceOneForm />}
+        {question.type === 'choice_multi_listening' && <ChoiceMultiForm />}
         {question.type === 'shadow_words' && <ShadowWordForm />}
-        {question.type === 'choice_one_reading' && <ChoiceOneReadingForm />}
-        {question.type === 'choice_multi_reading' && <ChoiceMultiReadingForm />}
-        {question.type === 'true_false_not_given_reading' && <TrueFalseNotGivenReadingForm />}
-        {question.type === 'matching_reading' && <MatchingReadingForm />}
+        {question.type === 'choice_one_reading' && <ChoiceOneForm />}
+        {question.type === 'choice_multi_reading' && <ChoiceMultiForm />}
+        {question.type === 'true_false_not_given_reading' && <TrueFalseNotGivenForm />}
+        {question.type === 'true_false_not_given_listening' && <TrueFalseNotGivenForm />}
+        {question.type === 'matching_reading' && <MatchingForm />}
+        {question.type === 'matching_listening' && <MatchingForm />}
       </>
     )
   })

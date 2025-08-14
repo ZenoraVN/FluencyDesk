@@ -25,27 +25,27 @@ const HEX_COLORS = [
   '2D4059'
 ]
 
-export interface GapFillReadingAnswer {
+export interface GapFillAnswer {
   id: string // hex color id
   answer: string
   explain: string
 }
 
-export interface GapFillReadingFormData {
+export interface GapFillFormData {
   fill_in_the_blank_question: {
     question: string
   }
-  fill_in_the_blank_answers: GapFillReadingAnswer[]
+  fill_in_the_blank_answers: GapFillAnswer[]
 }
 
-interface GapFillReadingFormProps {
-  initialData?: GapFillReadingFormData
+interface GapFillFormProps {
+  initialData?: GapFillFormData
 }
 
-export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData }): JSX.Element => {
+export const GapFillForm: FC<GapFillFormProps> = ({ initialData }): JSX.Element => {
   const [selectedBlankId, setSelectedBlankId] = useState<string | null>(null)
   const [blankValidation] = useState<string | null>(null)
-  const form = useFormContext<GapFillReadingFormData>()
+  const form = useFormContext<GapFillFormData>()
   const questionInputRef = useRef<any>(null)
   const answerRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -88,7 +88,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
       const q = value.fill_in_the_blank_question?.question || ''
       const blanks = q.match(/\*\*\*([a-f0-9]{6})\*\*\*/g) || []
       const ids = blanks.map((b) => b.replace(/\*\*\*/g, ''))
-      const currentAnswers = form.getValues('fill_in_the_blank_answers') as GapFillReadingAnswer[]
+      const currentAnswers = form.getValues('fill_in_the_blank_answers') as GapFillAnswer[]
       ids.forEach((id) => {
         if (!currentAnswers.find((a) => a.id === id)) {
           append({ id, answer: '', explain: '' })
@@ -143,16 +143,18 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                       <FormLabel className="text-[#2D3748] font-medium flex items-center gap-2">
                         Question
                       </FormLabel>
-                      {/* "Add Blank" button removed: blanks auto-insert on "***" */}
+                      {/* blanks auto-insert on "***" */}
                     </div>
-                    {/* Color palette: click to copy hex; greyed out when used */}
+                    {/* Color palette: click to insert hex placeholder */}
                     <div className="flex gap-2 my-2 overflow-hidden whitespace-nowrap">
                       {HEX_COLORS.map((hex) => {
                         const used = question.includes(`***${hex}***`)
                         return (
                           <div
                             key={hex}
-                            className={`inline-flex items-center justify-center px-2 py-1 text-xs text-white font-mono rounded-md border border-gray-200 cursor-pointer ${used ? 'hidden' : ''}`}
+                            className={`inline-flex items-center justify-center px-2 py-1 text-xs text-white font-mono rounded-md border border-gray-200 cursor-pointer ${
+                              used ? 'hidden' : ''
+                            }`}
                             style={{ backgroundColor: `#${hex}` }}
                             onClick={() => {
                               const current =
@@ -192,7 +194,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                             error ? 'border-red-500 text-red-500' : 'hover:border-[#52aaaf]'
                           }`}
                           min={true}
-                          placeholder="Enter the question here (e.g., The capital of France is ***1a2b3c***)"
+                          placeholder="Enter the question here (e.g., I heard a phrase with ***1a2b3c***)"
                         />
                       </div>
                     </FormControl>
@@ -212,7 +214,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
               <div className="pb-3 flex items-center gap-2">
                 <h4 className="text-sm font-medium text-[#2D3748]">Preview</h4>
               </div>
-              <div className="p-4 border border-gray-200 rounded-b-lg min-h-[80px] hover:border-[#52aaaf] rounded-lg bg-gray-50">
+              <div className="p-4 border border-gray-200 rounded-b-lg min-h-[80px] hover:border-[#52aaaf] bg-gray-50">
                 {question ? (
                   <GapFillView
                     content={question}
@@ -295,13 +297,16 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                                       ansField.onChange(val)
                                       form.trigger(`fill_in_the_blank_answers.${index}.answer`)
                                     }}
-                                    className={`bg-gray-50 ${!plain ? 'border-red-500 text-red-500' : 'hover:border-[#52aaaf]'}`}
+                                    className={`bg-gray-50 ${
+                                      !plain
+                                        ? 'border-red-500 text-red-500'
+                                        : 'hover:border-[#52aaaf]'
+                                    }`}
                                     placeholder="Enter answer here"
                                     min={true}
                                   />
                                 </div>
                               </FormControl>
-                              {/* error display removed */}
                             </FormItem>
                           )
                         }}
@@ -322,7 +327,7 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                               if (!plain) return true
                               const allExplanations = form
                                 .getValues('fill_in_the_blank_answers')
-                                .map((a: GapFillReadingAnswer) => (a.explain || '').trim())
+                                .map((a: GapFillAnswer) => (a.explain || '').trim())
                                 .filter((_, i) => i !== index)
                               return (
                                 !allExplanations.includes(plain) ||
@@ -339,20 +344,21 @@ export const GapFillReadingForm: FC<GapFillReadingFormProps> = ({ initialData })
                                 Explanation
                               </FormLabel>
                               <FormControl>
-                                <div>
+                                <div className="mt-2">
                                   <CustomInput
                                     value={expField.value || ''}
                                     onChange={(val: string) => {
                                       expField.onChange(val)
                                       form.trigger(`fill_in_the_blank_answers.${index}.explain`)
                                     }}
-                                    className={`bg-gray-50 border-b pb-2 ${!plain ? 'border-red-500 text-red-500' : ''}`}
+                                    className={`bg-gray-50 ${
+                                      !plain ? 'border-red-500 text-red-500' : ''
+                                    }`}
                                     placeholder="Enter explanation here"
                                     min={true}
                                   />
                                 </div>
                               </FormControl>
-                              {/* error display removed */}
                             </FormItem>
                           )
                         }}

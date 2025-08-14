@@ -7,11 +7,7 @@ import {
   SkillType,
   QuestionDefinition
 } from '../types/questionDetail'
-// import { QuestionCreateCard } from './QuestionCreateCard'
 
-/**
- * This card allows the user to pick a skill area and then a question type to create.
- */
 interface QuestionChoiceCardProps {
   onCreate: (q: QuestionDefinition) => void
 }
@@ -24,6 +20,7 @@ export const QuestionChoiceCard: React.FC<QuestionChoiceCardProps> = ({ onCreate
   function handleViewExample(_q: QuestionDefinition) {
     // No-op, for now
   }
+
   function handleCreateQuestion(q: QuestionDefinition) {
     onCreate(q)
   }
