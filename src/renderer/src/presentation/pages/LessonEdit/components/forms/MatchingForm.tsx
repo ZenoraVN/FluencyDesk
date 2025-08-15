@@ -112,9 +112,8 @@ export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
       <div className="space-y-6">
         {/* Matching Pairs Section */}
         <div className="space-y-4">
-          <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+          <div className="flex justify-between items-end pb-2 border-b border-gray-200">
             <div>
-              <h4 className="text-sm font-medium text-[#2D3748]">Các cặp ghép nối</h4>
               {form.formState.errors.matchings?.root && (
                 <div className="text-sm text-red-500 mt-1">
                   {form.formState.errors.matchings.root.message}
@@ -136,7 +135,7 @@ export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
             {fields.map((field, index) => (
               <div key={field.id} className="relative rounded-lg border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
-                  <h5 className="text-sm font-medium text-[#2D3748]">Cặp ghép nối {index + 1}</h5>
+                  <h5 className="text-sm font-medium text-[#2D3748]">Matching {index + 1}</h5>
                   {fields.length > 2 && (
                     <Button
                       type="button"
@@ -149,74 +148,80 @@ export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
                   )}
                 </div>
                 <div className="flex flex-col gap-4">
-                  {/* Question */}
-                  <FormField
-                    control={form.control}
-                    name={`matchings.${index}.question`}
-                    rules={{
-                      required: true,
-                      validate: (value: string) => {
-                        const plain = (value || '').replace(/<[^>]*>/g, '').trim()
-                        return Boolean(plain)
-                      }
-                    }}
-                    render={({ field: qField }) => {
-                      const plain = (qField.value || '').replace(/<[^>]*>/g, '').trim()
-                      return (
-                        <FormItem>
-                          <FormLabel className="text-[#2D3748] font-medium">Câu hỏi</FormLabel>
-                          <FormControl>
-                            <CustomInput
-                              value={qField.value || ''}
-                              onChange={(val: any) => {
-                                qField.onChange(val)
-                                form.trigger('matchings')
-                              }}
-                              className={`w-full min-h-[40px] bg-transparent text-[#2D3748] py-1.5 my-1 ${
-                                !plain
-                                  ? 'border-red-500 focus:ring-red-500'
-                                  : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
-                              }`}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Answer */}
-                  <FormField
-                    control={form.control}
-                    name={`matchings.${index}.answer`}
-                    rules={{
-                      required: true,
-                      validate: (value: string) => {
-                        const plain = (value || '').replace(/<[^>]*>/g, '').trim()
-                        return Boolean(plain)
-                      }
-                    }}
-                    render={({ field: aField }) => {
-                      const plain = (aField.value || '').replace(/<[^>]*>/g, '').trim()
-                      return (
-                        <FormItem>
-                          <FormLabel className="text-[#2D3748] font-medium">Đáp án</FormLabel>
-                          <FormControl>
-                            <CustomInput
-                              value={aField.value || ''}
-                              onChange={(val: any) => {
-                                aField.onChange(val)
-                                form.trigger('matchings')
-                              }}
-                              className={`w-full min-h-[40px] bg-transparent text-[#2D3748] py-1.5 my-1 ${
-                                !plain
-                                  ? 'border-red-500 focus:ring-red-500'
-                                  : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
-                              }`}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )
-                    }}
-                  />
+                  <div className="flex gap-4">
+                    {/* Question */}
+                    <div className="w-1/2">
+                      <FormField
+                        control={form.control}
+                        name={`matchings.${index}.question`}
+                        rules={{
+                          required: true,
+                          validate: (value: string) => {
+                            const plain = (value || '').replace(/<[^>]*>/g, '').trim()
+                            return Boolean(plain)
+                          }
+                        }}
+                        render={({ field: qField }) => {
+                          const plain = (qField.value || '').replace(/<[^>]*>/g, '').trim()
+                          return (
+                            <FormItem>
+                              <FormLabel className="text-[#2D3748] font-medium">Question</FormLabel>
+                              <FormControl>
+                                <CustomInput
+                                  value={qField.value || ''}
+                                  onChange={(val: any) => {
+                                    qField.onChange(val)
+                                    form.trigger('matchings')
+                                  }}
+                                  className={`w-full min-h-[40px] bg-white text-[#2D3748] py-1.5 my-1 ${
+                                    !plain
+                                      ? 'border-red-500 focus:ring-red-500'
+                                      : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
+                                  }`}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )
+                        }}
+                      />
+                    </div>
+                    {/* Answer */}
+                    <div className="w-1/2">
+                      <FormField
+                        control={form.control}
+                        name={`matchings.${index}.answer`}
+                        rules={{
+                          required: true,
+                          validate: (value: string) => {
+                            const plain = (value || '').replace(/<[^>]*>/g, '').trim()
+                            return Boolean(plain)
+                          }
+                        }}
+                        render={({ field: aField }) => {
+                          const plain = (aField.value || '').replace(/<[^>]*>/g, '').trim()
+                          return (
+                            <FormItem>
+                              <FormLabel className="text-[#2D3748] font-medium">Answer</FormLabel>
+                              <FormControl>
+                                <CustomInput
+                                  value={aField.value || ''}
+                                  onChange={(val: any) => {
+                                    aField.onChange(val)
+                                    form.trigger('matchings')
+                                  }}
+                                  className={`w-full min-h-[40px] bg-white text-[#2D3748] py-1.5 my-1 ${
+                                    !plain
+                                      ? 'border-red-500 focus:ring-red-500'
+                                      : 'border-[#52aaa5] hover:border-[#52aaa5] focus:border-[#52aaa5] focus:ring-2 focus:ring-[#52aaa5]/20'
+                                  }`}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )
+                        }}
+                      />
+                    </div>
+                  </div>
                   {/* Explanation */}
                   <FormField
                     control={form.control}
@@ -242,7 +247,7 @@ export const MatchingForm: FC<MatchingFormProps> = ({ initialData }) => {
                         .trim()
                       return (
                         <FormItem className="mt-2">
-                          <FormLabel className="text-[#2D3748] font-medium">Giải thích</FormLabel>
+                          <FormLabel className="text-[#2D3748] font-medium">Explain</FormLabel>
                           <FormControl>
                             <div className="mt-2">
                               <CustomTextarea
